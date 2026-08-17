@@ -312,6 +312,72 @@ body{
  .history-roll{width:23px;height:23px;font-size:9px}
 }
 
+
+/* Mobile bottom controls fix */
+@media (orientation:portrait){
+  body{padding-bottom:145px;}
+  .chiptray{
+    position:fixed;
+    left:0;right:0;bottom:0;
+    z-index:70;
+    min-height:68px;
+  }
+  .roll-history-bar{
+    position:fixed;
+    left:0;right:0;
+    bottom:68px;
+    z-index:69;
+    padding:7px 10px 8px;
+    overflow:visible;
+  }
+  .roll-history-title{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    width:100%;
+    overflow:visible;
+    white-space:nowrap;
+    font-size:10px;
+  }
+  .roll-history-title span{
+    display:inline-block;
+    margin-left:0;
+    overflow:visible;
+  }
+  .roll-history{
+    min-height:34px;
+    overflow-x:auto;
+    overflow-y:visible;
+  }
+  .roll-float{
+    bottom:155px!important;
+    right:16px!important;
+  }
+}
+@media (orientation:landscape) and (max-height:600px){
+  body{padding-bottom:82px;}
+  .chiptray{
+    position:fixed;
+    left:0;right:0;bottom:0;
+    z-index:70;
+  }
+  .roll-history-bar{
+    position:fixed;
+    left:0;right:0;
+    bottom:46px;
+    z-index:69;
+    overflow:visible;
+  }
+  .roll-history-title{
+    overflow:visible;
+    white-space:nowrap;
+  }
+  .roll-float{
+    bottom:102px!important;
+    right:10px!important;
+  }
+}
+
 </style>
 </head>
 <body>
