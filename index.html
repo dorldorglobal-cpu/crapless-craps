@@ -294,6 +294,24 @@ body{
   body{user-select:none;-webkit-user-select:none}
 }
 
+
+.roll-history-bar{
+ position:sticky;bottom:68px;z-index:24;background:linear-gradient(#151515,#070707);
+ border-top:1px solid #684923;border-bottom:1px solid #684923;padding:5px 8px 6px;
+}
+.roll-history-title{font-size:9px;font-weight:900;letter-spacing:1px;color:#e2bb67;margin-bottom:4px;white-space:nowrap}
+.roll-history-title span{color:#8f8f8f;font-weight:normal;margin-left:5px}
+.roll-history{display:flex;gap:5px;overflow-x:auto;white-space:nowrap;padding-bottom:2px}
+.history-roll{flex:0 0 auto;width:29px;height:29px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:900;background:#f1f1f1;color:#111;border:2px solid #8c8c8c}
+.history-roll.seven{background:#b8212e;color:#fff;border-color:#ff8a93}
+.history-roll.current{border-color:#ffd862;box-shadow:0 0 0 2px #7f6618}
+.history-empty{color:#888;font-size:10px}
+@media (orientation:landscape) and (max-height:600px){
+ .roll-history-bar{bottom:46px;padding:3px 6px 4px}
+ .roll-history-title{font-size:7px;margin-bottom:2px}
+ .history-roll{width:23px;height:23px;font-size:9px}
+}
+
 </style>
 </head>
 <body>
@@ -315,6 +333,8 @@ body{
     <div class="stat">BANKROLL<b id="bankroll">$1,000</b></div>
     <div class="stat">ON TABLE<b id="tableAmt">$0</b></div>
     <div class="stat">POINT<b id="point">OFF</b></div>
+    <div class="stat">CURRENT STREAK<b id="streak">0</b></div>
+    <div class="stat">LAST STREAK<b id="lastStreak">0</b></div>
   </div>
   <div class="controls">
     <div class="bets-toggle">
@@ -387,6 +407,10 @@ body{
  </div>
 </div>
 
+<div class="roll-history-bar">
+  <div class="roll-history-title">ROLLS <span>NEWEST → OLDEST</span></div>
+  <div class="roll-history" id="rollHistory"><span class="history-empty">No rolls yet</span></div>
+</div>
 <div class="chiptray" id="chiptray"></div>
 
 <script>
@@ -398,6 +422,8 @@ let rollWin=0;
 let atsSeen=new Set(), undoStack=[];
 let atsLocked=false;
 let lastBetLayout=null;
+let rollStreak=0;
+let lastStreak=0;
 const nums=[2,3,4,5,6,8,9,10,11,12];
 const placeRates={2:5.5,3:2.75,4:1.8,5:1.4,6:7/6,8:7/6,9:1.4,10:1.8,11:2.75,12:5.5};
 const buyRates={2:6,3:3,4:2,5:1.5,6:1.2,8:1.2,9:1.5,10:2,11:3,12:6};
@@ -432,6 +458,14 @@ function render(){
  $('#bankroll').textContent=money(bankroll);
  $('#tableAmt').textContent=money(totalBets());
  $('#point').textContent=point??'OFF';
+ $('#streak').textContent=rollStreak;
+ $('#lastStreak').textContent=lastStreak;
+ const hist=$('#rollHistory');
+ if(hist){
+   hist.innerHTML=history.length
+     ? history.slice().reverse().map((n,i)=>`<span class="history-roll ${n===7?'seven':''} ${i===0?'current':''}">${n}</span>`).join('')
+     : '<span class="history-empty">No rolls yet</span>';
+ }
  document.querySelectorAll('.target').forEach(el=>{
    const k=el.dataset.key,v=bets[k]||0;
    el.classList.toggle('hasbet',v>0);
