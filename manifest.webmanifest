@@ -1,0 +1,10 @@
+{
+  "name": "Crapless Craps Casino",
+  "short_name": "Crapless Craps",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#090909",
+  "theme_color": "#0d6b46",
+  "orientation": "any",
+  "description": "Playable Crapless Craps casino game"
+}
