@@ -1,9 +1,11 @@
-const CACHE='crapless-craps-v6';
-const ASSETS=['./','./index.html','./manifest.webmanifest'];
+const CACHE='crapless-craps-v7';
+const ASSETS=['./','./index.html','./manifest.webmanifest','./streak-fix.js'];
+
 self.addEventListener('install',e=>{
   self.skipWaiting();
   e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)));
 });
+
 self.addEventListener('activate',e=>{
   e.waitUntil(
     caches.keys()
@@ -11,6 +13,7 @@ self.addEventListener('activate',e=>{
       .then(()=>self.clients.claim())
   );
 });
+
 self.addEventListener('fetch',e=>{
   e.respondWith(
     fetch(e.request)

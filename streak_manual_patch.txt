@@ -1,0 +1,49 @@
+MANUAL STREAK FIX
+
+1. Upload streak-fix.js to the same folder as index.html.
+
+2. In index.html, find this near the bottom:
+
+<script>
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  navigator.serviceWorker.register('./sw.js').catch(()=>{});
+}
+</script>
+
+Immediately BEFORE that block, add:
+
+<script src="./streak-fix.js"></script>
+
+So the end of index.html should look like:
+
+<script src="./streak-fix.js"></script>
+<script>
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  navigator.serviceWorker.register('./sw.js').catch(()=>{});
+}
+</script>
+</body>
+</html>
+
+3. Replace your existing sw.js with the supplied sw.js.
+   The cache is bumped from crapless-craps-v6 to crapless-craps-v7.
+
+4. Commit/upload all 3 changes:
+   - index.html (one new script tag)
+   - streak-fix.js (new file)
+   - sw.js (replacement)
+
+WHAT IT DOES
+
+CURRENT STREAK:
+Counts every roll after the most recent 7.
+Example newest -> oldest:
+9, 6, 11, 8, 4, 10, 7
+Current Streak = 6
+
+LAST STREAK:
+Counts the completed roll between the most recent 7 and the previous 7.
+
+On a 7:
+- Current Streak becomes 0.
+- The completed streak becomes Last Streak.
