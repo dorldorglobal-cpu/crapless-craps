@@ -1,4 +1,4 @@
-const CACHE='crapless-craps-v5';
+const CACHE='crapless-craps-v6';
 const ASSETS=['./','./index.html','./manifest.webmanifest'];
 self.addEventListener('install',e=>{
   self.skipWaiting();
