@@ -8,8 +8,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="Crapless Craps"/>
-<link rel="manifest" href="manifest.webmanifest?v=11"/>
-<link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png?v=11"/>
+<link rel="manifest" href="manifest.webmanifest?v=21"/>
+<link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png?v=21"/>
 <title>Crapless Craps Casino</title>
 <style>
 :root{
@@ -845,9 +845,29 @@ body{
   .point-puck-anchor .point-puck{transform:translateY(-12px) scale(.76)}
 }
 
+
+.save-stat b{color:#9ee6a8!important}.save-stat.saving b{color:#ffd862!important}
+.reset-backdrop{position:fixed;inset:0;z-index:240;background:#000b;opacity:0;pointer-events:none}
+.reset-backdrop.open{opacity:1;pointer-events:auto}
+.reset-modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:245;width:min(90vw,430px);background:#121212;color:#fff;border:3px solid #b64b55;border-radius:17px;padding:18px;box-shadow:0 14px 44px #000c;opacity:0;pointer-events:none;text-align:center}
+.reset-modal.open{opacity:1;pointer-events:auto}
+.reset-title{font-size:20px;font-weight:900;color:#ff929b}.reset-text{font-size:12px;line-height:1.45;color:#ccc;margin-top:10px}
+.reset-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}.reset-actions button{min-height:46px;border-radius:9px;font-weight:900}
+.reset-cancel{background:#252525;color:#fff;border:1px solid #555}.reset-confirm{background:#b8212e;color:#fff;border:1px solid #ff8a93}
+@media (orientation:portrait){.topbar > div:first-child{grid-template-columns:repeat(6,minmax(0,1fr))!important}.controls{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
 </style>
 </head>
 <body>
+
+<div class="reset-backdrop" id="resetBackdrop"></div>
+<div class="reset-modal" id="resetModal" aria-hidden="true">
+  <div class="reset-title">START A NEW GAME?</div>
+  <div class="reset-text">This erases the saved bankroll, bets, point, roll history, streaks, ATS progress, odds, and traveling Come/Don't Come bets on this device.</div>
+  <div class="reset-actions">
+    <button type="button" class="reset-cancel" id="cancelReset">CANCEL</button>
+    <button type="button" class="reset-confirm" id="confirmReset">RESET GAME</button>
+  </div>
+</div>
 <div class="odds-backdrop" id="oddsBackdrop"></div>
 <div class="odds-modal" id="oddsModal" aria-hidden="true">
 <div class="odds-title">ADD PASS LINE ODDS?</div>
@@ -887,6 +907,7 @@ body{
     <div class="stat">POINT<b id="point">OFF</b></div>
     <div class="stat">CURRENT STREAK<b id="streak">0</b></div>
     <div class="stat">LAST STREAK<b id="lastStreak">0</b></div>
+    <div class="stat save-stat">SAVE<b id="saveStatus">READY</b></div>
   </div>
   <div class="controls">
     <div class="bets-toggle">
@@ -896,6 +917,7 @@ body{
     <button class="btn" id="sameBet">SAME BET</button>
     <button class="btn" id="undo">UNDO</button>
     <button class="btn" id="clear">CLEAR</button>
+    <button class="btn" id="newGame">NEW GAME</button>
     <button class="btn" id="banker">BANKER +$500</button>
   </div>
 </div>
@@ -919,7 +941,7 @@ body{
     <button type="button" class="guide-tab" data-guide-tab="line">Line Bets</button>
   </div>
 
-  <div class="guide-body">
+  <div class="guide-body"><div class="guide-note"><b>AUTOSAVE:</b> Your bankroll, bets, point, odds, Come/Don’t Come, ATS progress, roll history, streaks, and settings save automatically on this device. Reopening the app restores the session. Use NEW GAME to erase it.</div>
 <div class="guide-note"><b>ON / OFF PUCK:</b> The small dealer puck shows OFF before a point is established. After the come-out roll sets a point, it flips to ON and moves onto that point number. When the point is made or a 7 ends the hand, it returns to OFF.</div>
 <div class="guide-note"><b>CHIP CONTROLS:</b> Quick tap an existing chip to add the currently selected denomination to that bet. Press and hold for about 0.65 seconds to pick the chip up, then drag it to another compatible bet or swipe it down to REMOVE.</div>
 <div class="guide-note"><b>CHIP STACKS:</b> Bets now use casino-style denomination colors on the felt: $1 white, $5 red, $10 blue, $25 green, $100 black, and $500 purple. Mixed bets display as a physical stack instead of one generic black chip.</div>
@@ -1094,6 +1116,27 @@ const dice=['⚀','⚁','⚂','⚃','⚄','⚅'];
 const $=s=>document.querySelector(s);
 const money=n=>'$'+Math.round(n*100)/100;
 
+const SAVE_KEY='craplessCrapsSaveV21';
+let saveTimer=null,restoringState=false;
+function currentGameState(){return {version:21,selected,bankroll,bets,point,betsWorking,history,rollWin,atsSeen:[...atsSeen],atsLocked,lastBetLayout,rollStreak,lastStreak,comePoints,dontComePoints,passOdds}}
+function setSaveStatus(t,m='saved'){const el=$('#saveStatus');if(!el)return;el.textContent=t;const st=el.closest('.save-stat');if(st){st.classList.remove('saving','saved');st.classList.add(m)}}
+function saveGameNow(){if(restoringState)return;try{localStorage.setItem(SAVE_KEY,JSON.stringify(currentGameState()));setSaveStatus('SAVED')}catch(e){setSaveStatus('ERROR','saving')}}
+function scheduleSave(){if(restoringState)return;setSaveStatus('SAVING','saving');clearTimeout(saveTimer);saveTimer=setTimeout(saveGameNow,120)}
+function restoreGame(){
+ const raw=localStorage.getItem(SAVE_KEY); if(!raw)return false;
+ try{
+  const x=JSON.parse(raw); restoringState=true;
+  selected=Number(x.selected)||5; bankroll=Number.isFinite(x.bankroll)?x.bankroll:1000; bets=x.bets||{};
+  point=x.point??null; betsWorking=x.betsWorking!==false; history=Array.isArray(x.history)?x.history:[];
+  rollWin=Number(x.rollWin)||0; atsSeen=new Set(Array.isArray(x.atsSeen)?x.atsSeen:[]); atsLocked=!!x.atsLocked;
+  lastBetLayout=x.lastBetLayout||null; rollStreak=Number(x.rollStreak)||0; lastStreak=Number(x.lastStreak)||0;
+  comePoints=x.comePoints||{}; dontComePoints=x.dontComePoints||{}; passOdds=Number(x.passOdds)||0;
+  restoringState=false; return true;
+ }catch(e){restoringState=false;return false}
+}
+function clearSavedGame(){try{localStorage.removeItem(SAVE_KEY)}catch(e){}}
+
+
 function fairDie(){
  const x=new Uint32Array(1); crypto.getRandomValues(x);
  return x[0]%6+1;
@@ -1207,6 +1250,7 @@ function render(){
    const el=document.querySelector(`.atsbox[data-key="${k}"]`);
    if(el) el.classList.toggle('locked',atsLocked);
  });
+ scheduleSave();
 }
 function addBet(key){
  if(['SMALL','TALL','ALL'].includes(key) && atsLocked){
@@ -1899,7 +1943,7 @@ function roll(){
 }
 chips.forEach(v=>{
  const b=document.createElement('button');b.className=`chip ${chipClasses[v]} ${v===selected?'sel':''}`;
- b.textContent='$'+v;b.onclick=()=>{selected=v;document.querySelectorAll('.chip').forEach(x=>x.classList.remove('sel'));b.classList.add('sel')};
+ b.textContent='$'+v;b.onclick=()=>{selected=v;document.querySelectorAll('.chip').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');scheduleSave()};
  $('#chiptray').appendChild(b);
 });
 $('#roll').onclick=roll;
@@ -1964,7 +2008,18 @@ document.querySelectorAll('.guide-tab').forEach(tab=>{
  });
 });
 
-renderNumbers();render();bindTargets();
+
+function openResetModal(){$('#resetBackdrop').classList.add('open');$('#resetModal').classList.add('open')}
+function closeResetModal(){$('#resetBackdrop').classList.remove('open');$('#resetModal').classList.remove('open')}
+function resetGameState(){
+ clearSavedGame(); restoringState=true; selected=5;bankroll=1000;bets={};point=null;betsWorking=true;history=[];rollWin=0;
+ atsSeen=new Set();atsLocked=false;lastBetLayout=null;rollStreak=0;lastStreak=0;comePoints={};dontComePoints={};passOdds=0;undoStack=[];
+ restoringState=false;closeResetModal();$('#msg').textContent='New game started. Bankroll reset to $1,000.';render();saveGameNow();
+}
+$('#newGame').addEventListener('click',openResetModal);$('#cancelReset').addEventListener('click',closeResetModal);
+$('#resetBackdrop').addEventListener('click',closeResetModal);$('#confirmReset').addEventListener('click',resetGameState);
+
+renderNumbers();restoreGame();render();bindTargets();
 })();
 </script>
 <script>

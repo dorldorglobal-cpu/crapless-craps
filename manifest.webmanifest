@@ -6,6 +6,7 @@
   "background_color": "#090909",
   "theme_color": "#0d6b46",
   "orientation": "any",
+  "description": "Playable Crapless Craps casino game",
   "icons": [
     {
       "src": "./icons/icon-192.png",
