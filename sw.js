@@ -1,5 +1,5 @@
-const CACHE='crapless-craps-v7';
-const ASSETS=['./','./index.html','./manifest.webmanifest','./streak-fix.js'];
+const CACHE='crapless-craps-v9';
+const ASSETS=['./','./index.html','./manifest.webmanifest'];
 
 self.addEventListener('install',e=>{
   self.skipWaiting();

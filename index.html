@@ -295,6 +295,7 @@ body{
 }
 
 
+/* Streak + roll history */
 .roll-history-bar{
  position:sticky;bottom:68px;z-index:24;background:linear-gradient(#151515,#070707);
  border-top:1px solid #684923;border-bottom:1px solid #684923;padding:5px 8px 6px;
@@ -306,128 +307,119 @@ body{
 .history-roll.seven{background:#b8212e;color:#fff;border-color:#ff8a93}
 .history-roll.current{border-color:#ffd862;box-shadow:0 0 0 2px #7f6618}
 .history-empty{color:#888;font-size:10px}
-@media (orientation:landscape) and (max-height:600px){
- .roll-history-bar{bottom:46px;padding:3px 6px 4px}
- .roll-history-title{font-size:7px;margin-bottom:2px}
- .history-roll{width:23px;height:23px;font-size:9px}
-}
 
-
-/* Mobile bottom controls fix */
 @media (orientation:portrait){
   body{padding-bottom:145px;}
   .chiptray{
-    position:fixed;
-    left:0;right:0;bottom:0;
-    z-index:70;
-    min-height:68px;
+    position:fixed;left:0;right:0;bottom:0;z-index:70;min-height:68px;
   }
   .roll-history-bar{
-    position:fixed;
-    left:0;right:0;
-    bottom:68px;
-    z-index:69;
-    padding:7px 10px 8px;
-    overflow:visible;
+    position:fixed;left:0;right:0;bottom:68px;z-index:69;padding:7px 10px 8px;
   }
-  .roll-history-title{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    width:100%;
-    overflow:visible;
-    white-space:nowrap;
-    font-size:10px;
+  .roll-history-title{display:flex;align-items:center;gap:8px;width:100%;font-size:10px}
+  .roll-history-title span{margin-left:0}
+  .roll-history{min-height:34px}
+  .roll-float{bottom:155px!important;right:16px!important}
+
+  .topbar{display:block;padding:10px 10px 8px;position:sticky;top:0}
+  .topbar > div:first-child{
+    display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;width:100%;
   }
-  .roll-history-title span{
-    display:inline-block;
-    margin-left:0;
-    overflow:visible;
+  .stat{min-width:0;font-size:9px;line-height:1.05}
+  .stat b{font-size:14px;margin-top:3px}
+  .controls{
+    width:100%;display:grid!important;
+    grid-template-columns:1fr 1fr 1.25fr .9fr .9fr 1.35fr;
+    gap:4px;margin-top:7px;align-items:stretch;
   }
-  .roll-history{
-    min-height:34px;
-    overflow-x:auto;
-    overflow-y:visible;
+  .bets-toggle{display:contents!important}
+  .btn,.onoff{
+    width:100%;min-width:0;padding:7px 4px;font-size:9px;line-height:1.05;border-radius:7px;white-space:nowrap;
   }
-  .roll-float{
-    bottom:155px!important;
-    right:16px!important;
-  }
+  #banker{white-space:normal}
+  .casino{padding-top:4px}
 }
 @media (orientation:landscape) and (max-height:600px){
   body{padding-bottom:82px;}
-  .chiptray{
-    position:fixed;
-    left:0;right:0;bottom:0;
-    z-index:70;
-  }
+  .chiptray{position:fixed;left:0;right:0;bottom:0;z-index:70}
   .roll-history-bar{
-    position:fixed;
-    left:0;right:0;
-    bottom:46px;
-    z-index:69;
-    overflow:visible;
+    position:fixed;left:0;right:0;bottom:46px;z-index:69;padding:3px 6px 4px;
   }
-  .roll-history-title{
-    overflow:visible;
-    white-space:nowrap;
-  }
-  .roll-float{
-    bottom:102px!important;
-    right:10px!important;
-  }
+  .roll-history-title{font-size:7px;margin-bottom:2px}
+  .history-roll{width:23px;height:23px;font-size:9px}
+  .roll-float{bottom:102px!important;right:10px!important}
 }
 
 
-/* Compact mobile top controls */
-@media (orientation:portrait){
-  .topbar{
-    display:block;
-    padding:10px 10px 8px;
-    position:sticky;
-    top:0;
-  }
-  .topbar > div:first-child{
-    display:grid!important;
-    grid-template-columns:repeat(5,minmax(0,1fr));
-    gap:8px;
-    width:100%;
-  }
-  .stat{
-    min-width:0;
-    font-size:9px;
-    line-height:1.05;
-  }
-  .stat b{
-    font-size:14px;
-    margin-top:3px;
-  }
-  .controls{
-    width:100%;
-    display:grid!important;
-    grid-template-columns:1fr 1fr 1.25fr .9fr .9fr 1.35fr;
-    gap:4px;
-    margin-top:7px;
-    align-items:stretch;
-  }
-  .bets-toggle{
-    display:contents!important;
-  }
-  .btn,.onoff{
-    width:100%;
-    min-width:0;
-    padding:7px 4px;
-    font-size:9px;
-    line-height:1.05;
-    border-radius:7px;
-    white-space:nowrap;
-  }
-  #banker{
-    white-space:normal;
-  }
-  .casino{
-    padding-top:4px;
-  }
+/* Bet Guide */
+.guide-btn{border-color:#b8903d!important;color:#ffe39a!important}
+.guide-backdrop{
+  position:fixed;inset:0;background:rgba(0,0,0,.62);z-index:180;
+  opacity:0;pointer-events:none;transition:opacity .18s ease;
+}
+.guide-backdrop.open{opacity:1;pointer-events:auto}
+.bet-guide{
+  position:fixed;right:0;top:0;bottom:0;width:min(92vw,520px);
+  background:#10100f;color:#fff;z-index:190;
+  border-left:2px solid #9b7a35;
+  box-shadow:-12px 0 34px rgba(0,0,0,.55);
+  transform:translateX(102%);transition:transform .22s ease;
+  display:flex;flex-direction:column;
+  padding-top:env(safe-area-inset-top);
+}
+.bet-guide.open{transform:translateX(0)}
+.guide-head{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:14px 16px 10px;border-bottom:1px solid #473817;
+}
+.guide-kicker{font-size:9px;letter-spacing:1.8px;color:#bca15c;font-weight:900}
+.guide-title{font-size:25px;font-weight:900}
+.guide-close{
+  width:44px;height:44px;border-radius:50%;border:1px solid #555;
+  background:#252525;color:#fff;font-size:28px;line-height:1;
+}
+.guide-tabs{
+  display:flex;gap:5px;padding:8px;overflow-x:auto;background:#171715;border-bottom:1px solid #333;
+}
+.guide-tab{
+  flex:0 0 auto;min-height:40px;border:1px solid #555;border-radius:8px;
+  background:#222;color:#ddd;padding:7px 10px;font-weight:800;font-size:11px;
+}
+.guide-tab.active{background:#c7a24d;color:#111;border-color:#f0cf7d}
+.guide-body{overflow-y:auto;padding:10px 12px 18px;-webkit-overflow-scrolling:touch}
+.guide-section{display:none}
+.guide-section.active{display:block}
+.guide-note{
+  background:#1f1d16;border:1px solid #5f4e27;border-radius:9px;
+  padding:10px 11px;margin-bottom:9px;font-size:12px;line-height:1.4;color:#e9e2cb;
+}
+.guide-subtitle{
+  font-size:11px;letter-spacing:1.1px;color:#d4b865;font-weight:900;
+  margin:14px 2px 7px;
+}
+.guide-card{
+  display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;
+  border-bottom:1px solid #30302f;padding:11px 4px;
+}
+.guide-card b{display:block;font-size:13px;color:#fff}
+.guide-card span{display:block;font-size:11px;color:#bdbdb8;line-height:1.35;margin-top:3px}
+.guide-card strong{
+  font-size:11px;text-align:right;color:#f3d77c;max-width:125px;line-height:1.25;
+}
+.muted-guide{opacity:.72}
+.guide-foot{
+  border-top:1px solid #3a3323;background:#171612;color:#a7a08e;
+  padding:9px 12px calc(9px + env(safe-area-inset-bottom));font-size:10px;text-align:center;
+}
+@media (orientation:landscape) and (max-height:600px){
+  .bet-guide{width:min(72vw,590px)}
+  .guide-head{padding:7px 10px 5px}
+  .guide-title{font-size:18px}
+  .guide-close{width:36px;height:36px}
+  .guide-tabs{padding:5px}
+  .guide-tab{min-height:34px;padding:5px 8px;font-size:9px}
+  .guide-body{padding:6px 10px 10px}
+  .guide-card{padding:7px 3px}
 }
 
 </style>
@@ -459,12 +451,100 @@ body{
       <button class="btn onoff active" id="betsOn">BETS ON</button>
       <button class="btn onoff" id="betsOff">BETS OFF</button>
     </div>
+    <button class="btn guide-btn" id="openGuide">BET GUIDE</button>
     <button class="btn" id="sameBet">SAME BET</button>
     <button class="btn" id="undo">UNDO</button>
     <button class="btn" id="clear">CLEAR</button>
     <button class="btn" id="banker">BANKER +$500</button>
   </div>
 </div>
+
+
+<div class="guide-backdrop" id="guideBackdrop" aria-hidden="true"></div>
+<aside class="bet-guide" id="betGuide" aria-hidden="true" aria-label="Crapless Craps bet tutorial">
+  <div class="guide-head">
+    <div>
+      <div class="guide-kicker">CRAPLESS CRAPS</div>
+      <div class="guide-title">Bet Guide</div>
+    </div>
+    <button type="button" class="guide-close" id="closeGuide" aria-label="Close bet guide">×</button>
+  </div>
+
+  <div class="guide-tabs" role="tablist" aria-label="Bet guide sections">
+    <button type="button" class="guide-tab active" data-guide-tab="numbers">Numbers</button>
+    <button type="button" class="guide-tab" data-guide-tab="hardways">Hardways</button>
+    <button type="button" class="guide-tab" data-guide-tab="props">One Roll</button>
+    <button type="button" class="guide-tab" data-guide-tab="ats">Small/Tall/All</button>
+    <button type="button" class="guide-tab" data-guide-tab="line">Line Bets</button>
+  </div>
+
+  <div class="guide-body">
+    <section class="guide-section active" data-guide-section="numbers">
+      <div class="guide-note">Tap <b>BUY</b> on the top half of a number or <b>PLACE</b> on the bottom half. These stay up until taken down or a working 7 rolls.</div>
+      <div class="guide-card">
+        <div><b>PLACE 2 / 12</b><span>Wins when 2 or 12 rolls before 7.</span></div><strong>Pays 11:2</strong>
+      </div>
+      <div class="guide-card">
+        <div><b>PLACE 3 / 11</b><span>Wins when that number rolls before 7.</span></div><strong>Pays 11:4</strong>
+      </div>
+      <div class="guide-card">
+        <div><b>PLACE 4 / 10</b><span>Wins when that number rolls before 7.</span></div><strong>Pays 9:5</strong>
+      </div>
+      <div class="guide-card">
+        <div><b>PLACE 5 / 9</b><span>Wins when that number rolls before 7.</span></div><strong>Pays 7:5</strong>
+      </div>
+      <div class="guide-card">
+        <div><b>PLACE 6 / 8</b><span>Wins when that number rolls before 7.</span></div><strong>Pays 7:6</strong>
+      </div>
+
+      <div class="guide-subtitle">BUY BETS</div>
+      <div class="guide-note">BUY bets pay true odds in this game, minus a 5% vig on a winning bet.</div>
+      <div class="guide-card"><div><b>BUY 2 / 12</b><span>True odds 6:1.</span></div><strong>6:1 − 5% vig</strong></div>
+      <div class="guide-card"><div><b>BUY 3 / 11</b><span>True odds 3:1.</span></div><strong>3:1 − 5% vig</strong></div>
+      <div class="guide-card"><div><b>BUY 4 / 10</b><span>True odds 2:1.</span></div><strong>2:1 − 5% vig</strong></div>
+      <div class="guide-card"><div><b>BUY 5 / 9</b><span>True odds 3:2.</span></div><strong>3:2 − 5% vig</strong></div>
+      <div class="guide-card"><div><b>BUY 6 / 8</b><span>True odds 6:5.</span></div><strong>6:5 − 5% vig</strong></div>
+    </section>
+
+    <section class="guide-section" data-guide-section="hardways">
+      <div class="guide-note">A hardway must roll as a matching pair before either a 7 or the easy version of that number.</div>
+      <div class="guide-card"><div><b>HARD 4</b><span>Must roll 2+2. Loses on 3+1, 1+3, or 7.</span></div><strong>Pays 7:1</strong></div>
+      <div class="guide-card"><div><b>HARD 6</b><span>Must roll 3+3. Loses on any easy 6 or 7.</span></div><strong>Pays 9:1</strong></div>
+      <div class="guide-card"><div><b>HARD 8</b><span>Must roll 4+4. Loses on any easy 8 or 7.</span></div><strong>Pays 9:1</strong></div>
+      <div class="guide-card"><div><b>HARD 10</b><span>Must roll 5+5. Loses on any easy 10 or 7.</span></div><strong>Pays 7:1</strong></div>
+    </section>
+
+    <section class="guide-section" data-guide-section="props">
+      <div class="guide-note">These are one-roll bets. They resolve on the very next dice roll and then come down.</div>
+      <div class="guide-card"><div><b>ANY 7</b><span>Wins if the next roll totals 7.</span></div><strong>Pays 4:1</strong></div>
+      <div class="guide-card"><div><b>ANY CRAPS</b><span>Wins on 2, 3, or 12.</span></div><strong>Pays 7:1</strong></div>
+      <div class="guide-card"><div><b>ACES</b><span>Wins only on 2.</span></div><strong>Pays 30:1</strong></div>
+      <div class="guide-card"><div><b>ACE-DEUCE</b><span>Wins only on 3.</span></div><strong>Pays 15:1</strong></div>
+      <div class="guide-card"><div><b>YO / ELEVEN</b><span>Wins only on 11.</span></div><strong>Pays 15:1</strong></div>
+      <div class="guide-card"><div><b>BOXCARS</b><span>Wins only on 12.</span></div><strong>Pays 30:1</strong></div>
+      <div class="guide-card"><div><b>HORN</b><span>Splits your wager across 2, 3, 11, and 12.</span></div><strong>Component payout</strong></div>
+      <div class="guide-card"><div><b>C & E</b><span>Splits the wager between Craps (2/3/12) and Eleven.</span></div><strong>7:1 / 15:1 sides</strong></div>
+      <div class="guide-card"><div><b>FIELD</b><span>Wins on 2, 3, 4, 9, 10, 11, or 12.</span></div><strong>2/12 pay 2:1; others 1:1</strong></div>
+    </section>
+
+    <section class="guide-section" data-guide-section="ats">
+      <div class="guide-note"><b>Small / Tall / All can only be placed before the first roll of a hand.</b> After the first roll they lock. A 7 loses them and opens them again for the next hand.</div>
+      <div class="guide-card"><div><b>SMALL</b><span>Roll all of 2, 3, 4, 5, and 6 before a 7.</span></div><strong>Pays 30:1</strong></div>
+      <div class="guide-card"><div><b>TALL</b><span>Roll all of 8, 9, 10, 11, and 12 before a 7.</span></div><strong>Pays 30:1</strong></div>
+      <div class="guide-card"><div><b>ALL</b><span>Roll every number 2–6 and 8–12 before a 7.</span></div><strong>Pays 175:1</strong></div>
+      <div class="guide-note">The highlighted circles on the table show which ATS numbers have already been hit during the current hand.</div>
+    </section>
+
+    <section class="guide-section" data-guide-section="line">
+      <div class="guide-card"><div><b>PASS LINE — CRAPLESS</b><span>On the opening roll, 7 wins. Any other total becomes the point. Once a point is set, the point must repeat before 7.</span></div><strong>Pays 1:1</strong></div>
+      <div class="guide-card"><div><b>DON'T PASS</b><span>Opposes the Pass Line after a point is established. In this game it wins if 7 appears before the point repeats.</span></div><strong>Pays 1:1</strong></div>
+      <div class="guide-card muted-guide"><div><b>COME / DON'T COME</b><span>Shown on the layout, but traveling Come/Don't Come logic is not yet fully implemented in this build.</span></div><strong>Coming later</strong></div>
+      <div class="guide-note">The <b>BETS ON / BETS OFF</b> control determines whether number and hardway bets are working on come-out rolls.</div>
+    </section>
+  </div>
+
+  <div class="guide-foot">Payouts shown are the paytable currently programmed into this game.</div>
+</aside>
 
 <div class="casino">
  <div class="board-shell">
@@ -525,10 +605,12 @@ body{
  </div>
 </div>
 
+
 <div class="roll-history-bar">
   <div class="roll-history-title">ROLLS <span>NEWEST → OLDEST</span></div>
   <div class="roll-history" id="rollHistory"><span class="history-empty">No rolls yet</span></div>
 </div>
+
 <div class="chiptray" id="chiptray"></div>
 
 <script>
@@ -555,7 +637,7 @@ function fairDie(){
  return x[0]%6+1;
 }
 function saveUndo(){
- undoStack.push(JSON.stringify({bankroll,bets,point,betsWorking,atsLocked,seen:[...atsSeen]}));
+ undoStack.push(JSON.stringify({bankroll,bets,point,betsWorking,atsLocked,rollStreak,lastStreak,seen:[...atsSeen]}));
  if(undoStack.length>20) undoStack.shift();
 }
 function renderNumbers(){
@@ -861,6 +943,14 @@ function roll(){
     resolvePass(total,wasPoint);
     updatePoint(total,wasPoint);
 
+    // Streak = number of rolls since the last 7.
+    if(total===7){
+      lastStreak=rollStreak;
+      rollStreak=0;
+    }else{
+      rollStreak++;
+    }
+
     history.push(total);
     render();
     showWinOverlay();
@@ -899,8 +989,30 @@ $('#banker').onclick=()=>{saveUndo();bankroll+=500;$('#msg').textContent='Banker
 $('#clear').onclick=()=>{saveUndo();bankroll+=totalBets();bets={};$('#msg').textContent='All bets returned.';render()};
 $('#undo').onclick=()=>{
  if(!undoStack.length)return;
- const s=JSON.parse(undoStack.pop());bankroll=s.bankroll;bets=s.bets;point=s.point;betsWorking=s.betsWorking;atsLocked=!!s.atsLocked;atsSeen=new Set(s.seen);render()
+ const s=JSON.parse(undoStack.pop());bankroll=s.bankroll;bets=s.bets;point=s.point;betsWorking=s.betsWorking;atsLocked=!!s.atsLocked;rollStreak=s.rollStreak??rollStreak;lastStreak=s.lastStreak??lastStreak;atsSeen=new Set(s.seen);render()
 };
+
+function openBetGuide(){
+ const panel=$('#betGuide'),backdrop=$('#guideBackdrop');
+ panel.classList.add('open');backdrop.classList.add('open');
+ panel.setAttribute('aria-hidden','false');backdrop.setAttribute('aria-hidden','false');
+}
+function closeBetGuide(){
+ const panel=$('#betGuide'),backdrop=$('#guideBackdrop');
+ panel.classList.remove('open');backdrop.classList.remove('open');
+ panel.setAttribute('aria-hidden','true');backdrop.setAttribute('aria-hidden','true');
+}
+$('#openGuide').addEventListener('click',openBetGuide);
+$('#closeGuide').addEventListener('click',closeBetGuide);
+$('#guideBackdrop').addEventListener('click',closeBetGuide);
+document.querySelectorAll('.guide-tab').forEach(tab=>{
+ tab.addEventListener('click',()=>{
+   const name=tab.dataset.guideTab;
+   document.querySelectorAll('.guide-tab').forEach(t=>t.classList.toggle('active',t===tab));
+   document.querySelectorAll('.guide-section').forEach(sec=>sec.classList.toggle('active',sec.dataset.guideSection===name));
+ });
+});
+
 renderNumbers();render();bindTargets();
 })();
 </script>
