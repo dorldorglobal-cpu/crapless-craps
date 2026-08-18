@@ -1,34 +1,20 @@
-CRAPLESS CRAPS FULL V15
+CRAPLESS CRAPS FULL V16
 
-Complete app. All V14 features retained.
+NEW
+- Actual denomination-colored chip stacks on the table.
+- $1 white, $5 red, $10 blue, $25 green, $100 black, $500 purple.
+- Mixed bets visually stack denominations instead of becoming a generic black chip.
+- Grab/drag interaction shows the chip stack being moved.
+- Cheap CSS 'Physical Dice' mode is disabled for now; the cleaner quick dice remain.
 
-NEW CHIP INTERACTION:
-- Press and hold an existing chip for about 1/4 second.
-- The chip physically lifts under your finger.
-- Drag to another compatible betting area to MOVE the selected-chip amount.
-- Drag/swipe down into the red REMOVE zone to take that amount off the table.
-- Removed chips return to bankroll.
-- Invalid drops snap back.
-- Short tap behavior for adding bets is unchanged.
-- Light haptic feedback is used on supported phones.
-
-Moving rules:
-- BUY/PLACE number chips can move to another BUY/PLACE number.
-- Traveling COME chips move among traveling COME numbers.
-- Traveling DON'T COME chips move among traveling DON'T COME numbers.
-- Standard proposition/line bets move among compatible standard boxes.
-- Pass Odds remain in the Pass Odds area.
-
-Still included:
-- Physical Dice ON/OFF
+All V15 functionality retained:
+- Hold/grab/drag/remove chips
 - Pass Line 1x/2x odds
 - Come / Don't Come traveling bets
 - Buy / Place
-- Hardways / props / ATS
-- Streaks / roll history
-- Same Bet
-- Full Bet Guide
-- Dice app icon
-- Offline PWA
+- Hardways, props, Small/Tall/All
+- Same Bet, streaks, roll history
+- Bet Guide
+- Offline PWA and dice app icon
 
-Cache v15.
+Cache v16.

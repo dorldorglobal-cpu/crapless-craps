@@ -609,6 +609,48 @@ body{
   .grabbed-chip{width:50px;height:50px}
 }
 
+
+/* V16 denomination-colored chip stacks */
+.bet-chip-stack{
+  position:relative;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:34px;
+  height:30px;
+  vertical-align:middle;
+}
+.stack-chip{
+  position:absolute;
+  width:30px;
+  height:30px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:7px;
+  line-height:1;
+  font-weight:900;
+  border:3px dashed rgba(255,255,255,.9);
+  box-shadow:0 2px 4px rgba(0,0,0,.65), inset 0 0 0 2px rgba(0,0,0,.2);
+  text-shadow:0 1px 1px rgba(0,0,0,.35);
+}
+.stack-chip.c1{background:#f3f3f3;color:#111;border-color:#222}
+.stack-chip.c5{background:#c92731;color:#fff}
+.stack-chip.c10{background:#1768b5;color:#fff}
+.stack-chip.c25{background:#18884a;color:#fff}
+.stack-chip.c100{background:#161616;color:#fff}
+.stack-chip.c500{background:#742c99;color:#fff}
+.stack-chip.total-chip{
+  width:25px;height:25px;
+  font-size:6px;
+  background:#eee;color:#111;border:2px solid #111;
+  z-index:20;
+}
+.bet-side-chip .bet-chip-stack,.smallchip .bet-chip-stack,.travel-chip .bet-chip-stack{
+  transform:scale(.88);
+}
+
 </style>
 </head>
 <body>
@@ -657,7 +699,6 @@ body{
       <button class="btn onoff active" id="betsOn">BETS ON</button>
       <button class="btn onoff" id="betsOff">BETS OFF</button>
     </div>
-    <button class="btn physical-toggle active" id="physicalDiceToggle">PHYSICAL DICE: ON</button>
     <button class="btn" id="sameBet">SAME BET</button>
     <button class="btn" id="undo">UNDO</button>
     <button class="btn" id="clear">CLEAR</button>
@@ -685,6 +726,7 @@ body{
   </div>
 
   <div class="guide-body">
+<div class="guide-note"><b>CHIP STACKS:</b> Bets now use casino-style denomination colors on the felt: $1 white, $5 red, $10 blue, $25 green, $100 black, and $500 purple. Mixed bets display as a physical stack instead of one generic black chip.</div>
     <div class="guide-note"><b>MOVE CHIPS:</b> Press and hold an existing chip until it lifts under your finger. Drag it to another compatible betting area to move that amount. Swipe/drag it down to the red REMOVE zone to take it off the table and return it to your bankroll. Invalid drops snap back.</div>
 <div class="guide-note"><b>PHYSICAL DICE</b> can be turned ON or OFF. ON uses the longer casino-style tumble/bounce presentation. OFF uses the original quick dice. The random result is generated the same way in either mode.</div>
     <section class="guide-section active" data-guide-section="numbers">
@@ -843,7 +885,7 @@ let lastStreak=0;
 let comePoints={};
 let dontComePoints={};
 let passOdds=0;
-let physicalDiceEnabled=localStorage.getItem('physicalDiceEnabled')!=='false';
+let physicalDiceEnabled=false;
 const nums=[2,3,4,5,6,8,9,10,11,12];
 const placeRates={2:5.5,3:2.75,4:1.8,5:1.4,6:7/6,8:7/6,9:1.4,10:1.8,11:2.75,12:5.5};
 const buyRates={2:6,3:3,4:2,5:1.5,6:1.2,8:1.2,9:1.5,10:2,11:3,12:6};
@@ -906,7 +948,7 @@ function render(){
    const k=el.dataset.key,v=bets[k]||0;
    el.classList.toggle('hasbet',v>0);
    const c=el.querySelector('.smallchip,.chip-stack');
-   if(c)c.textContent=v?money(v):'';
+   if(c)c.innerHTML=v?chipStackHTML(v):'';
  });
  $('#betsOn').classList.toggle('active',betsWorking);
  $('#betsOff').classList.toggle('active',!betsWorking);
@@ -919,7 +961,7 @@ function render(){
        const v=bets[key]||0;
        h.classList.toggle('has-side-bet',v>0);
        const c=h.querySelector('.bet-side-chip');
-       if(c)c.textContent=v?money(v):'';
+       if(c)c.innerHTML=v?chipStackHTML(v):'';
      });
    }
  });
@@ -930,12 +972,12 @@ function render(){
    const dv=dontComePoints[n]||0;
    if(c){
      c.classList.toggle('active',cv>0);
-     c.textContent=cv?money(cv):'';
+     c.innerHTML=cv?chipStackHTML(cv):'';
      if(!c.dataset.holdDragBound){setupHoldDrag(c,`TRAVEL_COME_${n}`);c.dataset.holdDragBound='1';}
    }
    if(d){
      d.classList.toggle('active',dv>0);
-     d.textContent=dv?money(dv):'';
+     d.innerHTML=dv?chipStackHTML(dv):'';
      if(!d.dataset.holdDragBound){setupHoldDrag(d,`TRAVEL_DONT_${n}`);d.dataset.holdDragBound='1';}
    }
  });
@@ -972,6 +1014,38 @@ function renderATSHighlights(){
    const box=document.querySelector(`[data-ats="${name}"]`);
    if(box)box.innerHTML=arr.map(n=>`<span class="ats-num ${atsSeen.has(n)?'hit':''}">${n}</span>`).join('');
  });
+}
+
+
+const CHIP_DENOMS=[500,100,25,10,5,1];
+function chipClassForValue(v){
+ return ({1:'c1',5:'c5',10:'c10',25:'c25',100:'c100',500:'c500'})[v]||'c1';
+}
+function decomposeChips(amount){
+ let remaining=Math.max(0,Math.round(amount));
+ const chips=[];
+ for(const d of CHIP_DENOMS){
+   while(remaining>=d && chips.length<12){
+     chips.push(d);
+     remaining-=d;
+   }
+ }
+ return chips;
+}
+function chipStackHTML(amount){
+ if(!amount) return '';
+ const chips=decomposeChips(amount);
+ const shown=chips.slice(-5);
+ let html='<span class="bet-chip-stack">';
+ shown.forEach((d,i)=>{
+   const offset=(shown.length-1-i)*3;
+   html+=`<span class="stack-chip ${chipClassForValue(d)}" style="transform:translate(${offset}px,-${offset}px);z-index:${i+1}">${money(d)}</span>`;
+ });
+ if(chips.length>5){
+   html+=`<span class="stack-chip total-chip">${money(amount)}</span>`;
+ }
+ html+='</span>';
+ return html;
 }
 
 function selectedChipClass(){
@@ -1083,8 +1157,9 @@ function beginChipGrab(key,sourceEl,touch){
  };
 
  const ghost=$('#grabbedChip');
- ghost.className=`grabbed-chip show ${selectedChipClass()}`;
- ghost.textContent=money(amount);
+ const grabClass=chipClassForValue(amount);
+ ghost.className=`grabbed-chip show ${grabClass}`;
+ ghost.innerHTML=chipStackHTML(amount);
  ghost.style.left=`${touch.clientX}px`;
  ghost.style.top=`${touch.clientY}px`;
 
@@ -1461,7 +1536,8 @@ function updatePhysicalDiceButton(){
  btn.textContent=`PHYSICAL DICE: ${physicalDiceEnabled?'ON':'OFF'}`;
  btn.classList.toggle('active',physicalDiceEnabled);
 }
-$('#physicalDiceToggle').addEventListener('click',()=>{
+const physicalDiceToggle=$('#physicalDiceToggle');
+if(physicalDiceToggle) physicalDiceToggle.addEventListener('click',()=>{
  physicalDiceEnabled=!physicalDiceEnabled;
  localStorage.setItem('physicalDiceEnabled',String(physicalDiceEnabled));
  updatePhysicalDiceButton();
