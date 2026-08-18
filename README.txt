@@ -1,20 +1,15 @@
-CRAPLESS CRAPS FULL V16
+CRAPLESS CRAPS FULL V18
 
-NEW
-- Actual denomination-colored chip stacks on the table.
-- $1 white, $5 red, $10 blue, $25 green, $100 black, $500 purple.
-- Mixed bets visually stack denominations instead of becoming a generic black chip.
-- Grab/drag interaction shows the chip stack being moved.
-- Cheap CSS 'Physical Dice' mode is disabled for now; the cleaner quick dice remain.
+V18 VISUAL CHIP UPGRADE
+- Keeps the existing table and game layout.
+- Chip stacks are now vertically separated so each denomination can actually be seen.
+- More dimensional casino-chip styling with stronger edge, shadow and inset detail.
+- Mixed bets visibly show their different colors/denominations.
+- Total bet amount is shown directly beneath each stack.
+- Example: $35 displays as a green $25 chip + blue $10 chip, visibly stacked.
+- Grab/drag uses the improved stack appearance.
 
-All V15 functionality retained:
-- Hold/grab/drag/remove chips
-- Pass Line 1x/2x odds
-- Come / Don't Come traveling bets
-- Buy / Place
-- Hardways, props, Small/Tall/All
-- Same Bet, streaks, roll history
-- Bet Guide
-- Offline PWA and dice app icon
+All V17 functionality retained.
+Physical dice remain disabled until a genuinely better 3D implementation is built.
 
-Cache v16.
+Cache v18.

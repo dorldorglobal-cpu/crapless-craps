@@ -651,6 +651,93 @@ body{
   transform:scale(.88);
 }
 
+
+/* V17 Bet Guide placement fix */
+@media (min-width:700px) and (orientation:landscape){
+  .guide-float{
+    top:auto!important;
+    left:auto!important;
+    right:16px!important;
+    bottom:112px!important;
+    z-index:175!important;
+  }
+}
+@media (min-width:900px){
+  .guide-float{
+    top:88px!important;
+    right:16px!important;
+    bottom:auto!important;
+    left:auto!important;
+  }
+}
+
+
+/* V18 improved casino chip stacks */
+.bet-chip-stack{
+  position:relative;
+  display:inline-block;
+  width:42px;
+  height:44px;
+  vertical-align:middle;
+  overflow:visible;
+}
+.stack-chip{
+  position:absolute;
+  left:50%;
+  width:34px;
+  height:34px;
+  margin-left:-17px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:8px;
+  line-height:1;
+  font-weight:900;
+  border:4px dashed rgba(255,255,255,.95);
+  box-sizing:border-box;
+  box-shadow:
+    0 3px 0 rgba(0,0,0,.42),
+    0 5px 7px rgba(0,0,0,.48),
+    inset 0 0 0 2px rgba(255,255,255,.16),
+    inset 0 -5px 7px rgba(0,0,0,.20);
+  text-shadow:0 1px 1px rgba(0,0,0,.48);
+}
+.stack-chip.c1{background:#f3f3f3;color:#111;border-color:#222}
+.stack-chip.c5{background:#c92731;color:#fff}
+.stack-chip.c10{background:#1768b5;color:#fff}
+.stack-chip.c25{background:#18884a;color:#fff}
+.stack-chip.c100{background:#161616;color:#fff}
+.stack-chip.c500{background:#742c99;color:#fff}
+.stack-chip::after{
+  content:"";
+  position:absolute;
+  inset:6px;
+  border-radius:50%;
+  border:1px solid rgba(255,255,255,.55);
+  pointer-events:none;
+}
+.stack-total{
+  position:absolute;
+  left:50%;
+  top:39px;
+  transform:translateX(-50%);
+  white-space:nowrap;
+  padding:1px 4px;
+  border-radius:5px;
+  background:rgba(0,0,0,.78);
+  color:#fff;
+  font-size:7px;
+  font-weight:900;
+  line-height:1.15;
+  z-index:50;
+  box-shadow:0 1px 3px #0008;
+}
+.bet-side-chip .bet-chip-stack,
+.smallchip .bet-chip-stack,
+.travel-chip .bet-chip-stack{transform:scale(.92);transform-origin:center bottom}
+.grabbed-chip .bet-chip-stack{transform:scale(1.18);transform-origin:center}
+
 </style>
 </head>
 <body>
@@ -1025,9 +1112,13 @@ function decomposeChips(amount){
  let remaining=Math.max(0,Math.round(amount));
  const chips=[];
  for(const d of CHIP_DENOMS){
-   while(remaining>=d && chips.length<12){
-     chips.push(d);
-     remaining-=d;
+   const count=Math.floor(remaining/d);
+   if(count>0){
+     // Keep enough repeated chips to make genuine stacks visible,
+     // but preserve room for lower denominations in mixed bets.
+     const showCount=Math.min(count,2);
+     for(let i=0;i<showCount;i++) chips.push(d);
+     remaining-=count*d;
    }
  }
  return chips;
@@ -1035,15 +1126,17 @@ function decomposeChips(amount){
 function chipStackHTML(amount){
  if(!amount) return '';
  const chips=decomposeChips(amount);
- const shown=chips.slice(-5);
+
+ // Show up to 4 physical chips with enough vertical separation to read each denomination.
+ // For large same-denomination bets, keep the stack compact and show the total below.
+ const shown=chips.slice(-4);
  let html='<span class="bet-chip-stack">';
  shown.forEach((d,i)=>{
-   const offset=(shown.length-1-i)*3;
-   html+=`<span class="stack-chip ${chipClassForValue(d)}" style="transform:translate(${offset}px,-${offset}px);z-index:${i+1}">${money(d)}</span>`;
+   const bottom=i*7;
+   const z=i+1;
+   html+=`<span class="stack-chip ${chipClassForValue(d)}" style="bottom:${bottom}px;z-index:${z}">${money(d)}</span>`;
  });
- if(chips.length>5){
-   html+=`<span class="stack-chip total-chip">${money(amount)}</span>`;
- }
+ html+=`<span class="stack-total">${money(amount)}</span>`;
  html+='</span>';
  return html;
 }
