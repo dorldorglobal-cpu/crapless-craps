@@ -789,6 +789,62 @@ body{
 .travel-chip .bet-chip-stack{transform:scale(.9)}
 .grabbed-chip .bet-chip-stack{transform:scale(1.08)}
 
+
+/* V20 dealer ON/OFF puck */
+.point-puck-dock{
+  height:28px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  margin:-2px 0 3px;
+}
+.point-puck{
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:7px;
+  font-weight:900;
+  letter-spacing:.2px;
+  box-shadow:0 2px 5px rgba(0,0,0,.6), inset 0 0 0 2px rgba(255,255,255,.18);
+  border:2px solid #efefef;
+  z-index:12;
+  pointer-events:none;
+}
+.point-puck.off{
+  background:#171717;
+  color:#fff;
+}
+.point-puck.on{
+  background:#f4f4f4;
+  color:#111;
+  border-color:#111;
+}
+.point-puck-anchor{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:30px;
+  height:30px;
+  transform:translate(-50%,-50%);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  pointer-events:none;
+  z-index:10;
+}
+/* Shift the puck slightly upward so it does not cover the number digit or wager chip. */
+.point-puck-anchor .point-puck{
+  transform:translateY(-18px) scale(.82);
+}
+@media (orientation:landscape) and (max-height:600px){
+  .point-puck-dock{height:20px;margin:-1px 0 2px}
+  .point-puck{width:22px;height:22px;font-size:6px}
+  .point-puck-anchor .point-puck{transform:translateY(-12px) scale(.76)}
+}
+
 </style>
 </head>
 <body>
@@ -864,6 +920,7 @@ body{
   </div>
 
   <div class="guide-body">
+<div class="guide-note"><b>ON / OFF PUCK:</b> The small dealer puck shows OFF before a point is established. After the come-out roll sets a point, it flips to ON and moves onto that point number. When the point is made or a 7 ends the hand, it returns to OFF.</div>
 <div class="guide-note"><b>CHIP CONTROLS:</b> Quick tap an existing chip to add the currently selected denomination to that bet. Press and hold for about 0.65 seconds to pick the chip up, then drag it to another compatible bet or swipe it down to REMOVE.</div>
 <div class="guide-note"><b>CHIP STACKS:</b> Bets now use casino-style denomination colors on the felt: $1 white, $5 red, $10 blue, $25 green, $100 black, and $500 purple. Mixed bets display as a physical stack instead of one generic black chip.</div>
     <div class="guide-note"><b>MOVE CHIPS:</b> Press and hold an existing chip until it lifts under your finger. Drag it to another compatible betting area to move that amount. Swipe/drag it down to the red REMOVE zone to take it off the table and return it to your bankroll. Invalid drops snap back.</div>
@@ -943,6 +1000,9 @@ body{
   <div class="table">
    <div class="logo">CRAPLESS CRAPS</div>
    <div class="section-title">PLACE / BUY NUMBERS</div>
+   <div class="point-puck-dock" id="pointPuckDock">
+     <div class="point-puck off" id="pointPuck">OFF</div>
+   </div>
    <div class="grid-numbers" id="numbers"></div>
 
    <div class="midrow">
@@ -1049,6 +1109,7 @@ function renderNumbers(){
      <span class="mode-label">BUY</span><span class="bet-side-chip" draggable="true"></span>
    </button>
    <div class="num">${n}</div>
+   <div class="point-puck-anchor" data-puck-anchor="${n}"></div>
    <button type="button" class="number-half place-half" data-number="${n}" data-mode="PLACE" data-key="PLACE_${n}">
      <span class="mode-label">PLACE</span><span class="bet-side-chip" draggable="true"></span>
    </button>
@@ -1059,6 +1120,26 @@ function renderNumbers(){
  </div>`).join('');
  bindNumberTargets();
 }
+
+function renderPointPuck(){
+ const puck=$('#pointPuck');
+ const dock=$('#pointPuckDock');
+ if(!puck || !dock) return;
+
+ if(point===null){
+   if(puck.parentElement!==dock) dock.appendChild(puck);
+   puck.textContent='OFF';
+   puck.classList.remove('on');
+   puck.classList.add('off');
+ }else{
+   const anchor=document.querySelector(`[data-puck-anchor="${point}"]`);
+   if(anchor && puck.parentElement!==anchor) anchor.appendChild(puck);
+   puck.textContent='ON';
+   puck.classList.remove('off');
+   puck.classList.add('on');
+ }
+}
+
 function totalBets(){
  return Object.values(bets).reduce((a,b)=>a+b,0)
    +Object.values(comePoints).reduce((a,b)=>a+b,0)
@@ -1069,6 +1150,7 @@ function render(){
  $('#bankroll').textContent=money(bankroll);
  $('#tableAmt').textContent=money(totalBets());
  $('#point').textContent=point??'OFF';
+ renderPointPuck();
  $('#streak').textContent=rollStreak;
  $('#lastStreak').textContent=lastStreak;
  const pod=$('#passOddsDisplay');
