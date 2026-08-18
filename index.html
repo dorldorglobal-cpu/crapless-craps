@@ -8,7 +8,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="Crapless Craps"/>
-<link rel="manifest" href="manifest.webmanifest"/>
+<link rel="manifest" href="manifest.webmanifest?v=11"/>
+<link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png?v=11"/>
 <title>Crapless Craps Casino</title>
 <style>
 :root{
@@ -468,9 +469,161 @@ body{
   .guide-float{top:8px!important;bottom:auto!important;left:8px!important;font-size:8px!important;padding:6px 9px!important}
 }
 
+
+/* V12 traveling COME / DON'T COME bets */
+.travel-bets{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  z-index:8;
+  display:flex;
+  gap:3px;
+  pointer-events:none;
+}
+.travel-chip{
+  display:none;
+  min-width:28px;
+  height:28px;
+  border-radius:50%;
+  align-items:center;
+  justify-content:center;
+  font-size:7px;
+  font-weight:900;
+  box-shadow:0 2px 5px #0009;
+  border:2px solid #fff;
+  padding:0 3px;
+}
+.travel-chip.active{display:flex}
+.come-travel{
+  background:#f4f4f4;
+  color:#111;
+  border-color:#ffd862;
+}
+.dont-travel{
+  background:#1c1c1c;
+  color:#fff;
+  border-color:#ff8d97;
+}
+.come-travel::before{content:"C ";font-weight:900}
+.dont-travel::before{content:"DC ";font-weight:900}
+
+@media (orientation:landscape) and (max-height:600px){
+  .travel-chip{
+    min-width:22px;
+    height:22px;
+    font-size:6px;
+  }
+}
+
+/* V13 Pass Odds */
+.pass-split{display:grid!important;grid-template-columns:1fr minmax(82px,.36fr);padding:0!important;overflow:hidden}
+.pass-base-area{position:relative;min-height:75px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.pass-label{font-size:18px;letter-spacing:2px;font-weight:900}.pass-base-caption{font-size:8px;color:#ccc}
+.pass-odds-area{min-height:75px;border-left:2px solid #ddd;background:#0002;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.pass-odds-caption{font-size:9px;color:#e2bb67;font-weight:900}.pass-odds-value{font-size:15px;font-weight:900}
+.odds-backdrop{position:fixed;inset:0;z-index:215;background:#000a;opacity:0;pointer-events:none}.odds-backdrop.open{opacity:1;pointer-events:auto}
+.odds-modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.96);z-index:220;width:min(90vw,430px);background:#121212;border:3px solid #d6ae50;border-radius:18px;padding:18px;color:#fff;text-align:center;opacity:0;pointer-events:none}
+.odds-modal.open{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
+.odds-title{font-size:21px;font-weight:900;color:#f1d477}.odds-point{font-size:17px;margin-top:8px}.odds-base{font-size:13px;color:#ccc;margin-top:4px}
+.odds-buttons{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-top:15px}
+.odds-choice{min-height:52px;border-radius:10px;border:1px solid #666;background:#242424;color:#fff;font-weight:900}.odds-choice.primary{background:linear-gradient(#d1ac52,#946e21);color:#111}.odds-choice:disabled{opacity:.35}
+.odds-info{font-size:11px;color:#bbb;margin-top:10px}
+
+/* V14 optional casino-style physical dice */
+.physical-toggle.active{border-color:#f1d477!important;color:#f1d477!important}
+.physical-dice-stage{position:fixed;inset:0;z-index:165;pointer-events:none;display:none;overflow:hidden;perspective:900px}
+.physical-dice-stage.show{display:block}
+.physical-die{position:absolute;width:58px;height:58px;border-radius:10px;background:linear-gradient(145deg,#fff,#d5d5d5);color:#111;border:2px solid #aaa;box-shadow:0 10px 16px #0009,inset -5px -5px 9px #9997,inset 4px 4px 8px #fff;display:grid;place-items:center;font-size:30px;font-weight:900;transform-style:preserve-3d}
+.physical-dice-stage.throwing .die-one{animation:throwOne 1.25s cubic-bezier(.16,.7,.25,1) forwards}
+.physical-dice-stage.throwing .die-two{animation:throwTwo 1.4s cubic-bezier(.18,.68,.2,1) forwards}
+@keyframes throwOne{0%{left:85%;top:15%;transform:translateZ(100px) rotateX(0) rotateY(0)}25%{left:63%;top:28%;transform:translateZ(190px) rotateX(390deg) rotateY(300deg)}50%{left:43%;top:45%;transform:translateZ(35px) rotateX(760deg) rotateY(620deg)}64%{left:37%;top:39%;transform:translateZ(100px) rotateX(930deg) rotateY(760deg)}82%{left:31%;top:50%;transform:translateZ(15px) rotateX(1110deg) rotateY(900deg)}100%{left:29%;top:49%;transform:translateZ(0) rotateX(1170deg) rotateY(930deg)}}
+@keyframes throwTwo{0%{left:88%;top:19%;transform:translateZ(110px) rotateX(0) rotateY(0)}22%{left:68%;top:34%;transform:translateZ(200px) rotateX(350deg) rotateY(430deg)}47%{left:52%;top:49%;transform:translateZ(30px) rotateX(710deg) rotateY(800deg)}62%{left:48%;top:42%;transform:translateZ(110px) rotateX(890deg) rotateY(1020deg)}82%{left:43%;top:55%;transform:translateZ(14px) rotateX(1110deg) rotateY(1270deg)}100%{left:44%;top:54%;transform:translateZ(0) rotateX(1170deg) rotateY(1350deg)}}
+@media (orientation:portrait){.physical-die{width:52px;height:52px;font-size:27px}.controls{grid-template-columns:1fr 1fr 1.25fr .9fr .9fr 1.15fr 1.35fr!important}.physical-toggle{white-space:normal!important;font-size:8px!important}}
+
+
+/* V15 physical chip grab / move / remove */
+.grabbed-chip{
+  position:fixed;
+  width:54px;height:54px;
+  border-radius:50%;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:350;
+  pointer-events:none;
+  font-size:10px;
+  font-weight:900;
+  color:#111;
+  background:#f1f1f1;
+  border:5px dashed #111;
+  box-shadow:0 12px 24px rgba(0,0,0,.6);
+  transform:translate(-50%,-65%) scale(1.08);
+}
+.grabbed-chip.show{display:flex}
+.grabbed-chip.c1{background:#eee;color:#111}
+.grabbed-chip.c5{background:#d2222d;color:#fff;border-color:#fff}
+.grabbed-chip.c10{background:#1469be;color:#fff;border-color:#fff}
+.grabbed-chip.c25{background:#188c4b;color:#fff;border-color:#fff}
+.grabbed-chip.c100{background:#111;color:#fff;border-color:#fff}
+.grabbed-chip.c500{background:#7a2ca6;color:#fff;border-color:#fff}
+
+.remove-drop-zone{
+  position:fixed;
+  left:50%;
+  bottom:8px;
+  transform:translateX(-50%) translateY(120%);
+  z-index:340;
+  min-width:min(78vw,430px);
+  border:2px solid #ff828c;
+  border-radius:16px;
+  background:rgba(145,22,31,.96);
+  color:#fff;
+  padding:13px 18px;
+  text-align:center;
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.7px;
+  opacity:0;
+  transition:.15s ease;
+  pointer-events:none;
+}
+.remove-drop-zone.show{
+  transform:translateX(-50%) translateY(0);
+  opacity:1;
+}
+.remove-drop-zone.hot{
+  background:#d52a37;
+  box-shadow:0 0 0 4px rgba(255,150,160,.25),0 0 22px rgba(255,65,80,.45);
+}
+.drag-target-hot{
+  outline:4px solid #ffd862!important;
+  outline-offset:-3px;
+  background:rgba(255,216,98,.18)!important;
+}
+.chip-grab-source{
+  opacity:.28!important;
+}
+@media (orientation:portrait){
+  .remove-drop-zone{bottom:8px}
+  .grabbed-chip{width:50px;height:50px}
+}
+
 </style>
 </head>
 <body>
+<div class="odds-backdrop" id="oddsBackdrop"></div>
+<div class="odds-modal" id="oddsModal" aria-hidden="true">
+<div class="odds-title">ADD PASS LINE ODDS?</div>
+<div class="odds-point">Point is <b id="oddsPoint">—</b></div>
+<div class="odds-base">Pass Line: <b id="oddsBaseBet">$0</b></div>
+<div class="odds-buttons">
+<button type="button" class="odds-choice" data-odds-mult="0">NO ODDS</button>
+<button type="button" class="odds-choice primary" data-odds-mult="1">1× ODDS</button>
+<button type="button" class="odds-choice primary" data-odds-mult="2">2× ODDS</button>
+</div>
+<div class="odds-info" id="oddsInfo"></div>
+</div>
 <div class="win-overlay" id="winOverlay">
   <div class="win-card">
     <div class="win-label">WIN</div>
@@ -479,7 +632,13 @@ body{
  </div>
 </div>
 <button type="button" class="guide-float" id="guideFloat">? BET GUIDE</button>
+<div class="grabbed-chip" id="grabbedChip"></div>
+<div class="remove-drop-zone" id="removeDropZone">SWIPE DOWN TO REMOVE</div>
 <div class="drag-delete-zone" id="deleteZone">DRAG AWAY TO REMOVE CHIP</div>
+<div class="physical-dice-stage" id="physicalDiceStage" aria-hidden="true">
+ <div class="physical-die die-one" id="physicalDie1">•</div>
+ <div class="physical-die die-two" id="physicalDie2">•</div>
+</div>
 <div class="floating-dice" id="floatingDice">
   <div class="floating-die" id="fd1">⚀</div>
   <div class="floating-total" id="floatingTotal"></div>
@@ -498,6 +657,7 @@ body{
       <button class="btn onoff active" id="betsOn">BETS ON</button>
       <button class="btn onoff" id="betsOff">BETS OFF</button>
     </div>
+    <button class="btn physical-toggle active" id="physicalDiceToggle">PHYSICAL DICE: ON</button>
     <button class="btn" id="sameBet">SAME BET</button>
     <button class="btn" id="undo">UNDO</button>
     <button class="btn" id="clear">CLEAR</button>
@@ -525,6 +685,8 @@ body{
   </div>
 
   <div class="guide-body">
+    <div class="guide-note"><b>MOVE CHIPS:</b> Press and hold an existing chip until it lifts under your finger. Drag it to another compatible betting area to move that amount. Swipe/drag it down to the red REMOVE zone to take it off the table and return it to your bankroll. Invalid drops snap back.</div>
+<div class="guide-note"><b>PHYSICAL DICE</b> can be turned ON or OFF. ON uses the longer casino-style tumble/bounce presentation. OFF uses the original quick dice. The random result is generated the same way in either mode.</div>
     <section class="guide-section active" data-guide-section="numbers">
       <div class="guide-note">Tap <b>BUY</b> on the top half of a number or <b>PLACE</b> on the bottom half. These stay up until taken down or a working 7 rolls.</div>
       <div class="guide-card">
@@ -582,9 +744,11 @@ body{
     </section>
 
     <section class="guide-section" data-guide-section="line">
-      <div class="guide-card"><div><b>PASS LINE — CRAPLESS</b><span>On the opening roll, 7 wins. Any other total becomes the point. Once a point is set, the point must repeat before 7.</span></div><strong>Pays 1:1</strong></div>
+      <div class="guide-card"><div><b>PASS LINE — CRAPLESS</b><span>On the opening roll, 7 wins. Any other total becomes the point. After the point is set, choose NO ODDS, 1× ODDS, or 2× ODDS.</span></div><strong>Base pays 1:1</strong></div>
+<div class="guide-card"><div><b>PASS LINE ODDS</b><span>True odds: 2/12 = 6:1, 3/11 = 3:1, 4/10 = 2:1, 5/9 = 3:2, 6/8 = 6:5.</span></div><strong>True odds</strong></div>
       <div class="guide-card"><div><b>DON'T PASS</b><span>Opposes the Pass Line after a point is established. In this game it wins if 7 appears before the point repeats.</span></div><strong>Pays 1:1</strong></div>
-      <div class="guide-card muted-guide"><div><b>COME / DON'T COME</b><span>Shown on the layout, but traveling Come/Don't Come logic is not yet fully implemented in this build.</span></div><strong>Coming later</strong></div>
+      <div class="guide-card"><div><b>COME</b><span>Placed in the COME box. A 7 wins immediately. Any other total becomes that Come bet's number. Once traveled, that number must repeat before a 7.</span></div><strong>Pays 1:1</strong></div>
+      <div class="guide-card"><div><b>DON'T COME</b><span>Placed in the DON'T COME box. A 7 loses immediately. Any other total becomes that Don't Come number. Once traveled, 7 must roll before that number repeats.</span></div><strong>Pays 1:1</strong></div>
       <div class="guide-note">The <b>BETS ON / BETS OFF</b> control determines whether number and hardway bets are working on come-out rolls.</div>
     </section>
   </div>
@@ -601,7 +765,10 @@ body{
    <div class="grid-numbers" id="numbers"></div>
 
    <div class="midrow">
-    <div class="pass target" data-key="PASS">PASS LINE<div class="smallchip"></div></div>
+    <div class="pass pass-split target" data-key="PASS">
+<div class="pass-base-area"><span class="pass-label">PASS LINE</span><span class="pass-base-caption">BASE BET</span><div class="smallchip"></div></div>
+<div class="pass-odds-area"><span class="pass-odds-caption">ODDS</span><span class="pass-odds-value" id="passOddsDisplay">$0</span></div>
+</div>
     <div class="field target" data-key="FIELD">
       FIELD&nbsp; <strong>2</strong> 3 4 9 10 11 <strong>12</strong>
       <div class="smallchip"></div>
@@ -673,10 +840,15 @@ let atsLocked=false;
 let lastBetLayout=null;
 let rollStreak=0;
 let lastStreak=0;
+let comePoints={};
+let dontComePoints={};
+let passOdds=0;
+let physicalDiceEnabled=localStorage.getItem('physicalDiceEnabled')!=='false';
 const nums=[2,3,4,5,6,8,9,10,11,12];
 const placeRates={2:5.5,3:2.75,4:1.8,5:1.4,6:7/6,8:7/6,9:1.4,10:1.8,11:2.75,12:5.5};
 const buyRates={2:6,3:3,4:2,5:1.5,6:1.2,8:1.2,9:1.5,10:2,11:3,12:6};
 const BUY_VIG=0.05;
+const passOddsRates={2:6,3:3,4:2,5:1.5,6:1.2,8:1.2,9:1.5,10:2,11:3,12:6};
 const dice=['⚀','⚁','⚂','⚃','⚄','⚅'];
 const $=s=>document.querySelector(s);
 const money=n=>'$'+Math.round(n*100)/100;
@@ -686,7 +858,7 @@ function fairDie(){
  return x[0]%6+1;
 }
 function saveUndo(){
- undoStack.push(JSON.stringify({bankroll,bets,point,betsWorking,atsLocked,rollStreak,lastStreak,seen:[...atsSeen]}));
+ undoStack.push(JSON.stringify({bankroll,bets,point,betsWorking,atsLocked,rollStreak,lastStreak,comePoints,dontComePoints,passOdds,seen:[...atsSeen]}));
  if(undoStack.length>20) undoStack.shift();
 }
 function renderNumbers(){
@@ -699,16 +871,31 @@ function renderNumbers(){
    <button type="button" class="number-half place-half" data-number="${n}" data-mode="PLACE" data-key="PLACE_${n}">
      <span class="mode-label">PLACE</span><span class="bet-side-chip" draggable="true"></span>
    </button>
+   <div class="travel-bets">
+     <span class="travel-chip come-travel" data-travel-come="${n}"></span>
+     <span class="travel-chip dont-travel" data-travel-dont="${n}"></span>
+   </div>
  </div>`).join('');
  bindNumberTargets();
 }
-function totalBets(){return Object.values(bets).reduce((a,b)=>a+b,0)}
+function totalBets(){
+ return Object.values(bets).reduce((a,b)=>a+b,0)
+   +Object.values(comePoints).reduce((a,b)=>a+b,0)
+   +Object.values(dontComePoints).reduce((a,b)=>a+b,0)
+   +passOdds;
+}
 function render(){
  $('#bankroll').textContent=money(bankroll);
  $('#tableAmt').textContent=money(totalBets());
  $('#point').textContent=point??'OFF';
  $('#streak').textContent=rollStreak;
  $('#lastStreak').textContent=lastStreak;
+ const pod=$('#passOddsDisplay');
+ if(pod){
+   pod.textContent=money(passOdds);
+   const oa=pod.closest('.pass-odds-area');
+   if(oa && !oa.dataset.holdDragBound){setupHoldDrag(oa,'PASS_ODDS');oa.dataset.holdDragBound='1';}
+ }
  const hist=$('#rollHistory');
  if(hist){
    hist.innerHTML=history.length
@@ -734,6 +921,22 @@ function render(){
        const c=h.querySelector('.bet-side-chip');
        if(c)c.textContent=v?money(v):'';
      });
+   }
+ });
+ nums.forEach(n=>{
+   const c=document.querySelector(`[data-travel-come="${n}"]`);
+   const d=document.querySelector(`[data-travel-dont="${n}"]`);
+   const cv=comePoints[n]||0;
+   const dv=dontComePoints[n]||0;
+   if(c){
+     c.classList.toggle('active',cv>0);
+     c.textContent=cv?money(cv):'';
+     if(!c.dataset.holdDragBound){setupHoldDrag(c,`TRAVEL_COME_${n}`);c.dataset.holdDragBound='1';}
+   }
+   if(d){
+     d.classList.toggle('active',dv>0);
+     d.textContent=dv?money(dv):'';
+     if(!d.dataset.holdDragBound){setupHoldDrag(d,`TRAVEL_DONT_${n}`);d.dataset.holdDragBound='1';}
    }
  });
  renderATSHighlights();
@@ -770,7 +973,257 @@ function renderATSHighlights(){
    if(box)box.innerHTML=arr.map(n=>`<span class="ats-num ${atsSeen.has(n)?'hit':''}">${n}</span>`).join('');
  });
 }
+
+function selectedChipClass(){
+ return chipClasses[selected]||'c1';
+}
+function amountForKey(key){
+ if(key.startsWith('TRAVEL_COME_')) return comePoints[key.split('_').pop()]||0;
+ if(key.startsWith('TRAVEL_DONT_')) return dontComePoints[key.split('_').pop()]||0;
+ if(key==='PASS_ODDS') return passOdds||0;
+ return bets[key]||0;
+}
+function debitKey(key,amount){
+ if(key.startsWith('TRAVEL_COME_')){
+   const n=key.split('_').pop();
+   comePoints[n]=Math.max(0,(comePoints[n]||0)-amount);
+   if(comePoints[n]<=0) delete comePoints[n];
+   return;
+ }
+ if(key.startsWith('TRAVEL_DONT_')){
+   const n=key.split('_').pop();
+   dontComePoints[n]=Math.max(0,(dontComePoints[n]||0)-amount);
+   if(dontComePoints[n]<=0) delete dontComePoints[n];
+   return;
+ }
+ if(key==='PASS_ODDS'){
+   passOdds=Math.max(0,passOdds-amount);
+   return;
+ }
+ bets[key]=Math.max(0,(bets[key]||0)-amount);
+ if(bets[key]<=0) delete bets[key];
+}
+function creditKey(key,amount){
+ if(key.startsWith('TRAVEL_COME_')){
+   const n=key.split('_').pop();
+   comePoints[n]=(comePoints[n]||0)+amount;
+   return;
+ }
+ if(key.startsWith('TRAVEL_DONT_')){
+   const n=key.split('_').pop();
+   dontComePoints[n]=(dontComePoints[n]||0)+amount;
+   return;
+ }
+ if(key==='PASS_ODDS'){
+   passOdds+=amount;
+   return;
+ }
+ bets[key]=(bets[key]||0)+amount;
+}
+function elementBetKey(el){
+ if(!el) return null;
+ if(el.matches('.number-half')) return el.dataset.key||null;
+ if(el.matches('.target')) return el.dataset.key||null;
+ if(el.matches('[data-travel-come]')) return `TRAVEL_COME_${el.dataset.travelCome}`;
+ if(el.matches('[data-travel-dont]')) return `TRAVEL_DONT_${el.dataset.travelDont}`;
+ if(el.id==='passOddsDisplay'||el.closest('.pass-odds-area')) return 'PASS_ODDS';
+ return null;
+}
+function validDropKeyAt(x,y){
+ const stack=document.elementsFromPoint(x,y);
+ for(const el of stack){
+   const key=elementBetKey(el);
+   if(key) return {key,el};
+ }
+ return null;
+}
+function canMoveBetweenKeys(fromKey,toKey){
+ if(!toKey || fromKey===toKey) return false;
+
+ // Number bets can move between BUY/PLACE number areas.
+ const numberBet=/^(BUY|PLACE)_\d+$/.test(fromKey);
+ const numberTarget=/^(BUY|PLACE)_\d+$/.test(toKey);
+ if(numberBet) return numberTarget;
+
+ // Traveling Come bets can move only to another traveling Come number.
+ if(fromKey.startsWith('TRAVEL_COME_')) return toKey.startsWith('TRAVEL_COME_');
+ if(fromKey.startsWith('TRAVEL_DONT_')) return toKey.startsWith('TRAVEL_DONT_');
+
+ // Pass odds stay in Pass Odds.
+ if(fromKey==='PASS_ODDS') return toKey==='PASS_ODDS';
+
+ // Standard table bets can move among standard non-number target boxes.
+ if(bets[fromKey]!==undefined){
+   return !numberTarget && !toKey.startsWith('TRAVEL_') && toKey!=='PASS_ODDS';
+ }
+ return false;
+}
+function chipAmountToGrab(key){
+ const available=amountForKey(key);
+ if(!available) return 0;
+ // Grab the currently selected denomination, or the full amount if smaller.
+ return Math.min(selected,available);
+}
+
+let chipDragState=null;
+
+function beginChipGrab(key,sourceEl,touch){
+ const amount=chipAmountToGrab(key);
+ if(amount<=0) return;
+
+ chipDragState={
+   key,
+   amount,
+   sourceEl,
+   startX:touch.clientX,
+   startY:touch.clientY,
+   x:touch.clientX,
+   y:touch.clientY,
+   active:true
+ };
+
+ const ghost=$('#grabbedChip');
+ ghost.className=`grabbed-chip show ${selectedChipClass()}`;
+ ghost.textContent=money(amount);
+ ghost.style.left=`${touch.clientX}px`;
+ ghost.style.top=`${touch.clientY}px`;
+
+ sourceEl.classList.add('chip-grab-source');
+ $('#removeDropZone').classList.add('show');
+ if(navigator.vibrate) navigator.vibrate(20);
+}
+function moveChipGrab(touch){
+ if(!chipDragState?.active) return;
+ chipDragState.x=touch.clientX;
+ chipDragState.y=touch.clientY;
+
+ const ghost=$('#grabbedChip');
+ ghost.style.left=`${touch.clientX}px`;
+ ghost.style.top=`${touch.clientY}px`;
+
+ document.querySelectorAll('.drag-target-hot').forEach(el=>el.classList.remove('drag-target-hot'));
+
+ const removeZone=$('#removeDropZone');
+ const rz=removeZone.getBoundingClientRect();
+ const overRemove=touch.clientY>=rz.top-25;
+ removeZone.classList.toggle('hot',overRemove);
+
+ if(!overRemove){
+   const target=validDropKeyAt(touch.clientX,touch.clientY);
+   if(target && canMoveBetweenKeys(chipDragState.key,target.key)){
+     (target.el.closest('.number-half,.target,.pass-odds-area')||target.el).classList.add('drag-target-hot');
+   }
+ }
+}
+function endChipGrab(touch){
+ if(!chipDragState?.active) return;
+
+ const st=chipDragState;
+ const removeZone=$('#removeDropZone');
+ const rz=removeZone.getBoundingClientRect();
+ const swipeDown=(touch.clientY>=rz.top-25) || (touch.clientY-st.startY>110 && touch.clientY>window.innerHeight*.72);
+
+ document.querySelectorAll('.drag-target-hot').forEach(el=>el.classList.remove('drag-target-hot'));
+ st.sourceEl.classList.remove('chip-grab-source');
+ $('#grabbedChip').className='grabbed-chip';
+ removeZone.classList.remove('show','hot');
+
+ saveUndo();
+
+ if(swipeDown){
+   debitKey(st.key,st.amount);
+   bankroll+=st.amount;
+   $('#msg').textContent=`Removed ${money(st.amount)} from ${st.key.replaceAll('_',' ')}.`;
+   if(navigator.vibrate) navigator.vibrate([25,30,25]);
+ }else{
+   const target=validDropKeyAt(touch.clientX,touch.clientY);
+   if(target && canMoveBetweenKeys(st.key,target.key)){
+     debitKey(st.key,st.amount);
+     creditKey(target.key,st.amount);
+     $('#msg').textContent=`Moved ${money(st.amount)} from ${st.key.replaceAll('_',' ')} to ${target.key.replaceAll('_',' ')}.`;
+     if(navigator.vibrate) navigator.vibrate(15);
+   }else{
+     // invalid drop = snap back, no state change
+     undoStack.pop(); // remove unnecessary saveUndo
+     $('#msg').textContent='Chip returned to original bet.';
+   }
+ }
+
+ chipDragState=null;
+ render();
+}
+function cancelChipGrab(){
+ if(!chipDragState) return;
+ chipDragState.sourceEl.classList.remove('chip-grab-source');
+ document.querySelectorAll('.drag-target-hot').forEach(el=>el.classList.remove('drag-target-hot'));
+ $('#grabbedChip').className='grabbed-chip';
+ $('#removeDropZone').classList.remove('show','hot');
+ chipDragState=null;
+}
+
+function setupMouseGrab(el,key){
+ if(el.dataset.mouseGrabBound) return;
+ el.dataset.mouseGrabBound='1';
+ el.addEventListener('mousedown',e=>{
+   if(e.button!==0 || !amountForKey(key)) return;
+   e.preventDefault();
+   beginChipGrab(key,el,e);
+   const move=ev=>moveChipGrab(ev);
+   const up=ev=>{
+     document.removeEventListener('mousemove',move);
+     document.removeEventListener('mouseup',up);
+     endChipGrab(ev);
+   };
+   document.addEventListener('mousemove',move);
+   document.addEventListener('mouseup',up);
+ });
+}
+
+function setupHoldDrag(el,key){
+ setupMouseGrab(el,key);
+ let timer=null;
+ let dragging=false;
+ let startTouch=null;
+
+ el.addEventListener('touchstart',e=>{
+   if(!amountForKey(key)) return;
+   startTouch=e.touches[0];
+   dragging=false;
+   timer=setTimeout(()=>{
+     dragging=true;
+     beginChipGrab(key,el,startTouch);
+   },260);
+ },{passive:true});
+
+ el.addEventListener('touchmove',e=>{
+   const t=e.touches[0];
+   if(!t) return;
+   if(!dragging && startTouch && Math.hypot(t.clientX-startTouch.clientX,t.clientY-startTouch.clientY)>16){
+     clearTimeout(timer);
+   }
+   if(dragging){
+     e.preventDefault();
+     moveChipGrab(t);
+   }
+ },{passive:false});
+
+ el.addEventListener('touchend',e=>{
+   clearTimeout(timer);
+   if(dragging){
+     e.preventDefault();
+     const t=e.changedTouches[0];
+     endChipGrab(t);
+   }
+ },{passive:false});
+
+ el.addEventListener('touchcancel',()=>{
+   clearTimeout(timer);
+   if(dragging) cancelChipGrab();
+ },{passive:true});
+}
+
 function setupChipDrag(chip,key){
+ setupHoldDrag(chip,key);
  chip.addEventListener('dragstart',e=>{
    if(!bets[key]){e.preventDefault();return}
    chip.classList.add('dragging-chip');
@@ -925,21 +1378,117 @@ function resolveATS(total){
 function resolvePass(total,wasPoint){
  if(bets.PASS){
    if(wasPoint===null){
-     if(total===7){const s=bets.PASS;bankroll+=s*2;rollWin+=s;$('#msg').textContent+=' PASS wins.';lose('PASS')}
-   } else {
-     if(total===wasPoint){const s=bets.PASS;bankroll+=s*2;rollWin+=s;$('#msg').textContent+=' PASS wins on point.';lose('PASS')}
-     else if(total===7){lose('PASS');$('#msg').textContent+=' PASS loses.'}
+     if(total===7){const stake=bets.PASS;bankroll+=stake*2;rollWin+=stake;$('#msg').textContent+=' PASS wins.';lose('PASS');passOdds=0}
+   }else{
+     if(total===wasPoint){
+       const stake=bets.PASS;bankroll+=stake*2;rollWin+=stake;$('#msg').textContent+=' PASS wins on point.';
+       if(passOdds>0){const oddsProfit=passOdds*passOddsRates[wasPoint];bankroll+=passOdds+oddsProfit;rollWin+=oddsProfit;$('#msg').textContent+=` PASS ODDS win ${money(oddsProfit)}.`;passOdds=0}
+       lose('PASS');
+     }else if(total===7){lose('PASS');passOdds=0;$('#msg').textContent+=' PASS and odds lose.'}
    }
  }
  if(bets.DONT){
    if(wasPoint===null){
      if(total===7){lose('DONT');$('#msg').textContent+=" DON'T PASS loses."}
    }else{
-     if(total===7){const s=bets.DONT;bankroll+=s*2;rollWin+=s;$('#msg').textContent+=" DON'T PASS wins.";lose('DONT')}
+     if(total===7){const stake=bets.DONT;bankroll+=stake*2;rollWin+=stake;$('#msg').textContent+=" DON'T PASS wins.";lose('DONT')}
      else if(total===wasPoint){lose('DONT');$('#msg').textContent+=" DON'T PASS loses."}
    }
  }
 }
+
+function resolveComeBets(total){
+  // First resolve previously-traveled bets.
+  if(total===7){
+    Object.entries(dontComePoints).forEach(([n,stake])=>{
+      if(stake>0){
+        bankroll+=stake*2;
+        rollWin+=stake;
+        $('#msg').textContent+=` DON'T COME ${n} wins ${money(stake)}.`;
+      }
+    });
+    if(Object.keys(comePoints).length){
+      $('#msg').textContent+=' Traveling COME bets lose on 7.';
+    }
+    comePoints={};
+    dontComePoints={};
+  }else{
+    const comeStake=comePoints[total]||0;
+    if(comeStake>0){
+      bankroll+=comeStake*2;
+      rollWin+=comeStake;
+      $('#msg').textContent+=` COME ${total} wins ${money(comeStake)}.`;
+      delete comePoints[total];
+    }
+
+    const dontStake=dontComePoints[total]||0;
+    if(dontStake>0){
+      $('#msg').textContent+=` DON'T COME ${total} loses.`;
+      delete dontComePoints[total];
+    }
+  }
+
+  // Now resolve bets sitting in the COME / DON'T COME boxes for this roll.
+  // This ordering prevents a newly-traveled bet from resolving on the same roll.
+  if(bets.COME){
+    const stake=bets.COME;
+    if(total===7){
+      bankroll+=stake*2;
+      rollWin+=stake;
+      $('#msg').textContent+=` COME wins ${money(stake)} on 7.`;
+    }else{
+      comePoints[total]=(comePoints[total]||0)+stake;
+      $('#msg').textContent+=` COME travels to ${total}.`;
+    }
+    delete bets.COME;
+  }
+
+  if(bets.DONTCOME){
+    const stake=bets.DONTCOME;
+    if(total===7){
+      $('#msg').textContent+=" DON'T COME loses on 7.";
+    }else{
+      dontComePoints[total]=(dontComePoints[total]||0)+stake;
+      $('#msg').textContent+=` DON'T COME travels to ${total}.`;
+    }
+    delete bets.DONTCOME;
+  }
+}
+
+
+function updatePhysicalDiceButton(){
+ const btn=$('#physicalDiceToggle'); if(!btn)return;
+ btn.textContent=`PHYSICAL DICE: ${physicalDiceEnabled?'ON':'OFF'}`;
+ btn.classList.toggle('active',physicalDiceEnabled);
+}
+$('#physicalDiceToggle').addEventListener('click',()=>{
+ physicalDiceEnabled=!physicalDiceEnabled;
+ localStorage.setItem('physicalDiceEnabled',String(physicalDiceEnabled));
+ updatePhysicalDiceButton();
+ $('#msg').textContent=physicalDiceEnabled?'Physical dice ON.':'Physical dice OFF — quick roll mode.';
+});
+function showPhysicalThrow(a,b){
+ const st=$('#physicalDiceStage'),one=$('#physicalDie1'),two=$('#physicalDie2');
+ st.classList.remove('throwing');st.classList.add('show');one.textContent='•';two.textContent='•';
+ void st.offsetWidth;st.classList.add('throwing');
+ setTimeout(()=>{one.textContent=a;two.textContent=b},1050);
+ setTimeout(()=>st.classList.remove('throwing'),1450);
+ setTimeout(()=>st.classList.remove('show'),2200);
+}
+updatePhysicalDiceButton();
+
+function closeOddsPrompt(){$('#oddsModal').classList.remove('open');$('#oddsBackdrop').classList.remove('open')}
+function showPassOddsPrompt(pointNumber){
+ if(!bets.PASS||!passOddsRates[pointNumber])return;
+ const base=bets.PASS;$('#oddsPoint').textContent=pointNumber;$('#oddsBaseBet').textContent=money(base);
+ document.querySelectorAll('.odds-choice').forEach(btn=>{const m=Number(btn.dataset.oddsMult),a=base*m;btn.disabled=a>bankroll;btn.textContent=m===0?'NO ODDS':`${m}× — ${money(a)}`});
+ $('#oddsInfo').textContent=`True odds on ${pointNumber}: ${passOddsRates[pointNumber]} to 1.`;
+ $('#oddsBackdrop').classList.add('open');$('#oddsModal').classList.add('open');
+}
+function setPassOdds(mult){closeOddsPrompt();if(mult<=0){passOdds=0;render();return}if(!point||!bets.PASS)return;const desired=bets.PASS*mult;if(desired>bankroll){$('#msg').textContent='Not enough bankroll for those odds.';return}bankroll-=desired;passOdds=desired;$('#msg').textContent=`Added ${mult}× Pass Line odds: ${money(passOdds)}.`;render()}
+document.querySelectorAll('.odds-choice').forEach(btn=>btn.addEventListener('click',()=>setPassOdds(Number(btn.dataset.oddsMult))));
+$('#oddsBackdrop').addEventListener('click',()=>setPassOdds(0));
+
 function updatePoint(total,wasPoint){
  if(wasPoint===null){
    if(total!==7)point=total;
@@ -964,7 +1513,7 @@ function roll(){
  lastBetLayout=JSON.parse(JSON.stringify(bets));
 
  const floater=$('#floatingDice');
- floater.classList.add('show');
+ if(!physicalDiceEnabled) floater.classList.add('show');
  $('#floatingTotal').textContent='';
  $('#fd1').classList.add('rolling'); $('#fd2').classList.add('rolling');
 
@@ -977,6 +1526,7 @@ function roll(){
    if(++ticks>10){
     clearInterval(iv);
     const a=fairDie(),b=fairDie(),total=a+b,wasPoint=point,isComeout=wasPoint===null;
+    if(physicalDiceEnabled) showPhysicalThrow(a,b);
     rollWin=0;
 
     $('#fd1').classList.remove('rolling'); $('#fd2').classList.remove('rolling');
@@ -990,7 +1540,9 @@ function roll(){
     resolveHard(a,b,total,isComeout);
     resolveATS(total);
     resolvePass(total,wasPoint);
+    resolveComeBets(total);
     updatePoint(total,wasPoint);
+    const shouldAskPassOdds=(wasPoint===null && total!==7 && !!bets.PASS);
 
     // Streak = number of rolls since the last 7.
     if(total===7){
@@ -1004,6 +1556,7 @@ function roll(){
     render();
     showWinOverlay();
     rb.disabled=false;
+    if(shouldAskPassOdds)setTimeout(()=>showPassOddsPrompt(total),450);
 
     setTimeout(()=>floater.classList.remove('show'),1200);
    }
@@ -1035,10 +1588,22 @@ $('#sameBet').onclick=()=>{
  render();
 };
 $('#banker').onclick=()=>{saveUndo();bankroll+=500;$('#msg').textContent='Banker added $500.';render()};
-$('#clear').onclick=()=>{saveUndo();bankroll+=totalBets();bets={};$('#msg').textContent='All bets returned.';render()};
+$('#clear').onclick=()=>{
+ saveUndo();
+ bankroll+=totalBets();
+ bankroll+=Object.values(comePoints).reduce((a,b)=>a+b,0);
+ bankroll+=Object.values(dontComePoints).reduce((a,b)=>a+b,0);
+ bankroll+=passOdds;
+ bets={};
+ comePoints={};
+ dontComePoints={};
+ passOdds=0;
+ $('#msg').textContent='All bets returned.';
+ render();
+};
 $('#undo').onclick=()=>{
  if(!undoStack.length)return;
- const s=JSON.parse(undoStack.pop());bankroll=s.bankroll;bets=s.bets;point=s.point;betsWorking=s.betsWorking;atsLocked=!!s.atsLocked;rollStreak=s.rollStreak??rollStreak;lastStreak=s.lastStreak??lastStreak;atsSeen=new Set(s.seen);render()
+ const s=JSON.parse(undoStack.pop());bankroll=s.bankroll;bets=s.bets;point=s.point;betsWorking=s.betsWorking;atsLocked=!!s.atsLocked;rollStreak=s.rollStreak??rollStreak;lastStreak=s.lastStreak??lastStreak;comePoints=s.comePoints||{};dontComePoints=s.dontComePoints||{};passOdds=s.passOdds||0;atsSeen=new Set(s.seen);render()
 };
 
 function openBetGuide(){

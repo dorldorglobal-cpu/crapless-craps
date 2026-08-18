@@ -1,29 +1,34 @@
-CRAPLESS CRAPS FULL V10
+CRAPLESS CRAPS FULL V15
 
-This is the COMPLETE app.
+Complete app. All V14 features retained.
 
-V10 FIXES
-- BET GUIDE is a floating tab and stays visible.
-- ROLL HISTORY now has a dedicated two-line header.
-- NEWEST -> OLDEST is centered and cannot be squeezed off-screen.
-- Roll Dice and Bet Guide sit above the bottom roll-history area on phones.
-- Top controls are no longer overcrowded.
+NEW CHIP INTERACTION:
+- Press and hold an existing chip for about 1/4 second.
+- The chip physically lifts under your finger.
+- Drag to another compatible betting area to MOVE the selected-chip amount.
+- Drag/swipe down into the red REMOVE zone to take that amount off the table.
+- Removed chips return to bankroll.
+- Invalid drops snap back.
+- Short tap behavior for adding bets is unchanged.
+- Light haptic feedback is used on supported phones.
 
-ALL PRIOR FEATURES RETAINED
-- Current Streak / Last Streak
-- Roll history
-- Separate BUY and PLACE
-- Floating dice
-- Floating Roll Dice
+Moving rules:
+- BUY/PLACE number chips can move to another BUY/PLACE number.
+- Traveling COME chips move among traveling COME numbers.
+- Traveling DON'T COME chips move among traveling DON'T COME numbers.
+- Standard proposition/line bets move among compatible standard boxes.
+- Pass Odds remain in the Pass Odds area.
+
+Still included:
+- Physical Dice ON/OFF
+- Pass Line 1x/2x odds
+- Come / Don't Come traveling bets
+- Buy / Place
+- Hardways / props / ATS
+- Streaks / roll history
 - Same Bet
-- ATS number highlights
-- Small/Tall/All locks after first roll and resets after 7
-- Large WIN display
-- Bets ON/OFF
-- Drag/remove bets
-- Landscape mode
+- Full Bet Guide
+- Dice app icon
 - Offline PWA
-- Full Bet Guide tutorial with payouts
 
-Deploy index.html, manifest.webmanifest and sw.js to your project root.
-PWA cache version: v10.
+Cache v15.
