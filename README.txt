@@ -1,25 +1,29 @@
-CRAPLESS CRAPS FULL V9
+CRAPLESS CRAPS FULL V10
 
-Complete deployable app.
+This is the COMPLETE app.
 
-NEW:
-- BET GUIDE button in the top controls.
-- Clickable tutorial with tabs for:
-  Numbers / Buy vs Place
-  Hardways
-  One-roll proposition bets
-  Small / Tall / All
-  Pass / Don't Pass
-- Every guide entry explains what wins/loses and the payout programmed into this game.
-- Current Streak / Last Streak and roll history remain included.
-- PWA cache bumped to v9.
+V10 FIXES
+- BET GUIDE is a floating tab and stays visible.
+- ROLL HISTORY now has a dedicated two-line header.
+- NEWEST -> OLDEST is centered and cannot be squeezed off-screen.
+- Roll Dice and Bet Guide sit above the bottom roll-history area on phones.
+- Top controls are no longer overcrowded.
 
-Deploy by replacing the root project files:
-- index.html
-- manifest.webmanifest
-- sw.js
+ALL PRIOR FEATURES RETAINED
+- Current Streak / Last Streak
+- Roll history
+- Separate BUY and PLACE
+- Floating dice
+- Floating Roll Dice
+- Same Bet
+- ATS number highlights
+- Small/Tall/All locks after first roll and resets after 7
+- Large WIN display
+- Bets ON/OFF
+- Drag/remove bets
+- Landscape mode
+- Offline PWA
+- Full Bet Guide tutorial with payouts
 
-After Vercel deploys:
-1. Open the live URL in Safari and refresh.
-2. Fully close the Home Screen PWA.
-3. Reopen the app.
+Deploy index.html, manifest.webmanifest and sw.js to your project root.
+PWA cache version: v10.
