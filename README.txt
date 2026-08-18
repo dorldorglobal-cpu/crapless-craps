@@ -1,15 +1,27 @@
-CRAPLESS CRAPS FULL V18
+CRAPLESS CRAPS FULL V19
 
-V18 VISUAL CHIP UPGRADE
-- Keeps the existing table and game layout.
-- Chip stacks are now vertically separated so each denomination can actually be seen.
-- More dimensional casino-chip styling with stronger edge, shadow and inset detail.
-- Mixed bets visibly show their different colors/denominations.
-- Total bet amount is shown directly beneath each stack.
-- Example: $35 displays as a green $25 chip + blue $10 chip, visibly stacked.
-- Grab/drag uses the improved stack appearance.
+V19 CHANGES
 
-All V17 functionality retained.
-Physical dice remain disabled until a genuinely better 3D implementation is built.
+CHIPS
+- Back to one simple chip per bet.
+- The center of the chip shows the FULL current bet total.
+- As you add more, the amount in the middle updates.
+- Chip color changes based on the largest standard denomination represented:
+  $1 white
+  $5 red
+  $10 blue
+  $25 green
+  $100 black
+  $500 purple
 
-Cache v18.
+INTERACTION
+- QUICK TAP on an existing chip = add the currently selected chip amount to that bet.
+- LONG PRESS/HOLD about 0.65 seconds = pick up the chip for moving.
+- Drag to a compatible betting area to move it.
+- Swipe/drag down to REMOVE to take it off the table.
+- Removed the old too-fast grab behavior.
+
+All V18/V17 core game functionality retained.
+Physical dice remain disabled.
+
+Cache v19.

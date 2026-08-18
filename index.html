@@ -738,6 +738,57 @@ body{
 .travel-chip .bet-chip-stack{transform:scale(.92);transform-origin:center bottom}
 .grabbed-chip .bet-chip-stack{transform:scale(1.18);transform-origin:center}
 
+
+/* V19 simple single-chip display */
+.bet-chip-stack{
+  position:relative;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:34px;
+  height:34px;
+  overflow:visible;
+}
+.stack-chip{
+  position:relative!important;
+  left:auto!important;
+  bottom:auto!important;
+  transform:none!important;
+  margin:0!important;
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:8px;
+  line-height:1;
+  font-weight:900;
+  box-sizing:border-box;
+  border:4px dashed rgba(255,255,255,.95);
+  box-shadow:0 3px 6px rgba(0,0,0,.55),inset 0 0 0 2px rgba(255,255,255,.12);
+  text-shadow:0 1px 1px rgba(0,0,0,.45);
+}
+.stack-chip.c1{background:#f3f3f3;color:#111;border-color:#222}
+.stack-chip.c5{background:#c92731;color:#fff}
+.stack-chip.c10{background:#1768b5;color:#fff}
+.stack-chip.c25{background:#18884a;color:#fff}
+.stack-chip.c100{background:#161616;color:#fff}
+.stack-chip.c500{background:#742c99;color:#fff}
+.stack-chip::after{
+  content:"";
+  position:absolute;
+  inset:6px;
+  border-radius:50%;
+  border:1px solid rgba(255,255,255,.48);
+  pointer-events:none;
+}
+.stack-total{display:none!important}
+.bet-side-chip .bet-chip-stack,
+.smallchip .bet-chip-stack,
+.travel-chip .bet-chip-stack{transform:scale(.9)}
+.grabbed-chip .bet-chip-stack{transform:scale(1.08)}
+
 </style>
 </head>
 <body>
@@ -813,6 +864,7 @@ body{
   </div>
 
   <div class="guide-body">
+<div class="guide-note"><b>CHIP CONTROLS:</b> Quick tap an existing chip to add the currently selected denomination to that bet. Press and hold for about 0.65 seconds to pick the chip up, then drag it to another compatible bet or swipe it down to REMOVE.</div>
 <div class="guide-note"><b>CHIP STACKS:</b> Bets now use casino-style denomination colors on the felt: $1 white, $5 red, $10 blue, $25 green, $100 black, and $500 purple. Mixed bets display as a physical stack instead of one generic black chip.</div>
     <div class="guide-note"><b>MOVE CHIPS:</b> Press and hold an existing chip until it lifts under your finger. Drag it to another compatible betting area to move that amount. Swipe/drag it down to the red REMOVE zone to take it off the table and return it to your bankroll. Invalid drops snap back.</div>
 <div class="guide-note"><b>PHYSICAL DICE</b> can be turned ON or OFF. ON uses the longer casino-style tumble/bounce presentation. OFF uses the original quick dice. The random result is generated the same way in either mode.</div>
@@ -1125,20 +1177,17 @@ function decomposeChips(amount){
 }
 function chipStackHTML(amount){
  if(!amount) return '';
- const chips=decomposeChips(amount);
+ const total=Math.max(0,Math.round(amount));
 
- // Show up to 4 physical chips with enough vertical separation to read each denomination.
- // For large same-denomination bets, keep the stack compact and show the total below.
- const shown=chips.slice(-4);
- let html='<span class="bet-chip-stack">';
- shown.forEach((d,i)=>{
-   const bottom=i*7;
-   const z=i+1;
-   html+=`<span class="stack-chip ${chipClassForValue(d)}" style="bottom:${bottom}px;z-index:${z}">${money(d)}</span>`;
- });
- html+=`<span class="stack-total">${money(amount)}</span>`;
- html+='</span>';
- return html;
+ // Color by the largest standard denomination represented by the total.
+ let colorDenom=1;
+ for(const d of CHIP_DENOMS){
+   if(total>=d){colorDenom=d;break;}
+ }
+
+ return `<span class="bet-chip-stack">
+   <span class="stack-chip ${chipClassForValue(colorDenom)}">${money(total)}</span>
+ </span>`;
 }
 
 function selectedChipClass(){
@@ -1332,16 +1381,44 @@ function cancelChipGrab(){
 function setupMouseGrab(el,key){
  if(el.dataset.mouseGrabBound) return;
  el.dataset.mouseGrabBound='1';
+
+ let holdTimer=null;
+ let dragging=false;
+ let startX=0,startY=0;
+
  el.addEventListener('mousedown',e=>{
    if(e.button!==0 || !amountForKey(key)) return;
-   e.preventDefault();
-   beginChipGrab(key,el,e);
-   const move=ev=>moveChipGrab(ev);
+   startX=e.clientX; startY=e.clientY;
+   dragging=false;
+
+   holdTimer=setTimeout(()=>{
+     dragging=true;
+     beginChipGrab(key,el,e);
+   },650);
+
+   const move=ev=>{
+     if(!dragging && Math.hypot(ev.clientX-startX,ev.clientY-startY)>10){
+       clearTimeout(holdTimer);
+     }
+     if(dragging){
+       ev.preventDefault();
+       moveChipGrab(ev);
+     }
+   };
+
    const up=ev=>{
+     clearTimeout(holdTimer);
      document.removeEventListener('mousemove',move);
      document.removeEventListener('mouseup',up);
-     endChipGrab(ev);
+
+     if(dragging){
+       ev.preventDefault();
+       endChipGrab(ev);
+     }
+     // If not dragging, do nothing here.
+     // The normal click bubbles to the betting area and adds the selected chip.
    };
+
    document.addEventListener('mousemove',move);
    document.addEventListener('mouseup',up);
  });
@@ -1349,26 +1426,33 @@ function setupMouseGrab(el,key){
 
 function setupHoldDrag(el,key){
  setupMouseGrab(el,key);
+
  let timer=null;
  let dragging=false;
  let startTouch=null;
+ let moved=false;
 
  el.addEventListener('touchstart',e=>{
    if(!amountForKey(key)) return;
    startTouch=e.touches[0];
    dragging=false;
+   moved=false;
+
    timer=setTimeout(()=>{
      dragging=true;
      beginChipGrab(key,el,startTouch);
-   },260);
+   },650);
  },{passive:true});
 
  el.addEventListener('touchmove',e=>{
    const t=e.touches[0];
    if(!t) return;
-   if(!dragging && startTouch && Math.hypot(t.clientX-startTouch.clientX,t.clientY-startTouch.clientY)>16){
-     clearTimeout(timer);
+
+   if(startTouch && Math.hypot(t.clientX-startTouch.clientX,t.clientY-startTouch.clientY)>10){
+     moved=true;
+     if(!dragging) clearTimeout(timer);
    }
+
    if(dragging){
      e.preventDefault();
      moveChipGrab(t);
@@ -1377,10 +1461,24 @@ function setupHoldDrag(el,key){
 
  el.addEventListener('touchend',e=>{
    clearTimeout(timer);
+
    if(dragging){
      e.preventDefault();
-     const t=e.changedTouches[0];
-     endChipGrab(t);
+     endChipGrab(e.changedTouches[0]);
+     return;
+   }
+
+   // A quick, clean tap directly on an existing chip adds the selected denomination.
+   if(!moved && amountForKey(key)){
+     e.preventDefault();
+     e.stopPropagation();
+
+     // Traveling bets / Pass Odds aren't normal addBet targets.
+     if(key.startsWith('TRAVEL_COME_') || key.startsWith('TRAVEL_DONT_') || key==='PASS_ODDS'){
+       $('#msg').textContent='Hold this chip to move or remove it.';
+     }else{
+       addBet(key);
+     }
    }
  },{passive:false});
 
@@ -1399,18 +1497,6 @@ function setupChipDrag(chip,key){
    e.dataTransfer.setData('text/plain',key);
  });
  chip.addEventListener('dragend',()=>{chip.classList.remove('dragging-chip');$('#deleteZone').classList.remove('show')});
- let sx=0,sy=0,moved=false;
- chip.addEventListener('touchstart',e=>{
-   if(!bets[key])return;
-   const t=e.touches[0];sx=t.clientX;sy=t.clientY;moved=false;$('#deleteZone').classList.add('show');
- },{passive:true});
- chip.addEventListener('touchmove',e=>{
-   const t=e.touches[0];if(Math.hypot(t.clientX-sx,t.clientY-sy)>45)moved=true;
- },{passive:true});
- chip.addEventListener('touchend',()=>{
-   $('#deleteZone').classList.remove('show');
-   if(moved)removeSelected(key);
- },{passive:true});
 }
 function bindNumberTargets(){
  document.querySelectorAll('.number-half').forEach(btn=>{
@@ -1430,9 +1516,7 @@ function bindTargets(){
   el.dataset.bound='1';
   el.addEventListener('click',()=>addBet(el.dataset.key));
   el.addEventListener('contextmenu',e=>{e.preventDefault();removeSelected(el.dataset.key)});
-  let timer;
-  el.addEventListener('touchstart',()=>timer=setTimeout(()=>removeSelected(el.dataset.key),600),{passive:true});
-  el.addEventListener('touchend',()=>clearTimeout(timer),{passive:true});
+
   const chip=el.querySelector('.smallchip'); if(chip)setupChipDrag(chip,el.dataset.key);
  });
 }
