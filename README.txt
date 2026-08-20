@@ -1,11 +1,8 @@
-CRAPLESS CASINO FULL V42
+CRAPLESS CASINO FULL V43
 
 BLACKJACK
-- SAME BET added directly under CLEAR BET.
-- SAME BET restores prior Main + Match Dealer + Lucky Ladies wagers.
-- Player Blackjack resolves immediately after dealer blackjack check.
-- Dealer checks Ace, 10, J, Q, or K for blackjack.
-- Dealer does not draw extra cards against player Blackjack.
-- V41 dealer-blackjack lock and all earlier Blackjack fixes retained.
+- Added $1K and $5K chips.
+- Wager stacks compress using $1K and $5K denominations.
+- V42 SAME BET and Blackjack rules retained.
 
-PWA cache: crapless-casino-v42
+PWA cache: crapless-casino-v43

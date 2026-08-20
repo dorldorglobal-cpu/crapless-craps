@@ -212,6 +212,12 @@
 #slot-preview .bj-bet-circle b{margin-top:18px!important}
 #slot-preview .bj-bet-stack{top:38%!important}
 
+
+#slot-preview .bj-chip[data-bj-chip="1000"]{background:#b36b00;color:#fff}
+#slot-preview .bj-chip[data-bj-chip="5000"]{background:#8b1a1a;color:#fff}
+#slot-preview .bj-bet-chip.c1000{background:#b36b00;color:#fff}
+#slot-preview .bj-bet-chip.c5000{background:#8b1a1a;color:#fff}
+
 </style>
 
   <section class="game-view" id="game-craps">
@@ -273,6 +279,8 @@
         <button type="button" class="bj-chip" data-bj-chip="25">$25</button>
         <button type="button" class="bj-chip" data-bj-chip="100">$100</button>
         <button type="button" class="bj-chip" data-bj-chip="500">$500</button>
+        <button type="button" class="bj-chip" data-bj-chip="1000">$1K</button>
+        <button type="button" class="bj-chip" data-bj-chip="5000">$5K</button>
       </div>
       <div class="bj-message" id="bj-message">Choose a chip, tap a betting circle, then DEAL.</div>
       <div class="bj-side-result" id="bj-side-result"></div>
@@ -402,8 +410,8 @@
     function bjCountCard(card){if(!card)return;if(['2','3','4','5','6'].includes(card.rank))bjRunningCount++;else if(['10','J','Q','K','A'].includes(card.rank))bjRunningCount--;bjDecksRemaining=Math.max(.25,bjShoe.length/52);updateBjCounter()}
     function drawBj(exposed=true){if(bjShoe.length<40)makeBjShoe();const c=bjShoe.pop();if(exposed)bjCountCard(c);return c}
     function bjCardHTML(card,hidden=false){if(hidden)return '<div class="bj-card back">?</div>';const red=card.suit==='♥'||card.suit==='♦';return `<div class="bj-card ${red?'red':''}"><div>${card.rank}${card.suit}</div><div class="suit">${card.suit}</div><div class="bottom">${card.rank}${card.suit}</div></div>`}
-    function bjChipColorClass(amount){if(amount>=500)return'c500';if(amount>=100)return'c100';if(amount>=25)return'c25';if(amount>=10)return'c10';if(amount>=5)return'c5';return'c1'}
-    function bjStackHTML(amount){if(!amount)return'';const denoms=[500,100,25,10,5,1];let remaining=Math.round(amount);const stack=[];for(const d of denoms){const count=Math.floor(remaining/d);for(let i=0;i<count;i++)stack.push(d);remaining-=count*d}return stack.map((d,i)=>`<div class="bj-bet-chip ${bjChipColorClass(d)}"><span>${i===stack.length-1?money(amount):''}</span></div>`).join('')}
+    function bjChipColorClass(amount){if(amount>=5000)return'c5000';if(amount>=1000)return'c1000';if(amount>=500)return'c500';if(amount>=100)return'c100';if(amount>=25)return'c25';if(amount>=10)return'c10';if(amount>=5)return'c5';return'c1'}
+    function bjStackHTML(amount){if(!amount)return'';const denoms=[5000,1000,500,100,25,10,5,1];let remaining=Math.round(amount);const stack=[];for(const d of denoms){const count=Math.floor(remaining/d);for(let i=0;i<count;i++)stack.push(d);remaining-=count*d}return stack.map((d,i)=>`<div class="bj-bet-chip ${bjChipColorClass(d)}"><span>${i===stack.length-1?money(amount):''}</span></div>`).join('')}
     function renderBj(){localStorage.setItem(SHARED_BANKROLL_KEY,String(bjBankroll));bankroll=bjBankroll;
       $('#bj-bankroll').textContent=money(bjBankroll);$('#bj-main-bet').textContent=money(bjMainBet);$('#bj-main-circle-amt').textContent=money(bjMainBet);$('#bj-match-amt').textContent=money(bjMatchBet);$('#bj-ladies-amt').textContent=money(bjLadiesBet);$('#bj-last-win').textContent=money(bjLastWin);$('#bj-shoe').textContent=String(bjShoe.length);$('#bj-main-stack').innerHTML=bjStackHTML(bjMainBet);$('#bj-match-stack').innerHTML=bjStackHTML(bjMatchBet);$('#bj-ladies-stack').innerHTML=bjStackHTML(bjLadiesBet);
       const shownPlayer=bjSplitMode?(bjSplitHands[bjActiveHand]||[]):bjPlayer;
