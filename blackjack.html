@@ -451,17 +451,31 @@
     }
     function startBjRound(){
       if(bjRoundActive)return;if(bjMainBet<=0){$('#bj-message').textContent='Place a main Blackjack bet first.';return}
-      bjLastWin=0;bjInsuranceBet=0;bjInsuranceResolved=false;bjResolvingRound=false;bjSplitAdvanceLocked=false;bjBaseMainBet=bjMainBet;bjPlayer=[];bjDealer=[];bjSplitHands=[];bjSplitBets=[];bjActiveHand=0;bjSplitMode=false;bjHoleHidden=true;bjPlayer.push(drawBj(true));bjDealer.push(drawBj(true));bjPlayer.push(drawBj(true));bjDealer.push(drawBj(false));bjRoundActive=true;settleBjSideBets();renderBj();
+      bjLastWin=0;bjInsuranceBet=0;bjInsuranceResolved=false;bjResolvingRound=true;bjSplitAdvanceLocked=false;bjBaseMainBet=bjMainBet;bjPlayer=[];bjDealer=[];bjSplitHands=[];bjSplitBets=[];bjActiveHand=0;bjSplitMode=false;bjHoleHidden=true;bjPlayer.push(drawBj(true));bjDealer.push(drawBj(true));bjPlayer.push(drawBj(true));bjDealer.push(drawBj(false));bjRoundActive=true;settleBjSideBets();renderBj();
       const sideDelay=(bjMatchBet||bjLadiesBet)?1350:0;
       setTimeout(()=>{
         if(!bjRoundActive)return;
         const dealerUp=bjDealer[0];
         const dealerShowsAce=dealerUp?.rank==='A';
         const dealerShowsTen=dealerUp&&['10','J','Q','K'].includes(dealerUp.rank);
-        if(dealerShowsTen&&bjIsBlackjack(bjDealer)){finishBjRound();return}
-        if(dealerShowsAce){$('#bj-message').textContent='Dealer shows Ace — insurance is available.';renderBj();return}
-        if(bjIsBlackjack(bjPlayer)){finishBjRound();return}
-        $('#bj-message').textContent='Hit, Stand, or Double.';renderBj();
+        const dealerHasBlackjack=(dealerShowsAce||dealerShowsTen)&&bjIsBlackjack(bjDealer);
+        if(dealerHasBlackjack){
+          bjResolvingRound=false;
+          finishBjRound();
+          return;
+        }
+        bjResolvingRound=false;
+        if(dealerShowsAce){
+          $('#bj-message').textContent='Dealer checked — no blackjack. Insurance is available.';
+          renderBj();
+          return;
+        }
+        if(bjIsBlackjack(bjPlayer)){
+          finishBjRound();
+          return;
+        }
+        $('#bj-message').textContent='Hit, Stand, or Double.';
+        renderBj();
       },sideDelay);
     }
     function bjInsurance(){
