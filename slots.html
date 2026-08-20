@@ -20,7 +20,7 @@ button{font:inherit}
 .game-switcher a.active{color:#111;border-color:#ffe09a;background:linear-gradient(#e0bd65,#a77d2c)}
 .app{max-width:980px;margin:auto;padding:10px}
 .cabinet{border:4px solid #6a491e;border-radius:24px;padding:12px;background:linear-gradient(180deg,#2b0910,#080808 25%,#140609);box-shadow:0 12px 30px #000}
-.marquee{text-align:center;border:2px solid #e2c26a;border-radius:15px;padding:10px;background:radial-gradient(circle at 50% 0,#721a29,#26060c 64%,#090909)}
+.marquee{text-align:center;border:2px solid #e2c26a;border-radius:15px;padding:10px;background:radial-gradient(circle at 50% 0,#721a29,#26060c 64%,#090909)}.top-spin{cursor:pointer;user-select:none;box-shadow:0 4px 0 #6b480f,0 8px 16px #0008}.top-spin:active{transform:translateY(2px);box-shadow:0 2px 0 #6b480f,0 5px 10px #0008}
 .marquee small{display:block;font-size:9px;letter-spacing:4px;color:#d0b36f;font-weight:900}
 .marquee b{display:block;font-size:clamp(28px,7vw,52px);color:#ffe7a5;text-shadow:0 3px 0 #714800,0 0 18px #c99e38}
 .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-top:9px}
@@ -57,14 +57,14 @@ button{font:inherit}
 .paygrid{display:grid;grid-template-columns:repeat(2,1fr);gap:4px 12px;font-size:10px}
 .payrow{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid #242424;padding:4px 0}
 .footer{text-align:center;color:#737373;font-size:8px;margin-top:7px}
-@media(max-width:640px){.app{padding:5px}.cabinet{padding:6px}.stats{grid-template-columns:repeat(2,1fr)}.reels{gap:3px}.cell{min-height:61px}.controls{grid-template-columns:1fr}.betgrid{grid-template-columns:repeat(4,1fr)}.spinrow{grid-template-columns:1fr}.bank{min-height:48px}.paygrid{grid-template-columns:1fr}}
+@media(max-width:640px){.spin{display:none}.spinrow{grid-template-columns:1fr}.bank{width:100%}.app{padding:5px}.cabinet{padding:6px}.stats{grid-template-columns:repeat(2,1fr)}.reels{gap:3px}.cell{min-height:61px}.controls{grid-template-columns:1fr}.betgrid{grid-template-columns:repeat(4,1fr)}.spinrow{grid-template-columns:1fr}.bank{min-height:48px}.paygrid{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){.cell.spinning,.result.big{animation:none}}
 </style>
 </head>
 <body>
 <nav class="game-switcher"><a href="./index.html">🎲 CRAPS</a><a class="active" href="./slots.html">🎰 SLOTS</a></nav>
 <main class="app"><section class="cabinet">
-<div class="marquee"><small>CRAPLESS CASINO</small><b>LUCKY REELS 20</b></div>
+<div class="marquee top-spin" id="topSpin" role="button" tabindex="0" aria-label="Spin"><small>LAUREN&apos;S SLOTS</small><b id="topSpinText">SPIN TO WIN</b></div>
 <div class="stats">
 <div class="stat"><span>BANKROLL</span><strong id="bankroll">$1,000.00</strong></div>
 <div class="stat"><span>TOTAL BET</span><strong id="bet">$1.00</strong></div>
@@ -116,7 +116,7 @@ function fake(){return SYMBOLS[Math.floor(Math.random()*SYMBOLS.length)]}
 function save(){try{localStorage.setItem(SAVE,JSON.stringify({bankroll,bet,lastWin,freeSpins,spins,previousBet}))}catch(e){}}
 function load(){try{const x=JSON.parse(localStorage.getItem(SAVE)||'null');if(!x)return;bankroll=Number.isFinite(x.bankroll)?x.bankroll:1000;bet=[.2,.5,1,2,5,10,25].includes(x.bet)?x.bet:1;lastWin=Number(x.lastWin)||0;freeSpins=Number(x.freeSpins)||0;spins=Number(x.spins)||0;previousBet=[.2,.5,1,2,5,10,25].includes(x.previousBet)?x.previousBet:bet}catch(e){}}
 function build(){const r=$('#reels');r.innerHTML='';for(let c=0;c<5;c++){const reel=document.createElement('div');reel.className='reel';for(let row=0;row<3;row++){const cell=document.createElement('div');cell.className='cell';cell.dataset.c=c;cell.dataset.r=row;const sp=document.createElement('span');sp.textContent=grid[c][row].icon;cell.appendChild(sp);reel.appendChild(cell)}r.appendChild(reel)}}
-function render(){$('#bankroll').textContent=money(bankroll);$('#bet').textContent=money(bet);$('#lastwin').textContent=money(lastWin);$('#free').textContent=freeSpins;$('#spins').textContent=spins;document.querySelectorAll('.betbtn').forEach(b=>b.classList.toggle('active',Number(b.dataset.bet)===bet));$('#spin').textContent=freeSpins>0?'FREE SPIN':'SPIN';$('#spin').disabled=spinning||(freeSpins===0&&bankroll<bet);save()}
+function render(){$('#bankroll').textContent=money(bankroll);$('#bet').textContent=money(bet);$('#lastwin').textContent=money(lastWin);$('#free').textContent=freeSpins;$('#spins').textContent=spins;document.querySelectorAll('.betbtn').forEach(b=>b.classList.toggle('active',Number(b.dataset.bet)===bet));$('#spin').textContent=freeSpins>0?'FREE SPIN':'SPIN';$('#spin').disabled=spinning||(freeSpins===0&&bankroll<bet);$('#topSpinText').textContent=spinning?'SPINNING…':freeSpins>0?'FREE SPIN':'SPIN TO WIN';save()}
 function clearWins(){document.querySelectorAll('.cell').forEach(c=>c.classList.remove('win','wild','scatter'))}
 function evaluate(){
  const lineBet=bet/20;let total=0;const hits=new Set(),wins=[];
@@ -137,7 +137,7 @@ function spin(){
  spinning=false;render();},1150);
 }
 document.querySelectorAll('.betbtn').forEach(b=>b.addEventListener('click',()=>{if(!spinning){bet=Number(b.dataset.bet);render()}}));
-$('#spin').addEventListener('click',spin);$('#banker').addEventListener('click',()=>{if(!spinning){bankroll+=500;$('#result').textContent='BANKER +$500';render()}});
+$('#spin').addEventListener('click',spin);$('#topSpin').addEventListener('click',spin);$('#topSpin').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();spin()}});$('#banker').addEventListener('click',()=>{if(!spinning){bankroll+=500;$('#result').textContent='BANKER +$500';render()}});
 $('#same').addEventListener('click',()=>{if(!spinning){bet=previousBet;render()}});$('#max').addEventListener('click',()=>{if(!spinning){bet=25;render()}});
 $('#paytoggle').addEventListener('click',()=>{const p=$('#paytable');p.hidden=!p.hidden;$('#paytoggle').textContent=p.hidden?'SHOW PAYTABLE':'HIDE PAYTABLE'});
 $('#new').addEventListener('click',()=>{if(spinning)return;if(!confirm('Start a new slot session?'))return;bankroll=1000;bet=1;lastWin=0;freeSpins=0;spins=0;previousBet=1;$('#result').textContent='NEW SESSION';$('#lines').textContent='20 paylines active';render()});

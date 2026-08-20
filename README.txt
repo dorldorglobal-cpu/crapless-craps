@@ -1,26 +1,13 @@
-CRAPLESS CASINO FULL V22
+CRAPLESS CASINO FULL V23
 
-Includes the full V21 Crapless Craps game plus a second SLOTS page.
+SLOTS UPDATE
+- Renamed slot game header to LAUREN'S SLOTS.
+- Large top banner now says SPIN TO WIN.
+- The top banner itself is the working spin button.
+- During a spin it shows SPINNING...
+- During free spins it shows FREE SPIN.
+- On phones the lower Spin button is hidden so you do not need to scroll to spin.
+- Banker remains available below the reels.
 
-Use the CRAPS / SLOTS switch at the top to move between games.
-
-SLOTS:
-- 5 reels x 3 rows
-- 20 paylines
-- Wild
-- Scatter
-- 8 or 12 free-spin bonus
-- $0.20 to $25 total bets
-- Multiple paylines can win on one spin
-- Large win display
-- Banker +$500
-- Same Bet / Max Bet
-- Paytable
-- Independent slot autosave
-- Cryptographic final symbol selection
-- Offline PWA support
-
-CRAPS:
-- All V21 fixes and autosave retained.
-
-PWA cache: crapless-casino-v22
+All V22 Craps + Slots features retained.
+PWA cache: crapless-casino-v23
