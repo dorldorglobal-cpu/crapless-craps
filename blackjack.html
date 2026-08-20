@@ -518,11 +518,11 @@
       $('#bj-message').textContent=`Split accepted. Playing right-hand card first — Hand ${bjActiveHand+1}.`;
     }
     function bjHitActive(){
-      if(!bjRoundActive||bjResolvingRound||bjSplitAdvanceLocked)return;
+      if(!bjRoundActive||bjResolvingRound)return;
       if(!bjSplitMode){bjHit();return}
       const hand=bjSplitHands[bjActiveHand];hand.push(drawBj(true));renderBj();if(bjHandValue(hand)>=21)bjAdvanceSplitHand();
     }
-    function bjStandActive(){if(!bjRoundActive||bjResolvingRound||bjSplitAdvanceLocked)return;if(bjSplitMode){bjAdvanceSplitHand();return}finishBjRound()}
+    function bjStandActive(){if(!bjRoundActive||bjResolvingRound)return;if(bjSplitMode){bjAdvanceSplitHand();return}finishBjRound()}
     function bjDoubleActive(){
       if(!bjRoundActive||bjResolvingRound||bjSplitAdvanceLocked)return;
       if(!bjSplitMode){bjDouble();return}
@@ -535,8 +535,8 @@
       renderBj();
       $('#bj-message').textContent=`Hand ${bjActiveHand+1} doubled — one card dealt.`;
       setTimeout(()=>{
-        if(!bjRoundActive||!bjSplitMode||bjResolvingRound)return;
         bjSplitAdvanceLocked=false;
+        if(!bjRoundActive||!bjSplitMode||bjResolvingRound)return;
         bjAdvanceSplitHand();
       },420);
     }
