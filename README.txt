@@ -1,16 +1,13 @@
-CRAPLESS CASINO FULL V24
+CRAPLESS CASINO FULL V25
 
-Includes all V23 features.
+Includes all V24 features.
 
-LAUREN'S SLOTS premium symbol weights:
-Star 7
-Bell 7
-Diamond 6
-Seven 5
-Wild 7
-Scatter 7
+NEW SLOT WIN POPUP
+- Every monetary win triggers a large bouncing TOTAL WIN banner over the reels.
+- Shows the full total amount won on that spin.
+- Works during normal spins and free spins.
+- Keeps Lauren's Slots / Spin To Win top button.
+- Keeps the V24 premium symbol weights.
 
-The top LAUREN'S SLOTS / SPIN TO WIN banner remains the phone spin button.
-Craps and all prior fixes are retained.
-
-PWA cache: crapless-casino-v24
+Craps game and all prior fixes remain unchanged.
+PWA cache: crapless-casino-v25
