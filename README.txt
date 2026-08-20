@@ -1,11 +1,10 @@
-CRAPLESS CASINO FULL V27
+CRAPLESS CASINO FULL V28
 
-SLOT FIXES
-- Top LAUREN'S SLOTS / SPIN TO WIN banner spins.
-- Lower button now says SPIN TO WIN and spins.
-- Entire LAST RESULT banner is clickable/tappable to spin.
-- Win popup rebuilt as a true body-level fixed overlay.
-- Very high z-index and iOS-safe animation so it is not clipped by reels or PWA containers.
+SLOTS:
+- Win banner rebuilt to use the same direct show/hide style as the craps win overlay.
+- Body-level fixed overlay for iPhone PWA reliability.
+- Large bouncing TOTAL WIN amount.
+- Top SPIN TO WIN, lower SPIN TO WIN, and LAST RESULT all remain clickable to spin.
 
-All V26/V25/V24 features retained.
-Cache: crapless-casino-v27
+All previous Craps and Slots features retained.
+PWA cache: crapless-casino-v28
