@@ -491,7 +491,6 @@
     function bjDouble(){if(!bjRoundActive||bjPlayer.length!==2||bjBankroll<bjMainBet)return;bjBankroll-=bjMainBet;bjMainBet*=2;bjPlayer.push(drawBj(true));renderBj();finishBjRound()}
     function bjAdvanceSplitHand(){
       if(!bjSplitMode||!bjRoundActive||bjResolvingRound)return;
-      bjSplitAdvanceLocked=true;
       const next=bjActiveHand+1;
       if(next<bjSplitHands.length){
         bjActiveHand=next;
@@ -501,9 +500,9 @@
         return;
       }
       bjActiveHand=Math.max(0,bjSplitHands.length-1);
+      bjSplitAdvanceLocked=false;
       $('#bj-message').textContent='Player hands complete — dealer plays.';
       renderBj();
-      bjSplitAdvanceLocked=false;
       finishBjRound();
     }
     function bjSplit(){
@@ -519,7 +518,7 @@
       $('#bj-message').textContent=`Split accepted. Playing right-hand card first — Hand ${bjActiveHand+1}.`;
     }
     function bjHitActive(){
-      if(!bjRoundActive)return;
+      if(!bjRoundActive||bjResolvingRound||bjSplitAdvanceLocked)return;
       if(!bjSplitMode){bjHit();return}
       const hand=bjSplitHands[bjActiveHand];hand.push(drawBj(true));renderBj();if(bjHandValue(hand)>=21)bjAdvanceSplitHand();
     }
