@@ -1,12 +1,11 @@
-CRAPLESS CASINO FULL V41
+CRAPLESS CASINO FULL V42
 
-BLACKJACK DEALER BLACKJACK FIX
-- Player controls stay locked during the dealer's opening blackjack check.
-- Dealer checks for blackjack when showing:
-  Ace, 10, Jack, Queen, or King.
-- If dealer has blackjack, the hand ends immediately.
-- Player can no longer HIT / STAND / DOUBLE / SPLIT before that dealer check completes.
-- V40 larger chips and wager visibility layout retained.
-- Prior split settlement and bust reveal fixes retained.
+BLACKJACK
+- SAME BET added directly under CLEAR BET.
+- SAME BET restores prior Main + Match Dealer + Lucky Ladies wagers.
+- Player Blackjack resolves immediately after dealer blackjack check.
+- Dealer checks Ace, 10, J, Q, or K for blackjack.
+- Dealer does not draw extra cards against player Blackjack.
+- V41 dealer-blackjack lock and all earlier Blackjack fixes retained.
 
-PWA cache: crapless-casino-v41
+PWA cache: crapless-casino-v42

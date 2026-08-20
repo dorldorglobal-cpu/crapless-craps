@@ -263,6 +263,7 @@
         <button type="button" class="bj-action" id="bj-split" disabled>SPLIT</button>
         <button type="button" class="bj-action" id="bj-insurance" disabled>INSURANCE</button>
         <button type="button" class="bj-action" id="bj-clear-bet">CLEAR BET</button>
+        <button type="button" class="bj-action" id="bj-same-bet">SAME BET</button>
         <button type="button" class="bj-action" id="bj-new-shoe">NEW SHOE</button>
       </div>
       <div class="bj-chip-row" id="bj-chip-row">
@@ -383,7 +384,7 @@
     let bankroll=Number(localStorage.getItem(SHARED_BANKROLL_KEY)||1000),bet=1,lastWin=0,freeSpins=0,spins=0,previousBet=1,spinning=false;
     let grid=Array.from({length:5},()=>Array.from({length:3},()=>symbols[0]));
     let bjCounterEnabled=false,bjRunningCount=0,bjDecksRemaining=6;
-    let bjBankroll=bankroll,bjSelectedChip=5,bjMainBet=0,bjBaseMainBet=0,bjMatchBet=0,bjLadiesBet=0,bjInsuranceBet=0,bjInsuranceResolved=false,bjLastWin=0,bjRoundActive=false,bjHoleHidden=true,bjResolvingRound=false,bjSplitAdvanceLocked=false;
+    let bjBankroll=bankroll,bjSelectedChip=5,bjMainBet=0,bjBaseMainBet=0,bjMatchBet=0,bjLadiesBet=0,bjInsuranceBet=0,bjInsuranceResolved=false,bjLastWin=0,bjRoundActive=false,bjHoleHidden=true,bjResolvingRound=false,bjSplitAdvanceLocked=false,bjLastMainBet=0,bjLastMatchBet=0,bjLastLadiesBet=0;
     let bjShoe=[],bjPlayer=[],bjDealer=[],bjSplitHands=[],bjSplitBets=[],bjActiveHand=0,bjSplitMode=false;
     const BJ_SUITS=['♠','♥','♦','♣'];
     const BJ_RANKS=['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
@@ -424,10 +425,12 @@
       $('#bj-split').disabled=!handPlayable||activeHand.length!==2||activeHand[0]?.rank!==activeHand[1]?.rank||bjBankroll<activeWager||(bjSplitMode&&bjSplitHands.length>=5)||bjSplitAdvanceLocked;
       $('#bj-insurance').disabled=!bjRoundActive||bjResolvingRound||bjInsuranceResolved||!bjDealer[0]||bjDealer[0].rank!=='A'||bjBankroll<Math.min(bjMainBet/2,bjSelectedChip);
       const clearBtn=$('#bj-clear-bet');if(clearBtn)clearBtn.disabled=bjRoundActive||(bjMainBet+bjMatchBet+bjLadiesBet<=0);
+      const sameBtn=$('#bj-same-bet');if(sameBtn)sameBtn.disabled=bjRoundActive||(bjLastMainBet+bjLastMatchBet+bjLastLadiesBet<=0)||bjBankroll<(bjLastMainBet+bjLastMatchBet+bjLastLadiesBet);
       $('#bj-deal').classList.toggle('no-bet',bjMainBet<=0);
       root.querySelectorAll('[data-bj-chip]').forEach(b=>b.classList.toggle('sel',Number(b.dataset.bjChip)===bjSelectedChip));
     }
     function clearBjBets(){if(bjRoundActive)return;const refund=bjMainBet+bjMatchBet+bjLadiesBet;if(refund<=0)return;bjBankroll+=refund;bjMainBet=0;bjBaseMainBet=0;bjMatchBet=0;bjLadiesBet=0;$('#bj-message').textContent='Bets cleared.';renderBj()}
+    function sameBjBet(){if(bjRoundActive)return;const total=bjLastMainBet+bjLastMatchBet+bjLastLadiesBet;if(total<=0||bjBankroll<total)return;const refund=bjMainBet+bjMatchBet+bjLadiesBet;if(refund>0)bjBankroll+=refund;bjMainBet=0;bjMatchBet=0;bjLadiesBet=0;bjBankroll-=total;bjMainBet=bjLastMainBet;bjBaseMainBet=bjMainBet;bjMatchBet=bjLastMatchBet;bjLadiesBet=bjLastLadiesBet;$('#bj-message').textContent='Same bet restored.';renderBj()}
     function addBjBet(which){if(bjRoundActive)return;if(bjBankroll<bjSelectedChip){$('#bj-message').textContent='Not enough bankroll.';return}bjBankroll-=bjSelectedChip;if(which==='main')bjMainBet+=bjSelectedChip;if(which==='match')bjMatchBet+=bjSelectedChip;if(which==='ladies')bjLadiesBet+=bjSelectedChip;renderBj()}
     function luckyLadiesMultiplier(){
       if(bjPlayer.length<2||bjHandValue(bjPlayer.slice(0,2))!==20)return 0;
@@ -451,7 +454,7 @@
     }
     function startBjRound(){
       if(bjRoundActive)return;if(bjMainBet<=0){$('#bj-message').textContent='Place a main Blackjack bet first.';return}
-      bjLastWin=0;bjInsuranceBet=0;bjInsuranceResolved=false;bjResolvingRound=true;bjSplitAdvanceLocked=false;bjBaseMainBet=bjMainBet;bjPlayer=[];bjDealer=[];bjSplitHands=[];bjSplitBets=[];bjActiveHand=0;bjSplitMode=false;bjHoleHidden=true;bjPlayer.push(drawBj(true));bjDealer.push(drawBj(true));bjPlayer.push(drawBj(true));bjDealer.push(drawBj(false));bjRoundActive=true;settleBjSideBets();renderBj();
+      bjLastWin=0;bjInsuranceBet=0;bjInsuranceResolved=false;bjResolvingRound=true;bjSplitAdvanceLocked=false;bjBaseMainBet=bjMainBet;bjLastMainBet=bjMainBet;bjLastMatchBet=bjMatchBet;bjLastLadiesBet=bjLadiesBet;bjPlayer=[];bjDealer=[];bjSplitHands=[];bjSplitBets=[];bjActiveHand=0;bjSplitMode=false;bjHoleHidden=true;bjPlayer.push(drawBj(true));bjDealer.push(drawBj(true));bjPlayer.push(drawBj(true));bjDealer.push(drawBj(false));bjRoundActive=true;settleBjSideBets();renderBj();
       const sideDelay=(bjMatchBet||bjLadiesBet)?1350:0;
       setTimeout(()=>{
         if(!bjRoundActive)return;
@@ -465,13 +468,14 @@
           return;
         }
         bjResolvingRound=false;
+        if(bjIsBlackjack(bjPlayer)){
+          if(dealerShowsAce||dealerShowsTen)$('#bj-message').textContent='Dealer checked — no blackjack. Player blackjack.';
+          finishBjRound();
+          return;
+        }
         if(dealerShowsAce){
           $('#bj-message').textContent='Dealer checked — no blackjack. Insurance is available.';
           renderBj();
-          return;
-        }
-        if(bjIsBlackjack(bjPlayer)){
-          finishBjRound();
           return;
         }
         $('#bj-message').textContent='Hit, Stand, or Double.';
@@ -513,6 +517,20 @@
       $('#bj-message').textContent='Dealer reveals hole card.';
       renderBj();
       await new Promise(r=>setTimeout(r,500));
+
+      const immediatePlayerBlackjack=!bjSplitMode&&bjIsBlackjack(bjPlayer)&&!bjIsBlackjack(bjDealer);
+      if(immediatePlayerBlackjack){
+        const win=bjMainBet*1.5;
+        bjBankroll+=bjMainBet+win;
+        bjLastWin+=win;
+        bjRoundActive=false;bjResolvingRound=false;bjInsuranceBet=0;bjInsuranceResolved=false;
+        $('#bj-message').textContent=`BLACKJACK! +${money(win)}`;
+        showBjOutcome('BLACKJACK!',`WIN ${money(win)}`,true);
+        bjMainBet=bjBaseMainBet;
+        bjSplitMode=false;bjSplitHands=[];bjSplitBets=[];bjActiveHand=0;
+        renderBj();
+        return;
+      }
 
       while(bjHandValue(bjDealer)<17){
         await new Promise(r=>setTimeout(r,520));
@@ -697,6 +715,7 @@
     $('#bj-split').addEventListener('click',bjSplit);
     $('#bj-insurance').addEventListener('click',bjInsurance);
     $('#bj-clear-bet').addEventListener('click',clearBjBets);
+    $('#bj-same-bet').addEventListener('click',sameBjBet);
     $('#bj-new-shoe').addEventListener('click',()=>{if(!bjRoundActive)makeBjShoe()});
     $('#bj-add-money').addEventListener('click',()=>{bjBankroll+=500;bankroll=bjBankroll;renderBj();render()});
 
