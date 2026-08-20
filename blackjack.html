@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
+<meta name="theme-color" content="#07321f"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Crapless Casino"/>
+<link rel="manifest" href="./manifest.webmanifest?v=30"/>
+<link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png?v=30"/>
+<title>Crapless Casino Blackjack</title>
+</head>
+<body style="margin:0;background:#050505">
+<div id="slot-preview" class="slot-root">
+  <nav class="game-switcher" aria-label="Casino games">
+    <a href="./index.html">🎲 CRAPS</a>
+    <a href="./slots.html">🎰 SLOTS</a>
+    <a class="active" href="./blackjack.html">🂡 BLACKJACK</a>
+  </nav>
+  <style>
+
+    #slot-preview .game-switcher{display:flex;justify-content:center;gap:7px;padding:7px 10px;margin-bottom:10px;background:#080808;border-bottom:1px solid #6f5329;position:sticky;top:0;z-index:80}
+    #slot-preview .game-switcher a{min-width:100px;min-height:38px;display:flex;align-items:center;justify-content:center;border-radius:999px;border:1px solid #735a2e;text-decoration:none;color:#e8e8e8;background:#1c1c1c;font-size:10px;font-weight:900}
+    #slot-preview .game-switcher a.active{color:#111;border-color:#ffe09a;background:linear-gradient(#e0bd65,#a77d2c)}
+
+    #slot-preview{background:linear-gradient(180deg,#18070b,#050505);color:#fff;padding:16px;min-height:100%;font-family:Arial,Helvetica,sans-serif;border-radius:0}
+    #slot-preview *{box-sizing:border-box}
+    #slot-preview .cabinet{max-width:980px;margin:0 auto;border:4px solid #6d4b1f;border-radius:24px;padding:14px;background:linear-gradient(180deg,#2b0a10,#090909 24%,#140608);box-shadow:0 12px 30px #0008}
+    #slot-preview .marquee{text-align:center;border:2px solid #e8c66c;border-radius:16px;padding:10px;background:radial-gradient(circle at 50% 0,#761b2a,#25060b 62%,#090909);cursor:pointer;user-select:none}
+    #slot-preview .marquee .small{font-size:10px;letter-spacing:4px;color:#d6ba72;font-weight:900}
+    #slot-preview .marquee .big{font-size:clamp(25px,6vw,48px);font-weight:1000;color:#ffe6a4;text-shadow:0 3px 0 #704a00,0 0 18px #d3a53b}
+    #slot-preview .stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:10px}
+    #slot-preview .stat{background:#111;border:1px solid #4a381e;border-radius:10px;padding:8px;text-align:center;min-width:0}
+    #slot-preview .stat span{display:block;font-size:9px;color:#aaa;letter-spacing:.7px}
+    #slot-preview .stat b{display:block;font-size:18px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    #slot-preview .machine{margin-top:10px;border:3px solid #c9a958;border-radius:18px;padding:12px;background:linear-gradient(#191919,#080808)}
+    #slot-preview .reel-window{position:relative;background:#4d0e16;border:4px solid #5c3b16;border-radius:14px;padding:8px}
+    #slot-preview .reels{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+    #slot-preview .reel{display:grid;grid-template-rows:repeat(3,1fr);gap:4px}
+    #slot-preview .cell{min-height:74px;border:2px solid #a48749;border-radius:8px;background:linear-gradient(#fff4d1,#e6d09a);display:grid;place-items:center;color:#111;font-size:clamp(34px,7vw,56px);position:relative;overflow:hidden}
+    #slot-preview .cell.win{outline:4px solid #ffd85d;box-shadow:0 0 18px #ffd85d99}
+    #slot-preview .cell.scatter{background:linear-gradient(#efe6ff,#cbb8ff)}
+    #slot-preview .cell.wild{background:linear-gradient(#fff3b5,#f0b84b)}
+    #slot-preview .cell.spinning{animation:slotBlink .09s linear infinite}
+    @keyframes slotBlink{50%{transform:translateY(6px) scale(.96);filter:blur(1px)}}
+    #slot-preview .payline-note{text-align:center;color:#d8c08a;font-size:10px;margin-top:7px}
+    #slot-preview .result{margin-top:10px;min-height:76px;border-radius:13px;border:2px solid #6e5629;background:#090909;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:8px;cursor:pointer;user-select:none}
+    #slot-preview .result .label{font-size:10px;color:#aaa;letter-spacing:3px;font-weight:900}
+    #slot-preview .result .amount{font-size:clamp(28px,7vw,50px);font-weight:1000;color:#f0cf6c}
+    #slot-preview .result.bigwin{animation:bigWin .45s ease 5}
+    @keyframes bigWin{50%{background:#651321;box-shadow:0 0 28px #d6a433}}
+    #slot-preview .win-pop{position:fixed;left:50%;top:42%;transform:translate(-50%,-50%) scale(.2);-webkit-transform:translate(-50%,-50%) scale(.2);z-index:2147483000;width:min(88vw,520px);padding:18px 22px;border:4px solid #ffe38d;border-radius:20px;background:linear-gradient(180deg,#7d1727,#26070d);box-shadow:0 14px 35px #000c,0 0 28px #d6a433aa;text-align:center;pointer-events:none;opacity:0;visibility:hidden;display:block}
+    #slot-preview .win-pop.show{visibility:visible;animation:winPopBounce 1.65s cubic-bezier(.18,.82,.27,1) forwards;-webkit-animation:winPopBounce 1.65s cubic-bezier(.18,.82,.27,1) forwards}
+    #slot-preview .win-pop .win-pop-label{display:block;font-size:12px;letter-spacing:4px;color:#ffe7a5;font-weight:900}
+    #slot-preview .win-pop .win-pop-amount{display:block;font-size:clamp(38px,10vw,72px);line-height:1.05;color:#fff0a8;font-weight:1000;text-shadow:0 3px 0 #734800,0 0 22px #ffd45a}
+    @keyframes winPopBounce{0%{opacity:0;transform:translate(-50%,-50%) scale(.2)}18%{opacity:1;transform:translate(-50%,-50%) scale(1.18)}34%{transform:translate(-50%,-50%) scale(.94)}48%{transform:translate(-50%,-50%) scale(1.07)}64%{transform:translate(-50%,-50%) scale(1)}86%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-56%) scale(.9)}}
+    #slot-preview .controls{display:grid;grid-template-columns:1.2fr 1fr;gap:10px;margin-top:10px}
+    #slot-preview .panel{background:#111;border:1px solid #44351d;border-radius:12px;padding:10px}
+    #slot-preview .panel-title{font-size:9px;color:#bea463;font-weight:900;letter-spacing:1px;margin-bottom:8px}
+    #slot-preview .bet-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+    #slot-preview button{font:inherit}
+    #slot-preview .bet-btn,#slot-preview .small-btn,#slot-preview .spin-btn,#slot-preview .bank-btn{min-height:44px;border-radius:9px;border:1px solid #555;background:#232323;color:#fff;font-weight:900;cursor:pointer}
+    #slot-preview .bet-btn.active{background:linear-gradient(#dfbb60,#987022);color:#111;border-color:#ffe29a}
+    #slot-preview .action-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
+    #slot-preview .small-btn.gold{background:#71531e;border-color:#caa84c}
+    #slot-preview .spin-row{display:grid;grid-template-columns:1fr auto;gap:9px;margin-top:10px}
+    #slot-preview .spin-btn{min-height:76px;border-radius:16px;border:3px solid #ffe18d;background:linear-gradient(#f2ca60,#a77920);color:#171000;font-size:24px;font-weight:1000;letter-spacing:2px;box-shadow:0 5px 0 #63420d}
+    #slot-preview .spin-btn:disabled{opacity:.45;cursor:not-allowed}
+    #slot-preview .bank-btn{min-width:130px;border-radius:16px}
+    #slot-preview .paytable{margin-top:10px;background:#0e0e0e;border:1px solid #49391e;border-radius:12px;padding:10px}
+    #slot-preview .paytable h3{margin:0 0 8px;color:#e2c570;font-size:12px}
+    #slot-preview .paygrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px 14px;font-size:11px}
+    #slot-preview .payrow{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid #242424;padding:5px 0}
+    #slot-preview .line-win{margin-top:5px;font-size:11px;color:#d7d7d7;text-align:center;min-height:18px}
+    #slot-preview .free-badge{display:inline-block;padding:3px 7px;border-radius:999px;background:#4b296f;color:#fff;font-size:10px;font-weight:900}
+    #slot-preview .bj-counter-panel{display:grid;max-width:980px;margin:0 auto 10px;border:2px solid #4e6d4c;border-radius:12px;background:#08120a;padding:10px;text-align:center;grid-template-columns:auto repeat(3,minmax(0,1fr));gap:8px;align-items:center}
+    #slot-preview .bj-counter-panel.counter-off .bj-counter-box{display:none}
+    #slot-preview .bj-counter-box{border:1px solid #355238;border-radius:9px;background:#0d1b10;padding:8px}
+    #slot-preview .bj-counter-box span{display:block;font-size:9px;color:#9eb39f;letter-spacing:.8px;font-weight:900}
+    #slot-preview .bj-counter-box b{display:block;margin-top:4px;font-size:20px;color:#dff2d9}
+    #slot-preview .bj-counter-box.advice b{color:#f0d36f;font-size:14px}
+    #slot-preview .game-view{display:none}
+    #slot-preview .game-view.active{display:block}
+    #slot-preview .placeholder-game{max-width:980px;margin:0 auto;border:3px solid #6d4b1f;border-radius:18px;padding:22px;background:#0c0c0c;text-align:center}
+    #slot-preview .placeholder-game h2{margin:0 0 8px;color:#f0cf6c}
+    #slot-preview .placeholder-game p{margin:0;color:#bbb}
+    #slot-preview .bj-table{max-width:980px;margin:0 auto;border:4px solid #7b5b28;border-radius:28px 28px 18px 18px;padding:14px;background:radial-gradient(circle at 50% 0,#17623e,#07321f 62%,#041b12);box-shadow:0 14px 30px #0009,inset 0 0 38px #00170e}
+    #slot-preview .bj-title{position:relative;text-align:center;color:#f5d780;font-weight:1000;font-size:clamp(23px,5vw,38px);letter-spacing:2px;text-shadow:0 2px 0 #4f3700;padding-right:132px}
+    #slot-preview .bj-top-add{position:absolute;right:0;top:50%;transform:translateY(-50%);min-height:40px;border-radius:10px;border:1px solid #8b6f2d;background:#6a4d18;color:#fff;font-weight:900;padding:0 14px;cursor:pointer;font-size:11px}
+    #slot-preview .bj-sub{text-align:center;color:#d3c59b;font-size:10px;letter-spacing:1px;margin-top:3px}
+    #slot-preview .bj-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin-top:10px}
+    #slot-preview .bj-stat{background:#071a11;border:1px solid #477258;border-radius:9px;padding:7px;text-align:center}
+    #slot-preview .bj-stat span{display:block;font-size:8px;color:#9eb5a5}.bj-stat b{display:block;margin-top:3px;font-size:17px;color:#fff}
+    #slot-preview .bj-zone{margin-top:10px;padding:10px;border:1px solid #4b785e;border-radius:14px;background:#06281a99;text-align:center}
+    #slot-preview .bj-zone-label{font-size:9px;color:#b8ccb9;letter-spacing:2px;font-weight:900;margin-bottom:7px}
+    #slot-preview .bj-hand{display:flex;justify-content:center;gap:7px;min-height:112px;flex-wrap:wrap;align-items:center}
+    #slot-preview .bj-split-row{display:flex;justify-content:center;align-items:flex-start;gap:8px;width:100%;flex-wrap:nowrap}
+    #slot-preview .bj-split-hand{display:flex;justify-content:center;align-items:center;gap:4px;padding:6px;border:2px solid transparent;border-radius:12px;min-width:0;transition:.2s ease;position:relative}
+    #slot-preview .bj-split-hand.active{border-color:#ffd75b;background:#ffd75b12;box-shadow:0 0 18px #ffd75b55}
+    #slot-preview .bj-split-hand.active::after{content:'PLAYING';position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:#ffd75b;color:#111;border-radius:999px;padding:2px 7px;font-size:7px;font-weight:1000;letter-spacing:.6px}
+    #slot-preview .bj-split-row[data-hands="3"] .bj-card{width:58px;height:82px;font-size:15px}
+    #slot-preview .bj-split-row[data-hands="4"] .bj-card{width:50px;height:72px;font-size:13px;padding:4px}
+    #slot-preview .bj-split-row[data-hands="5"] .bj-card{width:44px;height:64px;font-size:12px;padding:3px}
+    #slot-preview .bj-split-row[data-hands="3"] .bj-card .suit{font-size:22px}
+    #slot-preview .bj-split-row[data-hands="4"] .bj-card .suit{font-size:19px}
+    #slot-preview .bj-split-row[data-hands="5"] .bj-card .suit{font-size:16px}
+    #slot-preview .bj-split-row.split-anim .bj-split-hand{animation:bjSplitSpread .45s ease-out}
+    @keyframes bjSplitSpread{0%{transform:translateX(0) scale(1)}45%{transform:translateX(var(--split-shift,0)) scale(.96)}100%{transform:translateX(0) scale(1)}}
+    #slot-preview .bj-card{width:72px;height:102px;border-radius:8px;background:#fff;color:#111;border:2px solid #ddd;box-shadow:0 4px 8px #0008;display:flex;flex-direction:column;justify-content:space-between;padding:6px;font-weight:1000;font-size:19px;text-align:left}
+    #slot-preview .bj-card.red{color:#c91d2c}
+    #slot-preview .bj-card.back{background:repeating-linear-gradient(45deg,#7c1421,#7c1421 7px,#efe0a8 7px,#efe0a8 10px);border-color:#fff;color:transparent}
+    #slot-preview .bj-card .suit{text-align:center;font-size:30px;line-height:1}
+    #slot-preview .bj-card .bottom{transform:rotate(180deg)}
+    #slot-preview .bj-total{font-size:12px;color:#f0d67d;font-weight:900;min-height:18px;margin-top:5px}
+    #slot-preview .bj-bets{position:relative;display:grid;grid-template-columns:78px 112px 78px;justify-content:center;align-items:center;gap:10px;min-height:124px;margin-top:12px;padding-right:0}
+    #slot-preview .bj-bet-circle{position:relative;border-radius:50%;border:3px solid #d6bc71;background:#0a351f;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:8px;cursor:pointer;user-select:none}
+    #slot-preview #bj-main-circle{width:112px;height:112px}
+    #slot-preview #bj-match-circle{width:78px;height:78px}
+    #slot-preview #bj-ladies-circle{width:78px;height:78px}
+    #slot-preview .bj-bet-circle.side{border-color:#9cc0e8;background:#0a2940}
+    #slot-preview .bj-bet-circle.ladies{border-color:#e49ac2;background:#48152f}
+    #slot-preview .bj-bet-circle span{font-size:8px;letter-spacing:.5px;color:#ddd;font-weight:900}.bj-bet-circle b{font-size:17px;margin-top:3px;color:#fff}
+    #slot-preview .bj-bet-stack{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column-reverse;align-items:center;pointer-events:none;z-index:2}
+    #slot-preview .bj-bet-chip{width:34px;height:34px;border-radius:50%;border:3px dashed #fff;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:1000;box-shadow:0 2px 5px #0008;margin-top:-25px;background:#1768b5;color:#fff;text-shadow:0 1px 1px #000;line-height:1;white-space:nowrap;position:relative}
+    #slot-preview .bj-bet-chip.c1{background:#f1f1f1;color:#000;border-color:#222;text-shadow:none}
+    #slot-preview .bj-bet-chip.c5{background:#c92731;color:#fff}
+    #slot-preview .bj-bet-chip.c10{background:#1768b5;color:#fff}
+    #slot-preview .bj-bet-chip.c25{background:#18884a;color:#fff}
+    #slot-preview .bj-bet-chip.c100{background:#161616;color:#fff}
+    #slot-preview .bj-bet-chip.c500{background:#742c99;color:#fff}
+    #slot-preview .bj-bet-stack .bj-bet-total{display:none}
+    #slot-preview .bj-bet-stack.lose{animation:bjChipsToDealer .65s ease-in forwards}
+    #slot-preview .bj-bet-stack.win{animation:bjChipsToPlayer .8s ease-out forwards}
+    @keyframes bjChipsToDealer{to{transform:translate(-50%,-170px) scale(.75);opacity:0}}
+    @keyframes bjChipsToPlayer{0%{transform:translate(-50%,-50%) scale(1)}55%{transform:translate(-50%,90px) scale(1.08)}100%{transform:translate(-50%,140px) scale(.8);opacity:0}}
+    #slot-preview .bj-bonus-popup{position:fixed;left:50%;top:34%;transform:translate(-50%,-50%) scale(.75);z-index:2147483002;display:none;min-width:min(84vw,430px);padding:16px 20px;border:3px solid #ffe18a;border-radius:18px;background:linear-gradient(#315c90,#10243b);box-shadow:0 12px 30px #000c;text-align:center;pointer-events:none}
+    #slot-preview .bj-bonus-popup.show{display:block;animation:bjBonusPop 1.25s ease-out forwards}
+    #slot-preview .bj-bonus-popup.ladies{background:linear-gradient(#7c2754,#321124)}
+    #slot-preview .bj-bonus-popup .title{font-size:13px;letter-spacing:2px;font-weight:1000;color:#fff1aa}
+    #slot-preview .bj-bonus-popup .amount{margin-top:4px;font-size:clamp(28px,7vw,44px);font-weight:1000;color:#fff}
+    @keyframes bjBonusPop{0%{opacity:0;transform:translate(-50%,-50%) scale(.55)}18%{opacity:1;transform:translate(-50%,-50%) scale(1.12)}32%{transform:translate(-50%,-50%) scale(.96)}50%{transform:translate(-50%,-50%) scale(1.03)}82%{opacity:1}100%{opacity:0;transform:translate(-50%,-55%) scale(.92)}}
+    #slot-preview .bj-help{position:absolute;right:-6px;top:-8px;width:22px;height:22px;min-height:22px;border-radius:50%;border:1px solid #fff;background:#111;color:#fff;font-size:12px;font-weight:1000;line-height:20px;padding:0;z-index:3}
+    #slot-preview .bj-side-help{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:#0008;z-index:2147483001;padding:16px}
+    #slot-preview .bj-side-help.show{display:flex}
+    #slot-preview .bj-side-help-card{width:min(92vw,440px);border:3px solid #e7c86d;border-radius:16px;background:#0b1711;color:#fff;padding:18px;box-shadow:0 16px 40px #000c}
+    #slot-preview .bj-side-help-card h3{margin:0 0 10px;color:#f0d57e}.bj-side-help-card .bj-help-lines{font-size:13px;line-height:1.55;color:#ddd}.bj-side-help-card button{width:100%;margin-top:14px;min-height:44px;border-radius:9px;border:1px solid #6b6b6b;background:#202020;color:#fff;font-weight:900}
+    #slot-preview .bj-chip-row{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid #4b785e}
+    #slot-preview .bj-chip{min-height:50px;aspect-ratio:1;border-radius:50%;border:4px dashed #eee;color:#fff;font-weight:900;cursor:pointer;box-shadow:0 3px 6px #0008,inset 0 0 0 2px #ffffff22}
+    #slot-preview .bj-chip[data-bj-chip="1"]{background:#f1f1f1;color:#111;border-color:#222}
+    #slot-preview .bj-chip[data-bj-chip="5"]{background:#c92731}
+    #slot-preview .bj-chip[data-bj-chip="10"]{background:#1768b5}
+    #slot-preview .bj-chip[data-bj-chip="25"]{background:#18884a}
+    #slot-preview .bj-chip[data-bj-chip="100"]{background:#161616}
+    #slot-preview .bj-chip[data-bj-chip="500"]{background:#742c99}
+    #slot-preview .bj-chip.sel{outline:4px solid #ffd75b;outline-offset:2px}
+    #slot-preview .bj-actions{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:12px;position:relative}
+    #slot-preview .bj-action{min-height:56px;border-radius:10px;border:1px solid #6b6b6b;background:#202020;color:#fff;font-weight:900;cursor:pointer;font-size:18px}
+    #slot-preview .bj-action.primary{background:linear-gradient(#e0ba5c,#97701f);color:#111;border-color:#ffe29a}
+    #slot-preview #bj-hit,#slot-preview #bj-stand{min-height:66px;font-size:21px}
+    #slot-preview #bj-double,#slot-preview #bj-split,#slot-preview #bj-insurance,#slot-preview #bj-new-shoe{min-height:44px;font-size:13px}
+    #slot-preview #bj-deal{position:absolute;right:4px;top:50%;transform:translateY(-50%);width:124px;min-height:96px;border-radius:18px;font-size:22px;box-shadow:0 5px 0 #63420d,0 8px 16px #0009}
+    #slot-preview .bj-action:disabled{opacity:.35;cursor:not-allowed}
+    #slot-preview .bj-message{margin-top:9px;min-height:48px;border-radius:10px;border:1px solid #4d795f;background:#061c12;display:flex;align-items:center;justify-content:center;text-align:center;padding:8px;color:#f2dc92;font-weight:900}
+    #slot-preview .bj-bank-row{display:none}
+    #slot-preview .bj-add-money{min-height:44px;border-radius:10px;border:1px solid #8b6f2d;background:#6a4d18;color:#fff;font-weight:900;padding:0 18px;cursor:pointer}
+    #slot-preview .bj-outcome-overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:#0005;z-index:2147483000;pointer-events:none}
+    #slot-preview .bj-outcome-overlay.show{display:flex}
+    #slot-preview .bj-outcome-card{min-width:min(86vw,520px);padding:22px 24px;border:4px solid #ffe28d;border-radius:20px;background:linear-gradient(#15472d,#092719);box-shadow:0 14px 36px #000c,0 0 28px #d8b44c88;text-align:center;animation:bjOutcomePop 1.7s ease-out forwards}
+    #slot-preview .bj-outcome-card.win{background:linear-gradient(#6c4e10,#261803)}
+    #slot-preview .bj-outcome-title{font-size:clamp(28px,8vw,54px);font-weight:1000;color:#fff0a4;text-shadow:0 3px 0 #6c4800}
+    #slot-preview .bj-outcome-sub{margin-top:6px;font-size:15px;color:#fff}
+    @keyframes bjOutcomePop{0%{transform:scale(.55);opacity:0}18%{transform:scale(1.16);opacity:1}34%{transform:scale(.95)}50%{transform:scale(1.06)}70%{transform:scale(1)}100%{transform:scale(.92);opacity:0}}
+    #slot-preview .bj-side-result{margin-top:5px;color:#b9d4c2;font-size:10px;min-height:15px}
+    #slot-preview .bj-paynote{margin-top:9px;font-size:9px;color:#a9b9ad;text-align:center;line-height:1.4}
+    @media(max-width:680px){#slot-preview{padding:6px}#slot-preview .cabinet{padding:7px}.stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}.reels{gap:3px!important}.cell{min-height:62px!important}.controls{grid-template-columns:1fr!important}.bet-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}.spin-row{grid-template-columns:1fr!important}.bank-btn{min-height:48px}.paygrid{grid-template-columns:1fr!important}}
+    @media(max-width:680px){#slot-preview .bj-title{padding-right:104px}#slot-preview .bj-top-add{padding:0 9px;font-size:9px}#slot-preview .bj-stats{grid-template-columns:repeat(2,minmax(0,1fr))}#slot-preview .bj-card{width:60px;height:86px;font-size:16px}#slot-preview .bj-card .suit{font-size:24px}#slot-preview .bj-bets{grid-template-columns:64px 96px 64px;gap:5px;padding-right:0}#slot-preview #bj-main-circle{width:96px;height:96px}#slot-preview #bj-match-circle,#slot-preview #bj-ladies-circle{width:64px;height:64px}#slot-preview .bj-chip-row{grid-template-columns:repeat(6,1fr);gap:4px}#slot-preview .bj-chip{min-height:42px;font-size:10px;border-width:3px}#slot-preview .bj-actions{gap:6px}#slot-preview #bj-deal{right:2px;width:92px;min-height:84px;font-size:17px}#slot-preview #bj-hit,#slot-preview #bj-stand{min-height:60px;font-size:19px}#slot-preview .bj-counter-panel{grid-template-columns:1fr}#slot-preview .bj-counter-panel.counter-off .bj-counter-box{display:none}}
+    @media(prefers-reduced-motion:reduce){#slot-preview .cell.spinning,#slot-preview .result.bigwin{animation:none}}
+  </style>
+
+  <section class="game-view" id="game-craps">
+    <div class="placeholder-game">
+      <h2>CRAPS</h2>
+      <p>The full Crapless Craps game lives in the main app build. This preview tab now switches correctly.</p>
+    </div>
+  </section>
+
+  <section class="game-view active" id="game-blackjack">
+    <div class="bj-side-help" id="bj-side-help" aria-live="polite"><div class="bj-side-help-card"><h3 id="bj-side-help-title">BONUS ODDS</h3><div class="bj-help-lines" id="bj-side-help-text"></div><button type="button" id="bj-side-help-close">CLOSE</button></div></div>
+    <div class="bj-bonus-popup" id="bj-bonus-popup" aria-live="polite"><div class="title" id="bj-bonus-popup-title">BONUS WON</div><div class="amount" id="bj-bonus-popup-amount">$0.00</div></div>
+    <div class="bj-outcome-overlay" id="bj-outcome-overlay" aria-live="polite"><div class="bj-outcome-card" id="bj-outcome-card"><div class="bj-outcome-title" id="bj-outcome-title">WINNER</div><div class="bj-outcome-sub" id="bj-outcome-sub"></div></div></div>
+    <div class="bj-counter-panel counter-off" id="bj-counter-panel" aria-live="polite">
+      <button type="button" class="small-btn" id="bj-counter-toggle">CARD COUNTER: OFF</button>
+      <div class="bj-counter-box"><span>RUNNING COUNT</span><b id="bj-running-count">0</b></div>
+      <div class="bj-counter-box"><span>TRUE COUNT</span><b id="bj-true-count">0.0</b></div>
+      <div class="bj-counter-box advice"><span>BET GUIDANCE</span><b id="bj-bet-advice">NORMAL BET</b></div>
+    </div>
+    <div class="bj-table">
+      <div class="bj-title">6-DECK BLACKJACK<button type="button" class="bj-top-add" id="bj-add-money">ADD MONEY +$500</button></div>
+      <div class="bj-sub">BLACKJACK PAYS 3:2 • DEALER STANDS ON 17</div>
+      <div class="bj-stats">
+        <div class="bj-stat"><span>BANKROLL</span><b id="bj-bankroll">$1,000.00</b></div>
+        <div class="bj-stat"><span>MAIN BET</span><b id="bj-main-bet">$0.00</b></div>
+        <div class="bj-stat"><span>SHOE</span><b id="bj-shoe">312</b></div>
+        <div class="bj-stat"><span>LAST WIN</span><b id="bj-last-win">$0.00</b></div>
+      </div>
+      <div class="bj-zone">
+        <div class="bj-zone-label">DEALER</div>
+        <div class="bj-hand" id="bj-dealer-hand"></div>
+        <div class="bj-total" id="bj-dealer-total"></div>
+      </div>
+      <div class="bj-zone">
+        <div class="bj-zone-label">PLAYER</div>
+        <div class="bj-hand" id="bj-player-hand"></div>
+        <div class="bj-total" id="bj-player-total"></div>
+      </div>
+      <div class="bj-bets">
+        <div class="bj-bet-circle side" id="bj-match-circle" role="button" tabindex="0"><button type="button" class="bj-help" id="bj-match-help" aria-label="Match the Dealer odds">?</button><span>MATCH<br>DEALER</span><b id="bj-match-amt">$0</b><div class="bj-bet-stack" id="bj-match-stack"></div></div>
+        <button type="button" class="bj-bet-circle" id="bj-main-circle"><span>BLACKJACK</span><b id="bj-main-circle-amt">$0</b><div class="bj-bet-stack main" id="bj-main-stack"></div></button>
+        <div class="bj-bet-circle ladies" id="bj-ladies-circle" role="button" tabindex="0"><button type="button" class="bj-help" id="bj-ladies-help" aria-label="Lucky Ladies odds">?</button><span>LUCKY<br>LADIES</span><b id="bj-ladies-amt">$0</b><div class="bj-bet-stack ladies" id="bj-ladies-stack"></div></div>
+        <button type="button" class="bj-action primary" id="bj-deal">DEAL</button>
+      </div>
+      <div class="bj-actions">
+        <button type="button" class="bj-action" id="bj-hit" disabled>HIT</button>
+        <button type="button" class="bj-action" id="bj-stand" disabled>STAND</button>
+        <button type="button" class="bj-action" id="bj-double" disabled>DOUBLE</button>
+        <button type="button" class="bj-action" id="bj-split" disabled>SPLIT</button>
+        <button type="button" class="bj-action" id="bj-insurance" disabled>INSURANCE</button>
+        <button type="button" class="bj-action" id="bj-new-shoe">NEW SHOE</button>
+      </div>
+      <div class="bj-chip-row" id="bj-chip-row">
+        <button type="button" class="bj-chip" data-bj-chip="1">$1</button>
+        <button type="button" class="bj-chip sel" data-bj-chip="5">$5</button>
+        <button type="button" class="bj-chip" data-bj-chip="10">$10</button>
+        <button type="button" class="bj-chip" data-bj-chip="25">$25</button>
+        <button type="button" class="bj-chip" data-bj-chip="100">$100</button>
+        <button type="button" class="bj-chip" data-bj-chip="500">$500</button>
+      </div>
+      <div class="bj-message" id="bj-message">Choose a chip, tap a betting circle, then DEAL.</div>
+      <div class="bj-side-result" id="bj-side-result"></div>
+      <div class="bj-paynote">Lucky Ladies preview: any 20 pays by strength; suited 20s pay more; two Q♥ pays 200:1; two Q♥ with dealer blackjack pays 1000:1. Match the Dealer pays more for suited rank matches.</div>
+    </div>
+  </section>
+
+  <section class="cabinet game-view" id="game-slots">
+    <div class="marquee" id="sp-topspin" role="button" tabindex="0" aria-label="Spin"><div class="small">LAUREN'S SLOTS</div><div class="big" id="sp-topspin-text">SPIN TO WIN</div></div>
+
+    <div class="stats">
+      <div class="stat"><span>BANKROLL</span><b id="sp-bankroll">$1,000.00</b></div>
+      <div class="stat"><span>TOTAL BET</span><b id="sp-bet">$1.00</b></div>
+      <div class="stat"><span>LAST WIN</span><b id="sp-lastwin">$0.00</b></div>
+      <div class="stat"><span>FREE SPINS</span><b id="sp-free">0</b></div>
+      <div class="stat"><span>SPINS</span><b id="sp-spins">0</b></div>
+    </div>
+
+    <div class="machine">
+      <div class="reel-window">
+        <div class="reels" id="sp-reels"></div>
+        <div class="win-pop" id="sp-winpop" aria-live="polite"><span class="win-pop-label">TOTAL WIN</span><span class="win-pop-amount" id="sp-winpop-amount">$0.00</span></div>
+      </div>
+      <div class="payline-note">5 REELS × 3 ROWS • 20 PAYLINES • WILD + SCATTER</div>
+      <div class="line-win" id="sp-lines">20 paylines active</div>
+
+      <div class="result" id="sp-resultbox" role="button" tabindex="0" aria-label="Spin">
+        <div class="label">LAST RESULT</div>
+        <div class="amount" id="sp-result">PRESS SPIN</div>
+      </div>
+
+      <div class="controls">
+        <div class="panel">
+          <div class="panel-title">TOTAL BET</div>
+          <div class="bet-grid" id="sp-bets">
+            <button type="button" class="bet-btn" data-bet="0.2">$0.20</button>
+            <button type="button" class="bet-btn" data-bet="0.5">$0.50</button>
+            <button type="button" class="bet-btn active" data-bet="1">$1</button>
+            <button type="button" class="bet-btn" data-bet="2">$2</button>
+            <button type="button" class="bet-btn" data-bet="5">$5</button>
+            <button type="button" class="bet-btn" data-bet="10">$10</button>
+            <button type="button" class="bet-btn" data-bet="25">$25</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">CONTROLS</div>
+          <div class="action-grid">
+            <button type="button" class="small-btn gold" id="sp-same">SAME BET</button>
+            <button type="button" class="small-btn" id="sp-max">MAX BET</button>
+            <button type="button" class="small-btn" id="sp-new">NEW SESSION</button>
+            <button type="button" class="small-btn" id="sp-paytoggle">HIDE PAYTABLE</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="spin-row">
+        <button type="button" class="spin-btn" id="sp-spin">SPIN</button>
+        <button type="button" class="bank-btn" id="sp-banker">BANKER<br>+$500</button>
+      </div>
+    </div>
+
+    <div class="paytable" id="sp-paytable">
+      <h3>PAYTABLE — PAYLINE WINS, LEFT TO RIGHT</h3>
+      <div class="paygrid">
+        <div class="payrow"><span>7️⃣ ×5</span><b>250× line bet</b></div>
+        <div class="payrow"><span>💎 ×5</span><b>120×</b></div>
+        <div class="payrow"><span>🔔 ×5</span><b>60×</b></div>
+        <div class="payrow"><span>⭐ ×5</span><b>40×</b></div>
+        <div class="payrow"><span>🍊 ×5</span><b>25×</b></div>
+        <div class="payrow"><span>🍋 ×5</span><b>20×</b></div>
+        <div class="payrow"><span>🍒 ×5</span><b>15×</b></div>
+        <div class="payrow"><span>🃏 WILD</span><b>Substitutes</b></div>
+        <div class="payrow"><span>🔮 SCATTER ×3</span><b>8 free spins</b></div>
+        <div class="payrow"><span>🔮 SCATTER ×4+</span><b>12 free spins</b></div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+  (()=>{
+    const root=document.getElementById('slot-preview');
+    if(root.dataset.ready==='1')return;
+    root.dataset.ready='1';
+    const $=s=>root.querySelector(s);
+    const money=n=>'$'+Number(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+
+    const symbols=[
+      {id:'cherry',icon:'🍒',w:26,p3:2,p4:5,p5:15},
+      {id:'lemon',icon:'🍋',w:22,p3:3,p4:7,p5:20},
+      {id:'orange',icon:'🍊',w:18,p3:4,p4:10,p5:25},
+      {id:'star',icon:'⭐',w:7,p3:7,p4:18,p5:40},
+      {id:'bell',icon:'🔔',w:7,p3:10,p4:25,p5:60},
+      {id:'diamond',icon:'💎',w:6,p3:18,p4:50,p5:120},
+      {id:'seven',icon:'7️⃣',w:5,p3:30,p4:90,p5:250},
+      {id:'wild',icon:'🃏',w:7,p3:0,p4:0,p5:0},
+      {id:'scatter',icon:'🔮',w:7,p3:0,p4:0,p5:0}
+    ];
+
+    const lines=[
+      [1,1,1,1,1],[0,0,0,0,0],[2,2,2,2,2],
+      [0,1,2,1,0],[2,1,0,1,2],[0,0,1,2,2],[2,2,1,0,0],
+      [1,0,0,0,1],[1,2,2,2,1],[0,1,1,1,0],[2,1,1,1,2],
+      [0,1,0,1,0],[2,1,2,1,2],[1,0,1,0,1],[1,2,1,2,1],
+      [0,2,0,2,0],[2,0,2,0,2],[0,2,2,2,0],[2,0,0,0,2],[1,1,0,1,1]
+    ];
+
+    const SHARED_BANKROLL_KEY='craplessCasinoSharedBankrollV30';
+    let bankroll=Number(localStorage.getItem(SHARED_BANKROLL_KEY)||1000),bet=1,lastWin=0,freeSpins=0,spins=0,previousBet=1,spinning=false;
+    let grid=Array.from({length:5},()=>Array.from({length:3},()=>symbols[0]));
+    let bjCounterEnabled=false,bjRunningCount=0,bjDecksRemaining=6;
+    let bjBankroll=bankroll,bjSelectedChip=5,bjMainBet=0,bjMatchBet=0,bjLadiesBet=0,bjInsuranceBet=0,bjInsuranceResolved=false,bjLastWin=0,bjRoundActive=false,bjHoleHidden=true;
+    let bjShoe=[],bjPlayer=[],bjDealer=[],bjSplitHands=[],bjSplitBets=[],bjActiveHand=0,bjSplitMode=false;
+    const BJ_SUITS=['♠','♥','♦','♣'];
+    const BJ_RANKS=['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+    function resetBjShoeCounter(){bjRunningCount=0;bjDecksRemaining=6;updateBjCounter()}
+
+    function makeBjShoe(){
+      const cards=[];
+      for(let d=0;d<6;d++)for(const suit of BJ_SUITS)for(const rank of BJ_RANKS)cards.push({rank,suit});
+      for(let i=cards.length-1;i>0;i--){const a=new Uint32Array(1);crypto.getRandomValues(a);const j=a[0]%(i+1);[cards[i],cards[j]]=[cards[j],cards[i]]}
+      bjShoe=cards;bjPlayer=[];bjDealer=[];bjSplitHands=[];bjSplitBets=[];bjActiveHand=0;bjSplitMode=false;bjRoundActive=false;bjHoleHidden=true;resetBjShoeCounter();renderBj();
+    }
+    function bjCardValue(card){if(card.rank==='A')return 11;if(['K','Q','J'].includes(card.rank))return 10;return Number(card.rank)}
+    function bjHandValue(hand){let total=hand.reduce((a,c)=>a+bjCardValue(c),0),aces=hand.filter(c=>c.rank==='A').length;while(total>21&&aces>0){total-=10;aces--}return total}
+    function bjIsBlackjack(hand){return hand.length===2&&bjHandValue(hand)===21}
+    function bjCountCard(card){if(!card)return;if(['2','3','4','5','6'].includes(card.rank))bjRunningCount++;else if(['10','J','Q','K','A'].includes(card.rank))bjRunningCount--;bjDecksRemaining=Math.max(.25,bjShoe.length/52);updateBjCounter()}
+    function drawBj(exposed=true){if(bjShoe.length<40)makeBjShoe();const c=bjShoe.pop();if(exposed)bjCountCard(c);return c}
+    function bjCardHTML(card,hidden=false){if(hidden)return '<div class="bj-card back">?</div>';const red=card.suit==='♥'||card.suit==='♦';return `<div class="bj-card ${red?'red':''}"><div>${card.rank}${card.suit}</div><div class="suit">${card.suit}</div><div class="bottom">${card.rank}${card.suit}</div></div>`}
+    function bjChipColorClass(amount){if(amount>=500)return'c500';if(amount>=100)return'c100';if(amount>=25)return'c25';if(amount>=10)return'c10';if(amount>=5)return'c5';return'c1'}
+    function bjStackHTML(amount){if(!amount)return'';const denoms=[500,100,25,10,5,1];let remaining=Math.round(amount);const stack=[];for(const d of denoms){const count=Math.floor(remaining/d);for(let i=0;i<count;i++)stack.push(d);remaining-=count*d}return stack.map((d,i)=>`<div class="bj-bet-chip ${bjChipColorClass(d)}"><span>${i===stack.length-1?money(amount):''}</span></div>`).join('')}
+    function renderBj(){localStorage.setItem(SHARED_BANKROLL_KEY,String(bjBankroll));bankroll=bjBankroll;
+      $('#bj-bankroll').textContent=money(bjBankroll);$('#bj-main-bet').textContent=money(bjMainBet);$('#bj-main-circle-amt').textContent=money(bjMainBet);$('#bj-match-amt').textContent=money(bjMatchBet);$('#bj-ladies-amt').textContent=money(bjLadiesBet);$('#bj-last-win').textContent=money(bjLastWin);$('#bj-shoe').textContent=String(bjShoe.length);$('#bj-main-stack').innerHTML=bjStackHTML(bjMainBet);$('#bj-match-stack').innerHTML=bjStackHTML(bjMatchBet);$('#bj-ladies-stack').innerHTML=bjStackHTML(bjLadiesBet);
+      const shownPlayer=bjSplitMode?bjSplitHands[bjActiveHand]:bjPlayer;
+      if(bjSplitMode){
+        $('#bj-player-hand').innerHTML=`<div class="bj-split-row" data-hands="${bjSplitHands.length}">${bjSplitHands.map((hand,i)=>`<div class="bj-split-hand ${i===bjActiveHand?'active':''}" style="--split-shift:${i%2===0?'10px':'-10px'}">${hand.map(c=>bjCardHTML(c)).join('')}</div>`).join('')}</div>`;
+      }else $('#bj-player-hand').innerHTML=shownPlayer.map(c=>bjCardHTML(c)).join('');
+      $('#bj-dealer-hand').innerHTML=bjDealer.map((c,i)=>bjCardHTML(c,bjHoleHidden&&i===1)).join('');
+      $('#bj-player-total').textContent=shownPlayer.length?`${bjSplitMode?`HAND ${bjActiveHand+1} • `:''}TOTAL ${bjHandValue(shownPlayer)}`:'';
+      $('#bj-dealer-total').textContent=bjDealer.length?(bjHoleHidden?`SHOWING ${bjCardValue(bjDealer[0])}`:`TOTAL ${bjHandValue(bjDealer)}`):'';
+      const activeHand=bjSplitMode?bjSplitHands[bjActiveHand]:bjPlayer;
+      $('#bj-hit').disabled=!bjRoundActive;$('#bj-stand').disabled=!bjRoundActive;$('#bj-double').disabled=!bjRoundActive||activeHand.length!==2||bjBankroll<(bjSplitMode?bjSplitBets[bjActiveHand]:bjMainBet);
+      const splitHand=bjSplitMode?bjSplitHands[bjActiveHand]:bjPlayer;
+      const splitWager=bjSplitMode?bjSplitBets[bjActiveHand]:bjMainBet;
+      $('#bj-split').disabled=!bjRoundActive||splitHand.length!==2||splitHand[0].rank!==splitHand[1].rank||bjBankroll<splitWager||(bjSplitMode&&bjSplitHands.length>=5);
+      $('#bj-insurance').disabled=!bjRoundActive||bjInsuranceResolved||!bjDealer[0]||bjDealer[0].rank!=='A'||bjBankroll<Math.min(bjMainBet/2,bjSelectedChip);
+      root.querySelectorAll('[data-bj-chip]').forEach(b=>b.classList.toggle('sel',Number(b.dataset.bjChip)===bjSelectedChip));
+    }
+    function addBjBet(which){if(bjRoundActive)return;if(bjBankroll<bjSelectedChip){$('#bj-message').textContent='Not enough bankroll.';return}bjBankroll-=bjSelectedChip;if(which==='main')bjMainBet+=bjSelectedChip;if(which==='match')bjMatchBet+=bjSelectedChip;if(which==='ladies')bjLadiesBet+=bjSelectedChip;renderBj()}
+    function luckyLadiesMultiplier(){
+      if(bjPlayer.length<2||bjHandValue(bjPlayer.slice(0,2))!==20)return 0;
+      const a=bjPlayer[0],b=bjPlayer[1];
+      if(a.rank==='Q'&&a.suit==='♥'&&b.rank==='Q'&&b.suit==='♥')return bjIsBlackjack(bjDealer)?1000:200;
+      if(a.rank===b.rank&&a.suit===b.suit)return 25;
+      if(a.suit===b.suit)return 10;
+      if(['10','J','Q','K'].includes(a.rank)&&['10','J','Q','K'].includes(b.rank))return 4;
+      return 2;
+    }
+    function matchDealerMultiplier(){
+      if(!bjMatchBet||bjPlayer.length<2||!bjDealer.length)return 0;const up=bjDealer[0];let total=0;
+      for(const c of bjPlayer.slice(0,2))if(c.rank===up.rank)total+=c.suit===up.suit?12:3;
+      return total;
+    }
+    function showBjBonusPopup(title,amount,ladies=false){const pop=$('#bj-bonus-popup');$('#bj-bonus-popup-title').textContent=title;$('#bj-bonus-popup-amount').textContent=amount;pop.classList.toggle('ladies',ladies);pop.classList.remove('show');void pop.offsetWidth;pop.classList.add('show');clearTimeout(pop._t);pop._t=setTimeout(()=>pop.classList.remove('show'),1300)}
+    function animateBjBetStack(id,type){const el=$(id);el.classList.remove('win','lose');void el.offsetWidth;el.classList.add(type);setTimeout(()=>el.classList.remove(type),850)}
+    function settleBjSideBets(){let text=[];const mm=matchDealerMultiplier();if(bjMatchBet){if(mm){const win=bjMatchBet*mm;const ret=bjMatchBet+win;bjBankroll+=ret;bjLastWin+=win;text.push(`Match Dealer +${money(win)}`);showBjBonusPopup('MATCH DEALER BONUS WON',money(win),false);animateBjBetStack('#bj-match-stack','win')}else{text.push('Match Dealer lost');animateBjBetStack('#bj-match-stack','lose');bjMatchBet=0}}
+      const lm=luckyLadiesMultiplier();if(bjLadiesBet){if(lm){const win=bjLadiesBet*lm;const ret=bjLadiesBet+win;bjBankroll+=ret;bjLastWin+=win;text.push(`Lucky Ladies ${lm}:1 +${money(win)}`);setTimeout(()=>showBjBonusPopup('LUCKY LADIES BONUS WON',money(win),true),mm&&bjMatchBet?650:0);animateBjBetStack('#bj-ladies-stack','win')}else{text.push('Lucky Ladies lost');animateBjBetStack('#bj-ladies-stack','lose');bjLadiesBet=0}}
+      $('#bj-side-result').textContent=text.join(' • ');renderBj();
+    }
+    function startBjRound(){
+      if(bjRoundActive)return;if(bjMainBet<=0){$('#bj-message').textContent='Place a main Blackjack bet first.';return}
+      bjLastWin=0;bjInsuranceBet=0;bjInsuranceResolved=false;bjPlayer=[];bjDealer=[];bjSplitHands=[];bjSplitBets=[];bjActiveHand=0;bjSplitMode=false;bjHoleHidden=true;bjPlayer.push(drawBj(true));bjDealer.push(drawBj(true));bjPlayer.push(drawBj(true));bjDealer.push(drawBj(false));bjRoundActive=true;settleBjSideBets();renderBj();
+      const sideDelay=(bjMatchBet||bjLadiesBet)?1350:0;
+      setTimeout(()=>{if(!bjRoundActive)return;if(bjDealer[0]?.rank==='A')$('#bj-message').textContent='Dealer shows Ace — insurance is available.';else if(bjIsBlackjack(bjPlayer)){finishBjRound()}else $('#bj-message').textContent='Hit, Stand, or Double.';renderBj()},sideDelay);
+    }
+    function bjInsurance(){
+      if(!bjRoundActive||bjInsuranceResolved||!bjDealer[0]||bjDealer[0].rank!=='A')return;
+      const maxInsurance=bjMainBet/2;
+      const wager=Math.min(maxInsurance,bjSelectedChip,bjBankroll);
+      if(wager<=0)return;
+      bjBankroll-=wager;bjInsuranceBet=wager;bjInsuranceResolved=true;
+      const dealerHasBlackjack=bjIsBlackjack(bjDealer);
+      if(dealerHasBlackjack){const win=wager*2;bjBankroll+=wager+win;bjLastWin+=win;$('#bj-message').textContent=`Insurance wins +${money(win)}`;showBjOutcome('INSURANCE WIN',`WIN ${money(win)}`,true)}
+      else{$('#bj-message').textContent=`Insurance lost ${money(wager)}.`;}
+      renderBj();
+    }
+    function showBjOutcome(title,sub,isWin=false){const overlay=$('#bj-outcome-overlay'),card=$('#bj-outcome-card');$('#bj-outcome-title').textContent=title;$('#bj-outcome-sub').textContent=sub||'';card.classList.toggle('win',isWin);overlay.classList.remove('show');void overlay.offsetWidth;overlay.classList.add('show');clearTimeout(overlay._hideTimer);overlay._hideTimer=setTimeout(()=>overlay.classList.remove('show'),1750)}
+    async function finishBjRound(){
+      const allPlayerBust=bjSplitMode?bjSplitHands.every(hand=>bjHandValue(hand)>21):bjHandValue(bjPlayer)>21;
+      if(allPlayerBust){
+        const msg=bjSplitMode?'ALL PLAYER HANDS BUST':'PLAYER BUSTS';
+        bjRoundActive=false;bjInsuranceBet=0;bjInsuranceResolved=false;$('#bj-message').textContent=msg;showBjOutcome('BUST','Dealer wins');
+        bjMainBet=0;bjMatchBet=0;bjLadiesBet=0;bjSplitMode=false;bjSplitHands=[];bjSplitBets=[];bjActiveHand=0;renderBj();return;
+      }
+      bjHoleHidden=false;if(bjDealer[1])bjCountCard(bjDealer[1]);renderBj();await new Promise(r=>setTimeout(r,420));
+      while(bjHandValue(bjDealer)<17){await new Promise(r=>setTimeout(r,520));bjDealer.push(drawBj(true));renderBj()}
+      const dv=bjHandValue(bjDealer),db=bjIsBlackjack(bjDealer);
+      let msg='',wonAny=false,totalMainWin=0;
+      if(bjSplitMode){
+        bjSplitHands.forEach((hand,i)=>{
+          const pv=bjHandValue(hand),wager=bjSplitBets[i];
+          if(pv>21)return;
+          if(db)return;
+          if(dv>21||pv>dv){bjBankroll+=wager*2;bjLastWin+=wager;totalMainWin+=wager;wonAny=true}
+          else if(pv===dv)bjBankroll+=wager;
+        });
+        msg=wonAny?`SPLIT HANDS WIN +${money(totalMainWin)}`:'SPLIT HANDS COMPLETE';
+        showBjOutcome(wonAny?'WINNER':'HAND COMPLETE',wonAny?`WIN ${money(totalMainWin)}`:'See hand results',wonAny);
+      }else{
+        const pv=bjHandValue(bjPlayer),pb=bjIsBlackjack(bjPlayer);
+        if(pv>21){msg='PLAYER BUSTS';showBjOutcome('BUST','Dealer wins')}
+        else if(pb&&!db){const win=bjMainBet*1.5;bjBankroll+=bjMainBet+win;bjLastWin+=win;totalMainWin=win;wonAny=true;msg=`BLACKJACK! +${money(win)}`;showBjOutcome('BLACKJACK!',`WIN ${money(win)}`,true)}
+        else if(db&&!pb){msg='DEALER BLACKJACK';showBjOutcome('DEALER BLACKJACK','Dealer wins')}
+        else if(dv>21||pv>dv){bjBankroll+=bjMainBet*2;bjLastWin+=bjMainBet;totalMainWin=bjMainBet;wonAny=true;msg=`YOU WIN +${money(bjMainBet)}`;showBjOutcome('WINNER',`WIN ${money(bjMainBet)}`,true)}
+        else if(pv===dv){bjBankroll+=bjMainBet;msg='PUSH';showBjOutcome('PUSH','Bet returned')}
+        else{msg='DEALER WINS';showBjOutcome('DEALER WINS','Better luck next hand')}
+      }
+      bjRoundActive=false;bjInsuranceBet=0;bjInsuranceResolved=false;$('#bj-message').textContent=msg;
+      if(!wonAny){bjMainBet=0;bjMatchBet=0;bjLadiesBet=0}
+      bjSplitMode=false;bjSplitHands=[];bjSplitBets=[];bjActiveHand=0;renderBj();
+    }
+    function bjHit(){if(!bjRoundActive)return;bjPlayer.push(drawBj(true));renderBj();if(bjHandValue(bjPlayer)>=21)finishBjRound()}
+    function bjDouble(){if(!bjRoundActive||bjPlayer.length!==2||bjBankroll<bjMainBet)return;bjBankroll-=bjMainBet;bjMainBet*=2;bjPlayer.push(drawBj(true));renderBj();finishBjRound()}
+    function bjAdvanceSplitHand(){if(!bjSplitMode)return;bjActiveHand++;if(bjActiveHand>=bjSplitHands.length){finishBjRound();return}renderBj();$('#bj-message').textContent=`Playing split hand ${bjActiveHand+1}.`}
+    function bjSplit(){
+      if(!bjRoundActive)return;
+      const hand=bjSplitMode?bjSplitHands[bjActiveHand]:bjPlayer;
+      const wager=bjSplitMode?bjSplitBets[bjActiveHand]:bjMainBet;
+      if(hand.length!==2||hand[0].rank!==hand[1].rank||bjBankroll<wager||(bjSplitMode&&bjSplitHands.length>=5))return;
+      bjBankroll-=wager;
+      const right=[hand[1],drawBj(true)],left=[hand[0],drawBj(true)];
+      if(!bjSplitMode){bjSplitMode=true;bjSplitHands=[right,left];bjSplitBets=[wager,wager];bjActiveHand=0}
+      else{bjSplitHands.splice(bjActiveHand,1,right,left);bjSplitBets.splice(bjActiveHand,1,wager,wager)}
+      renderBj();const row=$('#bj-player-hand .bj-split-row');if(row){row.classList.add('split-anim');setTimeout(()=>row.classList.remove('split-anim'),480)}
+      $('#bj-message').textContent=`Split accepted. Playing right-hand card first — Hand ${bjActiveHand+1}.`;
+    }
+    function bjHitActive(){
+      if(!bjRoundActive)return;
+      if(!bjSplitMode){bjHit();return}
+      const hand=bjSplitHands[bjActiveHand];hand.push(drawBj(true));renderBj();if(bjHandValue(hand)>=21)bjAdvanceSplitHand();
+    }
+    function bjStandActive(){if(!bjRoundActive)return;if(bjSplitMode)bjAdvanceSplitHand();else finishBjRound()}
+    function bjDoubleActive(){
+      if(!bjRoundActive)return;
+      if(!bjSplitMode){bjDouble();return}
+      const hand=bjSplitHands[bjActiveHand],wager=bjSplitBets[bjActiveHand];if(hand.length!==2||bjBankroll<wager)return;bjBankroll-=wager;bjSplitBets[bjActiveHand]*=2;hand.push(drawBj(true));renderBj();bjAdvanceSplitHand();
+    }
+
+    function bjBetAdvice(trueCount){
+      if(trueCount>=5)return 'VERY STRONG — BET HEAVIER';
+      if(trueCount>=3)return 'STRONG — INCREASE BET';
+      if(trueCount>=1)return 'SLIGHT EDGE — SMALL INCREASE';
+      if(trueCount<=-2)return 'BAD COUNT — MINIMUM BET';
+      return 'NORMAL BET';
+    }
+    function updateBjCounter(){
+      const trueCount=bjDecksRemaining>0?bjRunningCount/bjDecksRemaining:bjRunningCount;
+      $('#bj-running-count').textContent=String(bjRunningCount);
+      $('#bj-true-count').textContent=trueCount.toFixed(1);
+      $('#bj-bet-advice').textContent=bjBetAdvice(trueCount);
+      $('#bj-counter-toggle').textContent=`CARD COUNTER: ${bjCounterEnabled?'ON':'OFF'}`;
+      $('#bj-counter-panel').classList.toggle('counter-off',!bjCounterEnabled);
+    }
+
+    function cryptoUnit(){const a=new Uint32Array(1);crypto.getRandomValues(a);return a[0]/4294967296}
+    function pick(){const total=symbols.reduce((a,s)=>a+s.w,0);let r=cryptoUnit()*total;for(const s of symbols){r-=s.w;if(r<0)return s}return symbols[0]}
+    function fake(){return symbols[Math.floor(Math.random()*symbols.length)]}
+
+    function build(){const reels=$('#sp-reels');reels.innerHTML='';for(let c=0;c<5;c++){const reel=document.createElement('div');reel.className='reel';for(let r=0;r<3;r++){const cell=document.createElement('div');cell.className='cell';cell.dataset.col=c;cell.dataset.row=r;const span=document.createElement('span');span.textContent=grid[c][r].icon;cell.appendChild(span);reel.appendChild(cell)}reels.appendChild(reel)}}
+
+    function render(){
+      $('#sp-bankroll').textContent=money(bankroll);$('#sp-bet').textContent=money(bet);$('#sp-lastwin').textContent=money(lastWin);$('#sp-free').textContent=String(freeSpins);$('#sp-spins').textContent=String(spins);
+      root.querySelectorAll('.bet-btn').forEach(b=>b.classList.toggle('active',Number(b.dataset.bet)===bet));
+      $('#sp-spin').disabled=spinning || (freeSpins===0 && bankroll<bet);
+      $('#sp-spin').textContent=freeSpins>0?'FREE SPIN':'SPIN TO WIN';
+      $('#sp-topspin-text').textContent=spinning?'SPINNING…':freeSpins>0?'FREE SPIN':'SPIN TO WIN';
+    }
+
+    function clearWins(){root.querySelectorAll('.cell').forEach(c=>c.classList.remove('win','scatter','wild'))}
+    function showWinPop(amount){if(amount<=0)return;const pop=$('#sp-winpop');$('#sp-winpop-amount').textContent=money(amount);pop.classList.remove('show');pop.style.visibility='hidden';pop.style.opacity='0';void pop.offsetWidth;pop.style.visibility='visible';pop.style.opacity='1';pop.classList.add('show');clearTimeout(pop._hideTimer);pop._hideTimer=setTimeout(()=>{pop.classList.remove('show');pop.style.visibility='hidden';pop.style.opacity='0'},1900)}
+
+    function evaluate(){
+      const lineBet=bet/20;
+      let total=0;const hitCells=new Set();const wins=[];
+      lines.forEach((line,li)=>{
+        const firstCells=[];for(let c=0;c<5;c++)firstCells.push(grid[c][line[c]]);
+        let target=null;
+        for(const s of firstCells){if(s.id!=='wild'&&s.id!=='scatter'){target=s;break}}
+        if(!target)return;
+        let count=0;
+        for(let c=0;c<5;c++){const s=firstCells[c];if(s.id===target.id||s.id==='wild')count++;else break}
+        if(count>=3){const mult=count===3?target.p3:count===4?target.p4:target.p5;if(mult>0){const win=lineBet*mult;total+=win;wins.push(`Line ${li+1}: ${target.icon} ×${count} = ${money(win)}`);for(let c=0;c<count;c++)hitCells.add(`${c}-${line[c]}`)}}
+      });
+      let scatters=0;for(let c=0;c<5;c++)for(let r=0;r<3;r++)if(grid[c][r].id==='scatter'){scatters++;hitCells.add(`${c}-${r}`)}
+      let bonus=0;if(scatters>=4)bonus=12;else if(scatters===3)bonus=8;
+      return {total,wins,hitCells,bonus,scatters};
+    }
+
+    function spin(){
+      if(spinning)return;const free=freeSpins>0;if(!free && bankroll<bet)return;
+      spinning=true;previousBet=bet;if(free)freeSpins--;else bankroll-=bet;lastWin=0;clearWins();$('#sp-resultbox').classList.remove('bigwin');$('#sp-result').textContent=free?'FREE SPIN…':'SPINNING…';$('#sp-lines').textContent='20 paylines active';render();
+      const final=Array.from({length:5},()=>Array.from({length:3},pick));
+      const cells=[...root.querySelectorAll('.cell')];cells.forEach(c=>c.classList.add('spinning'));
+      const iv=setInterval(()=>{cells.forEach(cell=>cell.querySelector('span').textContent=fake().icon)},65);
+      setTimeout(()=>{
+        clearInterval(iv);grid=final;cells.forEach(cell=>{const c=Number(cell.dataset.col),r=Number(cell.dataset.row);cell.classList.remove('spinning');cell.querySelector('span').textContent=grid[c][r].icon;if(grid[c][r].id==='scatter')cell.classList.add('scatter');if(grid[c][r].id==='wild')cell.classList.add('wild')});
+        const ev=evaluate();lastWin=ev.total;bankroll+=lastWin;freeSpins+=ev.bonus;spins++;
+        ev.hitCells.forEach(k=>{const [c,r]=k.split('-');root.querySelector(`.cell[data-col="${c}"][data-row="${r}"]`)?.classList.add('win')});
+        if(ev.total>0){$('#sp-result').textContent=`WIN ${money(ev.total)}`;$('#sp-lines').textContent=ev.wins.slice(0,3).join(' • ')+(ev.wins.length>3?` • +${ev.wins.length-3} more`:``);showWinPop(ev.total);if(ev.total>=bet*10)$('#sp-resultbox').classList.add('bigwin')}else{$('#sp-result').textContent=ev.bonus?`${ev.bonus} FREE SPINS!`:'NO WIN';$('#sp-lines').textContent=ev.bonus?`${ev.scatters} scatters triggered bonus`:'20 paylines active'}
+        if(ev.bonus){$('#sp-result').textContent=`${ev.bonus} FREE SPINS!${ev.total>0?' + '+money(ev.total):''}`;$('#sp-resultbox').classList.add('bigwin')}
+        spinning=false;render();
+      },1100);
+    }
+
+    root.querySelectorAll('.bet-btn').forEach(b=>b.addEventListener('click',()=>{if(!spinning){bet=Number(b.dataset.bet);render()}}));
+    $('#sp-spin').addEventListener('click',spin);
+    $('#sp-topspin').addEventListener('click',spin);
+    $('#sp-topspin').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();spin()}});
+    $('#sp-resultbox').addEventListener('click',spin);
+    $('#sp-resultbox').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();spin()}});
+    $('#sp-banker').addEventListener('click',()=>{if(!spinning){bankroll+=500;$('#sp-result').textContent='BANKER +$500';render()}});
+    $('#sp-same').addEventListener('click',()=>{if(!spinning){bet=previousBet;render()}});
+    $('#sp-max').addEventListener('click',()=>{if(!spinning){bet=25;render()}});
+    $('#sp-new').addEventListener('click',()=>{if(spinning)return;bankroll=1000;bet=1;previousBet=1;lastWin=0;freeSpins=0;spins=0;$('#sp-result').textContent='NEW SESSION';$('#sp-lines').textContent='20 paylines active';clearWins();render()});
+    $('#sp-paytoggle').addEventListener('click',()=>{const p=$('#sp-paytable');const hidden=p.hidden;p.hidden=!hidden;$('#sp-paytoggle').textContent=hidden?'HIDE PAYTABLE':'SHOW PAYTABLE'});
+    $('#bj-counter-toggle').addEventListener('click',()=>{bjCounterEnabled=!bjCounterEnabled;updateBjCounter()});
+    root.querySelectorAll('[data-bj-chip]').forEach(b=>b.addEventListener('click',()=>{bjSelectedChip=Number(b.dataset.bjChip);renderBj()}));
+    $('#bj-main-circle').addEventListener('click',()=>addBjBet('main'));
+    $('#bj-match-circle').addEventListener('click',()=>addBjBet('match'));
+    $('#bj-ladies-circle').addEventListener('click',()=>addBjBet('ladies'));
+    $('#bj-match-help').addEventListener('click',e=>{e.stopPropagation();$('#bj-side-help-title').textContent='MATCH THE DEALER';$('#bj-side-help-text').innerHTML='One off-suit rank match: <b>3:1</b><br>One suited rank match: <b>12:1</b><br>Both player cards match dealer, both off-suit: <b>6:1</b><br>One suited + one off-suit match: <b>15:1</b><br>Both player cards suited matches: <b>24:1</b><br><br>The two-card payouts are the combined value of each matching card.';$('#bj-side-help').classList.add('show')});
+    $('#bj-ladies-help').addEventListener('click',e=>{e.stopPropagation();$('#bj-side-help-title').textContent='LUCKY LADIES';$('#bj-side-help-text').innerHTML='Any first-two-card 20: <b>2:1</b><br>Two 10-value cards: <b>4:1</b><br>Suited 20: <b>10:1</b><br>Matched suited 20: <b>25:1</b><br>Two Q♥: <b>200:1</b><br>Two Q♥ + dealer blackjack: <b>1000:1</b>';$('#bj-side-help').classList.add('show')});
+    $('#bj-side-help-close').addEventListener('click',()=>$('#bj-side-help').classList.remove('show'));
+    $('#bj-deal').addEventListener('click',startBjRound);
+    $('#bj-hit').addEventListener('click',bjHitActive);
+    $('#bj-stand').addEventListener('click',bjStandActive);
+    $('#bj-double').addEventListener('click',bjDoubleActive);
+    $('#bj-split').addEventListener('click',bjSplit);
+    $('#bj-insurance').addEventListener('click',bjInsurance);
+    $('#bj-new-shoe').addEventListener('click',()=>{if(!bjRoundActive)makeBjShoe()});
+    $('#bj-add-money').addEventListener('click',()=>{bjBankroll+=500;bankroll=bjBankroll;renderBj();render()});
+
+    makeBjShoe();build();render();updateBjCounter();renderBj();
+  })();
+  </script>
+</div>
+</body>
+</html>
