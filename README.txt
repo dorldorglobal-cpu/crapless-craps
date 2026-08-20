@@ -1,11 +1,9 @@
-CRAPLESS CASINO FULL V39
+CRAPLESS CASINO FULL V40
 
-BLACKJACK
-- Betting chips enlarged again for easier viewing and tapping.
-- Desktop chips: 70px.
-- Mobile chips: 64px.
-- Larger denomination text.
-- $100 and $500 labels remain fully visible.
-- All V38 Blackjack rules / split settlement / bust reveal fixes retained.
+BLACKJACK PHONE VISIBILITY UPDATE
+- Wager chip stack moved higher inside each betting circle.
+- Bet amount text moved lower so it remains visible beneath the chips.
+- Larger V39 betting chips retained.
+- All V38 rules and settlement fixes retained.
 
-PWA cache: crapless-casino-v39
+PWA cache: crapless-casino-v40
