@@ -1,12 +1,11 @@
-CRAPLESS CASINO FULL V32
+CRAPLESS CASINO FULL V33
 
-PHONE BLACKJACK LAYOUT UPDATE
-- Tightened Blackjack vertical spacing on iPhone.
-- Dealer and player card areas are shorter but remain readable.
-- Wager area is more compact.
-- HIT and STAND remain large.
-- DOUBLE and SPLIT are directly below and visible without scrolling on typical iPhone screens.
-- Insurance and New Shoe remain below.
-- All V31 split/stand/double fixes and other game features retained.
+NEW BLACKJACK SPLIT/DOUBLE FIX
+- Split DOUBLE deals one card, pauses, then advances.
+- STAND/DOUBLE advance through split hands cleanly.
+- Final split hand automatically starts dealer play.
+- Dealer hole card reveal explicitly switches from SHOWING to TOTAL.
+- Dealer draw sequence continues after reveal.
+- V32 phone layout retained.
 
-PWA cache: crapless-casino-v32
+PWA cache: crapless-casino-v33

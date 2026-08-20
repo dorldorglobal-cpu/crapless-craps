@@ -460,7 +460,7 @@
         bjRoundActive=false;bjInsuranceBet=0;bjInsuranceResolved=false;$('#bj-message').textContent=msg;showBjOutcome('BUST','Dealer wins');
         bjMainBet=0;bjMatchBet=0;bjLadiesBet=0;bjSplitMode=false;bjSplitHands=[];bjSplitBets=[];bjActiveHand=0;renderBj();return;
       }
-      bjHoleHidden=false;if(bjDealer[1])bjCountCard(bjDealer[1]);renderBj();await new Promise(r=>setTimeout(r,420));
+      bjHoleHidden=false;if(bjDealer[1])bjCountCard(bjDealer[1]);$('#bj-message').textContent='Dealer reveals hole card.';renderBj();await new Promise(r=>setTimeout(r,500));
       while(bjHandValue(bjDealer)<17){await new Promise(r=>setTimeout(r,520));bjDealer.push(drawBj(true));renderBj()}
       const dv=bjHandValue(bjDealer),db=bjIsBlackjack(bjDealer);
       let msg='',wonAny=false,totalMainWin=0;
@@ -489,7 +489,17 @@
     }
     function bjHit(){if(!bjRoundActive)return;bjPlayer.push(drawBj(true));renderBj();if(bjHandValue(bjPlayer)>=21)finishBjRound()}
     function bjDouble(){if(!bjRoundActive||bjPlayer.length!==2||bjBankroll<bjMainBet)return;bjBankroll-=bjMainBet;bjMainBet*=2;bjPlayer.push(drawBj(true));renderBj();finishBjRound()}
-    function bjAdvanceSplitHand(){if(!bjSplitMode)return;bjActiveHand++;if(bjActiveHand>=bjSplitHands.length){finishBjRound();return}renderBj();$('#bj-message').textContent=`Playing split hand ${bjActiveHand+1}.`}
+    function bjAdvanceSplitHand(){
+      if(!bjSplitMode||!bjRoundActive)return;
+      bjActiveHand++;
+      if(bjActiveHand>=bjSplitHands.length){
+        $('#bj-message').textContent='Player hands complete — dealer plays.';
+        finishBjRound();
+        return;
+      }
+      renderBj();
+      $('#bj-message').textContent=`Playing split hand ${bjActiveHand+1}.`;
+    }
     function bjSplit(){
       if(!bjRoundActive)return;
       const hand=bjSplitMode?bjSplitHands[bjActiveHand]:bjPlayer;
@@ -517,8 +527,10 @@
       bjSplitBets[bjActiveHand]*=2;
       hand.push(drawBj(true));
       renderBj();
-      $('#bj-message').textContent='Double down — one card dealt.';
-      setTimeout(()=>bjAdvanceSplitHand(),420);
+      $('#bj-message').textContent=`Hand ${bjActiveHand+1} doubled — one card dealt.`;
+      setTimeout(()=>{
+        if(bjRoundActive&&bjSplitMode)bjAdvanceSplitHand();
+      },420);
     }
 
     function bjBetAdvice(trueCount){
