@@ -1,11 +1,12 @@
-CRAPLESS CASINO FULL V33
+CRAPLESS CASINO FULL V34
 
-NEW BLACKJACK SPLIT/DOUBLE FIX
-- Split DOUBLE deals one card, pauses, then advances.
-- STAND/DOUBLE advance through split hands cleanly.
-- Final split hand automatically starts dealer play.
-- Dealer hole card reveal explicitly switches from SHOWING to TOTAL.
-- Dealer draw sequence continues after reveal.
-- V32 phone layout retained.
+NEW SPLIT FLOW FIX
+- Locks controls during split hand transitions.
+- Prevents double taps from advancing twice.
+- Split DOUBLE deals exactly one card, pauses, then advances.
+- Split STAND advances cleanly.
+- Final split hand hands control to dealer cleanly.
+- Dealer hole card reveal and total display continue normally.
+- All V33 phone layout fixes retained.
 
-PWA cache: crapless-casino-v33
+PWA cache: crapless-casino-v34
