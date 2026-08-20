@@ -392,7 +392,7 @@
     let bankroll=Number(localStorage.getItem(SHARED_BANKROLL_KEY)||1000),bet=1,lastWin=0,freeSpins=0,spins=0,previousBet=1,spinning=false;
     let grid=Array.from({length:5},()=>Array.from({length:3},()=>symbols[0]));
     let bjCounterEnabled=false,bjRunningCount=0,bjDecksRemaining=6;
-    let bjBankroll=bankroll,bjSelectedChip=5,bjMainBet=0,bjBaseMainBet=0,bjMatchBet=0,bjLadiesBet=0,bjInsuranceBet=0,bjInsuranceResolved=false,bjLastWin=0,bjRoundActive=false,bjHoleHidden=true,bjResolvingRound=false,bjSplitAdvanceLocked=false,bjLastMainBet=0,bjLastMatchBet=0,bjLastLadiesBet=0;
+    let bjBankroll=bankroll,bjSelectedChip=5,bjMainBet=0,bjBaseMainBet=0,bjMatchBet=0,bjLadiesBet=0,bjInsuranceBet=0,bjInsuranceResolved=false,bjLastWin=0,bjRoundActive=false,bjHoleHidden=true,bjResolvingRound=false,bjSplitAdvanceLocked=false,bjLastMainBet=0,bjLastMatchBet=0,bjLastLadiesBet=0,bjNewShoeQueued=false;
     let bjShoe=[],bjPlayer=[],bjDealer=[],bjSplitHands=[],bjSplitBets=[],bjActiveHand=0,bjSplitMode=false;
     const BJ_SUITS=['♠','♥','♦','♣'];
     const BJ_RANKS=['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
@@ -408,7 +408,15 @@
     function bjHandValue(hand){let total=hand.reduce((a,c)=>a+bjCardValue(c),0),aces=hand.filter(c=>c.rank==='A').length;while(total>21&&aces>0){total-=10;aces--}return total}
     function bjIsBlackjack(hand){return hand.length===2&&bjHandValue(hand)===21}
     function bjCountCard(card){if(!card)return;if(['2','3','4','5','6'].includes(card.rank))bjRunningCount++;else if(['10','J','Q','K','A'].includes(card.rank))bjRunningCount--;bjDecksRemaining=Math.max(.25,bjShoe.length/52);updateBjCounter()}
-    function drawBj(exposed=true){if(bjShoe.length<40)makeBjShoe();const c=bjShoe.pop();if(exposed)bjCountCard(c);return c}
+    function drawBj(exposed=true){
+      if(bjShoe.length===0){
+        makeBjShoe();
+        $('#bj-message').textContent='Emergency reshuffle — new 6-deck shoe loaded.';
+      }
+      const c=bjShoe.pop();
+      if(exposed)bjCountCard(c);
+      return c;
+    }
     function bjCardHTML(card,hidden=false){if(hidden)return '<div class="bj-card back">?</div>';const red=card.suit==='♥'||card.suit==='♦';return `<div class="bj-card ${red?'red':''}"><div>${card.rank}${card.suit}</div><div class="suit">${card.suit}</div><div class="bottom">${card.rank}${card.suit}</div></div>`}
     function bjChipColorClass(amount){if(amount>=5000)return'c5000';if(amount>=1000)return'c1000';if(amount>=500)return'c500';if(amount>=100)return'c100';if(amount>=25)return'c25';if(amount>=10)return'c10';if(amount>=5)return'c5';return'c1'}
     function bjStackHTML(amount){if(!amount)return'';const denoms=[5000,1000,500,100,25,10,5,1];let remaining=Math.round(amount);const stack=[];for(const d of denoms){const count=Math.floor(remaining/d);for(let i=0;i<count;i++)stack.push(d);remaining-=count*d}return stack.map((d,i)=>`<div class="bj-bet-chip ${bjChipColorClass(d)}"><span>${i===stack.length-1?money(amount):''}</span></div>`).join('')}
@@ -461,7 +469,7 @@
       $('#bj-side-result').textContent=text.join(' • ');renderBj();
     }
     function startBjRound(){
-      if(bjRoundActive)return;if(bjMainBet<=0){$('#bj-message').textContent='Place a main Blackjack bet first.';return}
+      if(bjRoundActive)return;if(bjMainBet<=0){$('#bj-message').textContent='Place a main Blackjack bet first.';return}if(bjShoe.length<=15||bjNewShoeQueued){bjNewShoeQueued=false;makeBjShoe();$('#bj-message').textContent='New 6-deck shoe shuffled.'}
       bjLastWin=0;bjInsuranceBet=0;bjInsuranceResolved=false;bjResolvingRound=true;bjSplitAdvanceLocked=false;bjBaseMainBet=bjMainBet;bjLastMainBet=bjMainBet;bjLastMatchBet=bjMatchBet;bjLastLadiesBet=bjLadiesBet;bjPlayer=[];bjDealer=[];bjSplitHands=[];bjSplitBets=[];bjActiveHand=0;bjSplitMode=false;bjHoleHidden=true;bjPlayer.push(drawBj(true));bjDealer.push(drawBj(true));bjPlayer.push(drawBj(true));bjDealer.push(drawBj(false));bjRoundActive=true;settleBjSideBets();renderBj();
       const sideDelay=(bjMatchBet||bjLadiesBet)?1350:0;
       setTimeout(()=>{
@@ -501,6 +509,15 @@
       else{$('#bj-message').textContent=`Insurance lost ${money(wager)}.`;}
       renderBj();
     }
+    function maybeShuffleBjShoe(){
+      if(bjRoundActive)return;
+      if(bjNewShoeQueued||bjShoe.length<=15){
+        bjNewShoeQueued=false;
+        makeBjShoe();
+        $('#bj-message').textContent='New 6-deck shoe shuffled.';
+        renderBj();
+      }
+    }
     function showBjOutcome(title,sub,isWin=false){const overlay=$('#bj-outcome-overlay'),card=$('#bj-outcome-card');$('#bj-outcome-title').textContent=title;$('#bj-outcome-sub').textContent=sub||'';card.classList.toggle('win',isWin);overlay.classList.remove('show');void overlay.offsetWidth;overlay.classList.add('show');clearTimeout(overlay._hideTimer);overlay._hideTimer=setTimeout(()=>overlay.classList.remove('show'),1750)}
     async function finishBjRound(){
       if(!bjRoundActive||bjResolvingRound)return;
@@ -517,7 +534,7 @@
         renderBj();
         await new Promise(r=>setTimeout(r,450));
         bjRoundActive=false;bjResolvingRound=false;bjInsuranceBet=0;bjInsuranceResolved=false;$('#bj-message').textContent=msg;showBjOutcome('BUST','Dealer wins');
-        bjMainBet=0;bjBaseMainBet=0;bjMatchBet=0;bjLadiesBet=0;bjSplitMode=false;bjSplitHands=[];bjSplitBets=[];bjActiveHand=0;renderBj();return;
+        bjMainBet=0;bjBaseMainBet=0;bjMatchBet=0;bjLadiesBet=0;bjSplitMode=false;bjSplitHands=[];bjSplitBets=[];bjActiveHand=0;renderBj();setTimeout(maybeShuffleBjShoe,1850);return;
       }
 
       bjHoleHidden=false;
@@ -575,7 +592,7 @@
       bjRoundActive=false;bjResolvingRound=false;bjInsuranceBet=0;bjInsuranceResolved=false;$('#bj-message').textContent=msg;
       if(!wonAny){bjMainBet=0;bjBaseMainBet=0;bjMatchBet=0;bjLadiesBet=0}
       else{bjMainBet=bjBaseMainBet}
-      bjSplitMode=false;bjSplitHands=[];bjSplitBets=[];bjActiveHand=0;renderBj();
+      bjSplitMode=false;bjSplitHands=[];bjSplitBets=[];bjActiveHand=0;renderBj();setTimeout(maybeShuffleBjShoe,1850);
     }
     function bjHit(){if(!bjRoundActive)return;bjPlayer.push(drawBj(true));renderBj();if(bjHandValue(bjPlayer)>=21)finishBjRound()}
     function bjDouble(){if(!bjRoundActive||bjPlayer.length!==2||bjBankroll<bjMainBet)return;bjBankroll-=bjMainBet;bjMainBet*=2;bjPlayer.push(drawBj(true));renderBj();finishBjRound()}
@@ -724,7 +741,17 @@
     $('#bj-insurance').addEventListener('click',bjInsurance);
     $('#bj-clear-bet').addEventListener('click',clearBjBets);
     $('#bj-same-bet').addEventListener('click',sameBjBet);
-    $('#bj-new-shoe').addEventListener('click',()=>{if(!bjRoundActive)makeBjShoe()});
+    $('#bj-new-shoe').addEventListener('click',()=>{
+      if(bjRoundActive){
+        bjNewShoeQueued=true;
+        $('#bj-message').textContent='NEW SHOE queued — it will shuffle when this hand finishes.';
+        return;
+      }
+      bjNewShoeQueued=false;
+      makeBjShoe();
+      $('#bj-message').textContent='New 6-deck shoe shuffled.';
+      renderBj();
+    });
     $('#bj-add-money').addEventListener('click',()=>{bjBankroll+=500;bankroll=bjBankroll;renderBj();render()});
 
     makeBjShoe();build();render();updateBjCounter();renderBj();
