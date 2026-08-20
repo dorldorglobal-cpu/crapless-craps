@@ -1,19 +1,12 @@
-CRAPLESS CASINO FULL V31 — PHONE FIXES
+CRAPLESS CASINO FULL V32
 
-BLACKJACK
-- iPhone game tabs moved below the status/notch area with larger touch targets.
-- Match Dealer / Blackjack / Lucky Ladies circles tightened so Lucky Ladies does not sit under DEAL.
-- DEAL stays on the far right.
-- Split STAND advances correctly to the next hand.
-- Split DOUBLE deals exactly one card, pauses so you can see it, then advances automatically.
-- After the final split hand, dealer play begins automatically.
-- $100 and $500 chip labels tightened so all digits remain visible.
+PHONE BLACKJACK LAYOUT UPDATE
+- Tightened Blackjack vertical spacing on iPhone.
+- Dealer and player card areas are shorter but remain readable.
+- Wager area is more compact.
+- HIT and STAND remain large.
+- DOUBLE and SPLIT are directly below and visible without scrolling on typical iPhone screens.
+- Insurance and New Shoe remain below.
+- All V31 split/stand/double fixes and other game features retained.
 
-CRAPS
-- $100 / $500 chip label sizing adjusted.
-- Top game navigation uses iPhone safe-area spacing.
-
-SLOTS
-- Top game navigation uses iPhone safe-area spacing.
-
-PWA cache: crapless-casino-v31
+PWA cache: crapless-casino-v32
