@@ -1,21 +1,19 @@
-CRAPLESS CASINO FULL V30 PHONE TEST
+CRAPLESS CASINO FULL V31 — PHONE FIXES
 
-Adds BLACKJACK as the third app tab.
+BLACKJACK
+- iPhone game tabs moved below the status/notch area with larger touch targets.
+- Match Dealer / Blackjack / Lucky Ladies circles tightened so Lucky Ladies does not sit under DEAL.
+- DEAL stays on the far right.
+- Split STAND advances correctly to the next hand.
+- Split DOUBLE deals exactly one card, pauses so you can see it, then advances automatically.
+- After the final split hand, dealer play begins automatically.
+- $100 and $500 chip labels tightened so all digits remain visible.
 
-Blackjack phone preview includes:
-- 6-deck shoe
-- Card counter ON/OFF, running count, true count, bet guidance
-- Main Blackjack wager plus Match Dealer and Lucky Ladies
-- Match Dealer and Lucky Ladies ? payout guides
-- Lucky Ladies Q♥ Q♥ 200:1 and Q♥ Q♥ + dealer Blackjack 1000:1
-- Insurance on dealer Ace
-- Hit / Stand / Double / Split
-- Re-split up to 5 hands
-- Right split hand plays first and active hand is highlighted
-- Dealer reveal/draw delays
-- Casino chip denominations and wager stacks
-- Add Money +$500
-- Large outcome and bonus banners
-- Current Blackjack preview layout optimized for phone testing
+CRAPS
+- $100 / $500 chip label sizing adjusted.
+- Top game navigation uses iPhone safe-area spacing.
 
-PWA cache v30.
+SLOTS
+- Top game navigation uses iPhone safe-area spacing.
+
+PWA cache: crapless-casino-v31

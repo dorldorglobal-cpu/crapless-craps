@@ -20,8 +20,8 @@
   </nav>
   <style>
 
-    #slot-preview .game-switcher{display:flex;justify-content:center;gap:7px;padding:7px 10px;margin-bottom:10px;background:#080808;border-bottom:1px solid #6f5329;position:sticky;top:0;z-index:80}
-    #slot-preview .game-switcher a{min-width:100px;min-height:38px;display:flex;align-items:center;justify-content:center;border-radius:999px;border:1px solid #735a2e;text-decoration:none;color:#e8e8e8;background:#1c1c1c;font-size:10px;font-weight:900}
+    #slot-preview .game-switcher{display:flex;justify-content:center;gap:7px;padding:calc(env(safe-area-inset-top) + 14px) 10px 10px;margin-bottom:10px;background:#080808;border-bottom:1px solid #6f5329;position:sticky;top:0;z-index:80}
+    #slot-preview .game-switcher a{min-width:100px;min-height:48px;display:flex;align-items:center;justify-content:center;border-radius:999px;border:1px solid #735a2e;text-decoration:none;color:#e8e8e8;background:#1c1c1c;font-size:10px;font-weight:900}
     #slot-preview .game-switcher a.active{color:#111;border-color:#ffe09a;background:linear-gradient(#e0bd65,#a77d2c)}
 
     #slot-preview{background:linear-gradient(180deg,#18070b,#050505);color:#fff;padding:16px;min-height:100%;font-family:Arial,Helvetica,sans-serif;border-radius:0}
@@ -174,7 +174,7 @@
     #slot-preview .bj-side-result{margin-top:5px;color:#b9d4c2;font-size:10px;min-height:15px}
     #slot-preview .bj-paynote{margin-top:9px;font-size:9px;color:#a9b9ad;text-align:center;line-height:1.4}
     @media(max-width:680px){#slot-preview{padding:6px}#slot-preview .cabinet{padding:7px}.stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}.reels{gap:3px!important}.cell{min-height:62px!important}.controls{grid-template-columns:1fr!important}.bet-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}.spin-row{grid-template-columns:1fr!important}.bank-btn{min-height:48px}.paygrid{grid-template-columns:1fr!important}}
-    @media(max-width:680px){#slot-preview .bj-title{padding-right:104px}#slot-preview .bj-top-add{padding:0 9px;font-size:9px}#slot-preview .bj-stats{grid-template-columns:repeat(2,minmax(0,1fr))}#slot-preview .bj-card{width:60px;height:86px;font-size:16px}#slot-preview .bj-card .suit{font-size:24px}#slot-preview .bj-bets{grid-template-columns:64px 96px 64px;gap:5px;padding-right:0}#slot-preview #bj-main-circle{width:96px;height:96px}#slot-preview #bj-match-circle,#slot-preview #bj-ladies-circle{width:64px;height:64px}#slot-preview .bj-chip-row{grid-template-columns:repeat(6,1fr);gap:4px}#slot-preview .bj-chip{min-height:42px;font-size:10px;border-width:3px}#slot-preview .bj-actions{gap:6px}#slot-preview #bj-deal{right:2px;width:92px;min-height:84px;font-size:17px}#slot-preview #bj-hit,#slot-preview #bj-stand{min-height:60px;font-size:19px}#slot-preview .bj-counter-panel{grid-template-columns:1fr}#slot-preview .bj-counter-panel.counter-off .bj-counter-box{display:none}}
+    @media(max-width:680px){#slot-preview .bj-title{padding-right:104px}#slot-preview .bj-top-add{padding:0 9px;font-size:9px}#slot-preview .bj-stats{grid-template-columns:repeat(2,minmax(0,1fr))}#slot-preview .bj-card{width:60px;height:86px;font-size:16px}#slot-preview .bj-card .suit{font-size:24px}#slot-preview .bj-bets{grid-template-columns:54px 88px 54px;gap:4px;padding-right:0;min-height:116px}#slot-preview #bj-main-circle{width:88px;height:88px}#slot-preview #bj-match-circle,#slot-preview #bj-ladies-circle{width:54px;height:54px}#slot-preview .bj-bet-circle span{font-size:6px}#slot-preview .bj-bet-circle b{font-size:14px}#slot-preview .bj-chip-row{gap:6px;padding:8px 6px}#slot-preview .bj-chip{flex-basis:50px;width:50px;height:50px;min-height:50px;font-size:13px;border-width:4px}#slot-preview .bj-chip[data-bj-chip="100"],#slot-preview .bj-chip[data-bj-chip="500"]{font-size:11px;letter-spacing:-.7px}#slot-preview .bj-actions{gap:6px}#slot-preview #bj-deal{right:0;width:82px;min-height:88px;font-size:18px}#slot-preview #bj-hit,#slot-preview #bj-stand{min-height:60px;font-size:19px}#slot-preview .bj-counter-panel{grid-template-columns:1fr}#slot-preview .bj-counter-panel.counter-off .bj-counter-box{display:none}}
     @media(prefers-reduced-motion:reduce){#slot-preview .cell.spinning,#slot-preview .result.bigwin{animation:none}}
   </style>
 
@@ -476,11 +476,18 @@
       if(!bjSplitMode){bjHit();return}
       const hand=bjSplitHands[bjActiveHand];hand.push(drawBj(true));renderBj();if(bjHandValue(hand)>=21)bjAdvanceSplitHand();
     }
-    function bjStandActive(){if(!bjRoundActive)return;if(bjSplitMode)bjAdvanceSplitHand();else finishBjRound()}
+    function bjStandActive(){if(!bjRoundActive)return;if(bjSplitMode){bjAdvanceSplitHand();return}finishBjRound()}
     function bjDoubleActive(){
       if(!bjRoundActive)return;
       if(!bjSplitMode){bjDouble();return}
-      const hand=bjSplitHands[bjActiveHand],wager=bjSplitBets[bjActiveHand];if(hand.length!==2||bjBankroll<wager)return;bjBankroll-=wager;bjSplitBets[bjActiveHand]*=2;hand.push(drawBj(true));renderBj();bjAdvanceSplitHand();
+      const hand=bjSplitHands[bjActiveHand],wager=bjSplitBets[bjActiveHand];
+      if(!hand||hand.length!==2||bjBankroll<wager)return;
+      bjBankroll-=wager;
+      bjSplitBets[bjActiveHand]*=2;
+      hand.push(drawBj(true));
+      renderBj();
+      $('#bj-message').textContent='Double down — one card dealt.';
+      setTimeout(()=>bjAdvanceSplitHand(),420);
     }
 
     function bjBetAdvice(trueCount){
