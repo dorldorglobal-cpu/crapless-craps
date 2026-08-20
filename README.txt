@@ -1,16 +1,11 @@
-CRAPLESS CASINO FULL V37 — BLACKJACK REBUILD
+CRAPLESS CASINO FULL V38
 
-This build fixes the runtime issue that broke HIT/STAND/DOUBLE/SPLIT in recent builds.
+BLACKJACK RULES / SETTLEMENT FIXES
+- Split hands now settle and display the NET result correctly.
+- Example: one $50 split hand wins and one $50 split hand loses = NET $0.00 / PUSH.
+- Player bust now reveals the dealer hole card before the hand ends.
+- Dealer does not draw additional cards after a player bust.
+- Dealer immediately checks for Blackjack when showing 10, J, Q, or K.
+- Existing V37 controls, split flow, Clear Bet, dimmed Deal, and phone layout retained.
 
-Blackjack:
-- HIT / STAND / DOUBLE / SPLIT rebuilt from active hand state.
-- Split flow rebuilt cleanly.
-- Split double gives one card, pauses, then advances.
-- Final split hand automatically starts dealer play.
-- Dealer hole card switches from SHOWING to TOTAL.
-- Original wager is restored after winning a doubled hand.
-- CLEAR BET refunds unplayed wagers.
-- DEAL is dimmed when no main wager is placed.
-- Previous mobile layout, side bets, counter, insurance, chips and banners retained.
-
-PWA cache: crapless-casino-v37
+PWA cache: crapless-casino-v38

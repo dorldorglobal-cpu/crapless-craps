@@ -449,7 +449,16 @@
       if(bjRoundActive)return;if(bjMainBet<=0){$('#bj-message').textContent='Place a main Blackjack bet first.';return}
       bjLastWin=0;bjInsuranceBet=0;bjInsuranceResolved=false;bjResolvingRound=false;bjSplitAdvanceLocked=false;bjBaseMainBet=bjMainBet;bjPlayer=[];bjDealer=[];bjSplitHands=[];bjSplitBets=[];bjActiveHand=0;bjSplitMode=false;bjHoleHidden=true;bjPlayer.push(drawBj(true));bjDealer.push(drawBj(true));bjPlayer.push(drawBj(true));bjDealer.push(drawBj(false));bjRoundActive=true;settleBjSideBets();renderBj();
       const sideDelay=(bjMatchBet||bjLadiesBet)?1350:0;
-      setTimeout(()=>{if(!bjRoundActive)return;if(bjDealer[0]?.rank==='A')$('#bj-message').textContent='Dealer shows Ace — insurance is available.';else if(bjIsBlackjack(bjPlayer)){finishBjRound()}else $('#bj-message').textContent='Hit, Stand, or Double.';renderBj()},sideDelay);
+      setTimeout(()=>{
+        if(!bjRoundActive)return;
+        const dealerUp=bjDealer[0];
+        const dealerShowsAce=dealerUp?.rank==='A';
+        const dealerShowsTen=dealerUp&&['10','J','Q','K'].includes(dealerUp.rank);
+        if(dealerShowsTen&&bjIsBlackjack(bjDealer)){finishBjRound();return}
+        if(dealerShowsAce){$('#bj-message').textContent='Dealer shows Ace — insurance is available.';renderBj();return}
+        if(bjIsBlackjack(bjPlayer)){finishBjRound();return}
+        $('#bj-message').textContent='Hit, Stand, or Double.';renderBj();
+      },sideDelay);
     }
     function bjInsurance(){
       if(!bjRoundActive||bjInsuranceResolved||!bjDealer[0]||bjDealer[0].rank!=='A')return;
@@ -472,6 +481,11 @@
       const allPlayerBust=bjSplitMode?bjSplitHands.every(hand=>bjHandValue(hand)>21):bjHandValue(bjPlayer)>21;
       if(allPlayerBust){
         const msg=bjSplitMode?'ALL PLAYER HANDS BUST':'PLAYER BUSTS';
+        bjHoleHidden=false;
+        if(bjDealer[1])bjCountCard(bjDealer[1]);
+        $('#bj-message').textContent='Player busts — dealer reveals hole card.';
+        renderBj();
+        await new Promise(r=>setTimeout(r,450));
         bjRoundActive=false;bjResolvingRound=false;bjInsuranceBet=0;bjInsuranceResolved=false;$('#bj-message').textContent=msg;showBjOutcome('BUST','Dealer wins');
         bjMainBet=0;bjBaseMainBet=0;bjMatchBet=0;bjLadiesBet=0;bjSplitMode=false;bjSplitHands=[];bjSplitBets=[];bjActiveHand=0;renderBj();return;
       }
@@ -492,15 +506,18 @@
       let msg='',wonAny=false,totalMainWin=0;
 
       if(bjSplitMode){
+        let splitNet=0;
         bjSplitHands.forEach((hand,i)=>{
           const pv=bjHandValue(hand),wager=bjSplitBets[i];
-          if(pv>21)return;
-          if(db)return;
-          if(dv>21||pv>dv){bjBankroll+=wager*2;bjLastWin+=wager;totalMainWin+=wager;wonAny=true}
-          else if(pv===dv)bjBankroll+=wager;
+          if(pv>21){splitNet-=wager;return}
+          if(db){splitNet-=wager;return}
+          if(dv>21||pv>dv){bjBankroll+=wager*2;bjLastWin+=wager;totalMainWin+=wager;splitNet+=wager;wonAny=true}
+          else if(pv===dv){bjBankroll+=wager}
+          else splitNet-=wager;
         });
-        msg=wonAny?`SPLIT HANDS WIN +${money(totalMainWin)}`:'SPLIT HANDS COMPLETE';
-        showBjOutcome(wonAny?'WINNER':'HAND COMPLETE',wonAny?`WIN ${money(totalMainWin)}`:'See hand results',wonAny);
+        if(splitNet>0){msg=`SPLIT HANDS NET WIN +${money(splitNet)}`;showBjOutcome('WINNER',`NET WIN ${money(splitNet)}`,true)}
+        else if(splitNet<0){msg=`SPLIT HANDS NET LOSS ${money(Math.abs(splitNet))}`;showBjOutcome('DEALER WINS',`NET LOSS ${money(Math.abs(splitNet))}`)}
+        else{msg='SPLIT HANDS PUSH — NET $0.00';showBjOutcome('PUSH','Split hands net $0.00')}
       }else{
         const pv=bjHandValue(bjPlayer),pb=bjIsBlackjack(bjPlayer);
         if(pv>21){msg='PLAYER BUSTS';showBjOutcome('BUST','Dealer wins')}
