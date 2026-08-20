@@ -142,6 +142,7 @@ button{font:inherit}
 }
 
 
+/* V29 simple craps-style slot win overlay */
 .slot-win-overlay{
   position:fixed;
   inset:0;
@@ -149,65 +150,79 @@ button{font:inherit}
   display:none;
   align-items:center;
   justify-content:center;
-  flex-direction:column;
-  background:rgba(0,0,0,.35);
+  background:rgba(0,0,0,.22);
   pointer-events:none;
 }
-.slot-win-overlay.show{
-  display:flex;
+.slot-win-overlay.show{display:flex}
+.slot-win-card{
+  min-width:min(86vw,520px);
+  padding:20px 24px;
+  border:4px solid #ffe18a;
+  border-radius:20px;
+  background:linear-gradient(180deg,#851a2a,#2b070d);
+  box-shadow:0 15px 38px rgba(0,0,0,.8),0 0 30px rgba(230,183,64,.65);
+  text-align:center;
+  animation:slotWinBounceV29 1.75s ease-out forwards;
+  -webkit-animation:slotWinBounceV29 1.75s ease-out forwards;
 }
-.slot-win-overlay .slot-win-label{
-  font-size:18px;
+.slot-win-label{
+  font-size:13px;
   font-weight:900;
   letter-spacing:4px;
-  color:#ffe39a;
-  text-shadow:0 2px 4px #000;
+  color:#ffe6a2;
 }
-.slot-win-overlay .slot-win-amount{
-  margin-top:8px;
-  padding:18px 26px;
-  border:4px solid #ffe39a;
-  border-radius:20px;
-  background:linear-gradient(#8a1a2a,#31080e);
-  color:#fff0a8;
-  font-size:clamp(44px,14vw,82px);
-  font-weight:1000;
+.slot-win-amount{
+  margin-top:7px;
+  font-size:clamp(44px,13vw,78px);
   line-height:1;
-  box-shadow:0 12px 36px #000b,0 0 26px #d5a63f99;
-  text-shadow:0 3px 0 #744900,0 0 18px #ffd75a;
-  transform:scale(.75);
-  -webkit-transform:scale(.75);
+  font-weight:1000;
+  color:#fff1aa;
+  text-shadow:0 3px 0 #734900,0 0 18px #ffd65a;
 }
-.slot-win-overlay.show .slot-win-amount{
-  animation:slotWinBounce 1.9s ease-out forwards;
-  -webkit-animation:slotWinBounce 1.9s ease-out forwards;
-}
-@keyframes slotWinBounce{
+@keyframes slotWinBounceV29{
   0%{transform:scale(.55);opacity:0}
-  18%{transform:scale(1.18);opacity:1}
+  18%{transform:scale(1.16);opacity:1}
   34%{transform:scale(.95);opacity:1}
-  48%{transform:scale(1.07);opacity:1}
-  64%{transform:scale(1);opacity:1}
-  86%{transform:scale(1);opacity:1}
+  48%{transform:scale(1.06);opacity:1}
+  66%{transform:scale(1);opacity:1}
+  88%{transform:scale(1);opacity:1}
   100%{transform:scale(.92);opacity:0}
 }
-@-webkit-keyframes slotWinBounce{
+@-webkit-keyframes slotWinBounceV29{
   0%{-webkit-transform:scale(.55);opacity:0}
-  18%{-webkit-transform:scale(1.18);opacity:1}
+  18%{-webkit-transform:scale(1.16);opacity:1}
   34%{-webkit-transform:scale(.95);opacity:1}
-  48%{-webkit-transform:scale(1.07);opacity:1}
-  64%{-webkit-transform:scale(1);opacity:1}
-  86%{-webkit-transform:scale(1);opacity:1}
+  48%{-webkit-transform:scale(1.06);opacity:1}
+  66%{-webkit-transform:scale(1);opacity:1}
+  88%{-webkit-transform:scale(1);opacity:1}
   100%{-webkit-transform:scale(.92);opacity:0}
+}
+
+
+/* V29 restore centered desktop cabinet */
+@media(min-width:900px){
+  .app{max-width:1100px!important;margin:0 auto!important;padding:10px 16px!important}
+  .cabinet{max-width:1000px!important;margin:0 auto!important}
 }
 
 </style>
 </head>
 <body>
-<div class="slot-win-overlay" id="winOverlay">
-  <div class="slot-win-label">TOTAL WIN</div>
-  <div class="slot-win-amount" id="winAmount">$0.00</div>
+<div class="slot-win-overlay" id="slotWinOverlay" aria-live="polite">
+  <div class="slot-win-card">
+    <div class="slot-win-label">TOTAL WIN</div>
+    <div class="slot-win-amount" id="slotWinAmount">$0.00</div>
+  </div>
 </div>
+<nav class="game-switcher"><a href="./index.html">🎲 CRAPS</a><a class="active" href="./slots.html">🎰 SLOTS</a></nav>
+<main class="app"><section class="cabinet">
+<div class="marquee top-spin" id="topSpin" role="button" tabindex="0" aria-label="Spin"><small>LAUREN&apos;S SLOTS</small><b id="topSpinText">SPIN TO WIN</b></div>
+<div class="stats">
+<div class="stat"><span>BANKROLL</span><strong id="bankroll">$1,000.00</strong></div>
+<div class="stat"><span>TOTAL BET</span><strong id="bet">$1.00</strong></div>
+<div class="stat"><span>LAST WIN</span><strong id="lastwin">$0.00</strong></div>
+<div class="stat"><span>FREE SPINS</span><strong id="free">0</strong></div>
+<div class="stat"><span>SPINS</span><strong id="spins">0</strong></div>
 </div>
 <div class="machine">
 <div class="reelbox"><div class="reels" id="reels"></div></div>
@@ -257,9 +272,8 @@ function render(){$('#bankroll').textContent=money(bankroll);$('#bet').textConte
 function clearWins(){document.querySelectorAll('.cell').forEach(c=>c.classList.remove('win','wild','scatter'))}
 function showWinPop(amount){
  if(amount<=0)return;
- const overlay=$('#winOverlay');
- const amountEl=$('#winAmount');
- amountEl.textContent=money(amount);
+ const overlay=$('#slotWinOverlay');
+ $('#slotWinAmount').textContent=money(amount);
  overlay.classList.remove('show');
  overlay.style.display='none';
  void overlay.offsetWidth;
@@ -269,7 +283,7 @@ function showWinPop(amount){
  overlay._hideTimer=setTimeout(()=>{
    overlay.classList.remove('show');
    overlay.style.display='none';
- },2000);
+ },1850);
 }
 function evaluate(){
  const lineBet=bet/20;let total=0;const hits=new Set(),wins=[];
@@ -285,7 +299,7 @@ function spin(){
  setTimeout(()=>{clearInterval(iv);grid=final;cells.forEach(c=>{const col=+c.dataset.c,row=+c.dataset.r;c.classList.remove('spinning');c.querySelector('span').textContent=grid[col][row].icon;if(grid[col][row].id==='wild')c.classList.add('wild');if(grid[col][row].id==='scatter')c.classList.add('scatter')});
  const ev=evaluate();lastWin=ev.total;bankroll+=lastWin;freeSpins+=ev.bonus;spins++;ev.hits.forEach(k=>{const [c,r]=k.split('-');document.querySelector(`.cell[data-c="${c}"][data-r="${r}"]`)?.classList.add('win')});
  if(ev.bonus){$('#result').textContent=`${ev.bonus} FREE SPINS!${ev.total?' + '+money(ev.total):''}`;$('#resultbox').classList.add('big');$('#lines').textContent=`${ev.scat} scatters triggered bonus`}
- else if(ev.total){$('#result').textContent=`WIN ${money(ev.total)}`;$('#lines').textContent=ev.wins.slice(0,3).join(' • ')+(ev.wins.length>3?` • +${ev.wins.length-3} more`:'');if(ev.total>=bet*10)$('#resultbox').classList.add('big')}
+ else if(ev.total){showWinPop(ev.total);$('#result').textContent=`WIN ${money(ev.total)}`;$('#lines').textContent=ev.wins.slice(0,3).join(' • ')+(ev.wins.length>3?` • +${ev.wins.length-3} more`:'');if(ev.total>=bet*10)$('#resultbox').classList.add('big')}
  else{$('#result').textContent='NO WIN';$('#lines').textContent='20 paylines active'}
  spinning=false;render();},1150);
 }

@@ -1,10 +1,14 @@
-CRAPLESS CASINO FULL V28
+CRAPLESS CASINO FULL V29
 
-SLOTS:
-- Win banner rebuilt to use the same direct show/hide style as the craps win overlay.
-- Body-level fixed overlay for iPhone PWA reliability.
-- Large bouncing TOTAL WIN amount.
-- Top SPIN TO WIN, lower SPIN TO WIN, and LAST RESULT all remain clickable to spin.
+V29 repairs the V28 slot layout regression.
 
-All previous Craps and Slots features retained.
-PWA cache: crapless-casino-v28
+FIXED:
+- Restored the full Lauren's Slots header, stats, reels, controls, and paytable.
+- Desktop/web cabinet is centered and no longer stretches edge to edge.
+- Keeps top SPIN TO WIN.
+- Keeps lower SPIN TO WIN.
+- Keeps LAST RESULT clickable to spin.
+- Rebuilt TOTAL WIN as a simple body-level craps-style overlay for iPhone reliability.
+- All previous symbol weights, free spins, autosave, and Craps features retained.
+
+PWA cache: crapless-casino-v29
