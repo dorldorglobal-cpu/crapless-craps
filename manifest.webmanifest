@@ -1,12 +1,12 @@
 {
-  "name": "Crapless Craps Casino",
-  "short_name": "Crapless Craps",
+  "name": "Crapless Casino",
+  "short_name": "Crapless Casino",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#090909",
   "theme_color": "#0d6b46",
   "orientation": "any",
-  "description": "Playable Crapless Craps casino game",
+  "description": "Crapless Craps and Lucky Reels 20 slot machine",
   "icons": [
     {
       "src": "./icons/icon-192.png",

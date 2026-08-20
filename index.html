@@ -8,8 +8,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="Crapless Craps"/>
-<link rel="manifest" href="manifest.webmanifest?v=21"/>
-<link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png?v=21"/>
+<link rel="manifest" href="manifest.webmanifest?v=22"/>
+<link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png?v=22"/>
 <title>Crapless Craps Casino</title>
 <style>
 :root{
@@ -855,9 +855,28 @@ body{
 .reset-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}.reset-actions button{min-height:46px;border-radius:9px;font-weight:900}
 .reset-cancel{background:#252525;color:#fff;border:1px solid #555}.reset-confirm{background:#b8212e;color:#fff;border:1px solid #ff8a93}
 @media (orientation:portrait){.topbar > div:first-child{grid-template-columns:repeat(6,minmax(0,1fr))!important}.controls{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
+
+/* V22 game switcher */
+.game-switcher{
+  display:flex;justify-content:center;gap:7px;padding:7px 10px;background:#080808;
+  border-bottom:1px solid #6f5329;position:sticky;top:0;z-index:230
+}
+.game-switcher a{
+  min-width:110px;min-height:38px;display:flex;align-items:center;justify-content:center;
+  border-radius:999px;border:1px solid #735a2e;text-decoration:none;color:#e8e8e8;
+  background:#1c1c1c;font-size:11px;font-weight:900;letter-spacing:.8px
+}
+.game-switcher a.active{
+  color:#111;border-color:#ffe09a;background:linear-gradient(#e0bd65,#a77d2c)
+}
+
 </style>
 </head>
 <body>
+<nav class="game-switcher" aria-label="Casino games">
+  <a class="active" href="./index.html">🎲 CRAPS</a>
+  <a href="./slots.html">🎰 SLOTS</a>
+</nav>
 
 <div class="reset-backdrop" id="resetBackdrop"></div>
 <div class="reset-modal" id="resetModal" aria-hidden="true">

@@ -1,24 +1,26 @@
-CRAPLESS CRAPS FULL V21 — AUTOSAVE
+CRAPLESS CASINO FULL V22
 
-NEW:
-- Automatically saves the active game locally on the device.
-- Restores the session when the PWA/browser is reopened.
-- Adds SAVE status at the top.
-- Adds NEW GAME with confirmation.
+Includes the full V21 Crapless Craps game plus a second SLOTS page.
 
-Saved state includes:
-- Bankroll and selected chip
-- Active bets
-- Point and puck state
-- Pass Line odds
-- Traveling Come / Don't Come
-- ATS progress / lock
-- Roll history
-- Current / last streak
-- Bets ON/OFF
-- Same Bet layout
+Use the CRAPS / SLOTS switch at the top to move between games.
 
-NEW GAME resets bankroll to $1,000 and clears the saved session.
+SLOTS:
+- 5 reels x 3 rows
+- 20 paylines
+- Wild
+- Scatter
+- 8 or 12 free-spin bonus
+- $0.20 to $25 total bets
+- Multiple paylines can win on one spin
+- Large win display
+- Banker +$500
+- Same Bet / Max Bet
+- Paytable
+- Independent slot autosave
+- Cryptographic final symbol selection
+- Offline PWA support
 
-All V20 gameplay remains.
-Cache v21.
+CRAPS:
+- All V21 fixes and autosave retained.
+
+PWA cache: crapless-casino-v22

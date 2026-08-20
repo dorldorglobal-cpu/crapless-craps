@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
+<meta name="theme-color" content="#16080b"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Crapless Casino"/>
+<link rel="manifest" href="./manifest.webmanifest?v=22"/>
+<link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png?v=22"/>
+<title>Crapless Casino Slots</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:#050505;color:#fff;font-family:Arial,Helvetica,sans-serif;overscroll-behavior:none}
+body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+button{font:inherit}
+.game-switcher{display:flex;justify-content:center;gap:7px;padding:7px 10px;background:#080808;border-bottom:1px solid #6f5329;position:sticky;top:0;z-index:50}
+.game-switcher a{min-width:110px;min-height:38px;display:flex;align-items:center;justify-content:center;border-radius:999px;border:1px solid #735a2e;text-decoration:none;color:#e8e8e8;background:#1c1c1c;font-size:11px;font-weight:900}
+.game-switcher a.active{color:#111;border-color:#ffe09a;background:linear-gradient(#e0bd65,#a77d2c)}
+.app{max-width:980px;margin:auto;padding:10px}
+.cabinet{border:4px solid #6a491e;border-radius:24px;padding:12px;background:linear-gradient(180deg,#2b0910,#080808 25%,#140609);box-shadow:0 12px 30px #000}
+.marquee{text-align:center;border:2px solid #e2c26a;border-radius:15px;padding:10px;background:radial-gradient(circle at 50% 0,#721a29,#26060c 64%,#090909)}
+.marquee small{display:block;font-size:9px;letter-spacing:4px;color:#d0b36f;font-weight:900}
+.marquee b{display:block;font-size:clamp(28px,7vw,52px);color:#ffe7a5;text-shadow:0 3px 0 #714800,0 0 18px #c99e38}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-top:9px}
+.stat{background:#111;border:1px solid #4c391d;border-radius:10px;padding:7px;text-align:center;min-width:0}
+.stat span{display:block;font-size:8px;color:#999}.stat strong{display:block;font-size:17px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.machine{margin-top:9px;border:3px solid #c7a755;border-radius:17px;padding:10px;background:linear-gradient(#181818,#080808)}
+.reelbox{background:#4a0d15;border:4px solid #5d3a13;border-radius:14px;padding:7px}
+.reels{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.reel{display:grid;grid-template-rows:repeat(3,1fr);gap:4px}
+.cell{min-height:74px;border-radius:8px;border:2px solid #9d8044;background:linear-gradient(#fff4d0,#e7d09a);display:grid;place-items:center;font-size:clamp(34px,8vw,58px);color:#111;overflow:hidden}
+.cell.spinning{animation:spinflash .09s linear infinite}
+.cell.win{outline:4px solid #ffd95f;box-shadow:0 0 19px #ffd95fa8}
+.cell.scatter{background:linear-gradient(#eee6ff,#ccb9ff)}
+.cell.wild{background:linear-gradient(#fff2af,#edb346)}
+@keyframes spinflash{50%{transform:translateY(8px) scale(.95);filter:blur(1px)}}
+.note{text-align:center;font-size:9px;color:#d2b87c;margin-top:6px}
+.lines{min-height:20px;margin-top:4px;text-align:center;font-size:10px;color:#ddd}
+.result{min-height:72px;margin-top:8px;border:2px solid #665128;border-radius:12px;background:#080808;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:6px}
+.result span{font-size:9px;color:#999;letter-spacing:3px;font-weight:900}
+.result b{font-size:clamp(27px,7vw,48px);color:#f0cd68}
+.result.big{animation:bigwin .45s ease 5}@keyframes bigwin{50%{background:#63121f;box-shadow:0 0 28px #d5a135}}
+.controls{display:grid;grid-template-columns:1.2fr 1fr;gap:8px;margin-top:9px}
+.panel{background:#111;border:1px solid #44341b;border-radius:11px;padding:9px}
+.panel-title{font-size:8px;color:#bca262;font-weight:900;margin-bottom:6px;letter-spacing:1px}
+.betgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.betbtn,.action,.spin,.bank{min-height:44px;border-radius:9px;border:1px solid #555;background:#242424;color:#fff;font-weight:900}
+.betbtn.active{background:linear-gradient(#deba5d,#987022);color:#111;border-color:#ffe29a}
+.actiongrid{display:grid;grid-template-columns:1fr 1fr;gap:5px}.action{font-size:9px}.action.gold{background:#71531e;border-color:#c9a649}
+.spinrow{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:9px}
+.spin{min-height:72px;border:3px solid #ffe18c;border-radius:15px;background:linear-gradient(#f0c65d,#a77920);color:#181000;font-size:23px;font-weight:1000;letter-spacing:2px;box-shadow:0 5px 0 #63410c}
+.spin:disabled{opacity:.45}.bank{min-width:130px}
+.paytable{margin-top:9px;background:#0e0e0e;border:1px solid #48381d;border-radius:11px;padding:9px}
+.paytable h3{margin:0 0 7px;font-size:11px;color:#e1c36e}
+.paygrid{display:grid;grid-template-columns:repeat(2,1fr);gap:4px 12px;font-size:10px}
+.payrow{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid #242424;padding:4px 0}
+.footer{text-align:center;color:#737373;font-size:8px;margin-top:7px}
+@media(max-width:640px){.app{padding:5px}.cabinet{padding:6px}.stats{grid-template-columns:repeat(2,1fr)}.reels{gap:3px}.cell{min-height:61px}.controls{grid-template-columns:1fr}.betgrid{grid-template-columns:repeat(4,1fr)}.spinrow{grid-template-columns:1fr}.bank{min-height:48px}.paygrid{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.cell.spinning,.result.big{animation:none}}
+</style>
+</head>
+<body>
+<nav class="game-switcher"><a href="./index.html">🎲 CRAPS</a><a class="active" href="./slots.html">🎰 SLOTS</a></nav>
+<main class="app"><section class="cabinet">
+<div class="marquee"><small>CRAPLESS CASINO</small><b>LUCKY REELS 20</b></div>
+<div class="stats">
+<div class="stat"><span>BANKROLL</span><strong id="bankroll">$1,000.00</strong></div>
+<div class="stat"><span>TOTAL BET</span><strong id="bet">$1.00</strong></div>
+<div class="stat"><span>LAST WIN</span><strong id="lastwin">$0.00</strong></div>
+<div class="stat"><span>FREE SPINS</span><strong id="free">0</strong></div>
+<div class="stat"><span>SPINS</span><strong id="spins">0</strong></div>
+</div>
+<div class="machine">
+<div class="reelbox"><div class="reels" id="reels"></div></div>
+<div class="note">5 REELS × 3 ROWS • 20 PAYLINES • WILD + SCATTER</div>
+<div class="lines" id="lines">20 paylines active</div>
+<div class="result" id="resultbox"><span>LAST RESULT</span><b id="result">PRESS SPIN</b></div>
+<div class="controls">
+<div class="panel"><div class="panel-title">TOTAL BET</div><div class="betgrid">
+<button class="betbtn" data-bet=".2">$0.20</button><button class="betbtn" data-bet=".5">$0.50</button><button class="betbtn active" data-bet="1">$1</button><button class="betbtn" data-bet="2">$2</button><button class="betbtn" data-bet="5">$5</button><button class="betbtn" data-bet="10">$10</button><button class="betbtn" data-bet="25">$25</button>
+</div></div>
+<div class="panel"><div class="panel-title">CONTROLS</div><div class="actiongrid">
+<button class="action gold" id="same">SAME BET</button><button class="action" id="max">MAX BET</button><button class="action" id="new">NEW SESSION</button><button class="action" id="paytoggle">HIDE PAYTABLE</button>
+</div></div>
+</div>
+<div class="spinrow"><button class="spin" id="spin">SPIN</button><button class="bank" id="banker">BANKER<br>+$500</button></div>
+</div>
+<div class="paytable" id="paytable"><h3>PAYTABLE — LEFT TO RIGHT ON 20 LINES</h3><div class="paygrid">
+<div class="payrow"><span>7️⃣ ×5</span><b>250× line bet</b></div><div class="payrow"><span>💎 ×5</span><b>120×</b></div>
+<div class="payrow"><span>🔔 ×5</span><b>60×</b></div><div class="payrow"><span>⭐ ×5</span><b>40×</b></div>
+<div class="payrow"><span>🍊 ×5</span><b>25×</b></div><div class="payrow"><span>🍋 ×5</span><b>20×</b></div>
+<div class="payrow"><span>🍒 ×5</span><b>15×</b></div><div class="payrow"><span>🃏 WILD</span><b>Substitutes</b></div>
+<div class="payrow"><span>🔮 ×3</span><b>8 free spins</b></div><div class="payrow"><span>🔮 ×4+</span><b>12 free spins</b></div>
+</div></div>
+<div class="footer">Entertainment simulator • Final symbols use browser cryptographic randomness • Slot session autosaves</div>
+</section></main>
+<script>
+(()=>{
+const $=s=>document.querySelector(s);
+const SYMBOLS=[
+{id:'cherry',icon:'🍒',w:26,p3:2,p4:5,p5:15},{id:'lemon',icon:'🍋',w:22,p3:3,p4:7,p5:20},
+{id:'orange',icon:'🍊',w:18,p3:4,p4:10,p5:25},{id:'star',icon:'⭐',w:12,p3:7,p4:18,p5:40},
+{id:'bell',icon:'🔔',w:8,p3:10,p4:25,p5:60},{id:'diamond',icon:'💎',w:5,p3:18,p4:50,p5:120},
+{id:'seven',icon:'7️⃣',w:3,p3:30,p4:90,p5:250},{id:'wild',icon:'🃏',w:3,p3:0,p4:0,p5:0},{id:'scatter',icon:'🔮',w:3,p3:0,p4:0,p5:0}
+];
+const LINES=[[1,1,1,1,1],[0,0,0,0,0],[2,2,2,2,2],[0,1,2,1,0],[2,1,0,1,2],[0,0,1,2,2],[2,2,1,0,0],[1,0,0,0,1],[1,2,2,2,1],[0,1,1,1,0],[2,1,1,1,2],[0,1,0,1,0],[2,1,2,1,2],[1,0,1,0,1],[1,2,1,2,1],[0,2,0,2,0],[2,0,2,0,2],[0,2,2,2,0],[2,0,0,0,2],[1,1,0,1,1]];
+const SAVE='craplessCasinoSlotsV22';
+let bankroll=1000,bet=1,lastWin=0,freeSpins=0,spins=0,previousBet=1,spinning=false;
+let grid=Array.from({length:5},()=>Array.from({length:3},()=>SYMBOLS[0]));
+const money=n=>'$'+Number(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+function rand(){const a=new Uint32Array(1);crypto.getRandomValues(a);return a[0]/4294967296}
+function pick(){const total=SYMBOLS.reduce((a,s)=>a+s.w,0);let r=rand()*total;for(const s of SYMBOLS){r-=s.w;if(r<0)return s}return SYMBOLS[0]}
+function fake(){return SYMBOLS[Math.floor(Math.random()*SYMBOLS.length)]}
+function save(){try{localStorage.setItem(SAVE,JSON.stringify({bankroll,bet,lastWin,freeSpins,spins,previousBet}))}catch(e){}}
+function load(){try{const x=JSON.parse(localStorage.getItem(SAVE)||'null');if(!x)return;bankroll=Number.isFinite(x.bankroll)?x.bankroll:1000;bet=[.2,.5,1,2,5,10,25].includes(x.bet)?x.bet:1;lastWin=Number(x.lastWin)||0;freeSpins=Number(x.freeSpins)||0;spins=Number(x.spins)||0;previousBet=[.2,.5,1,2,5,10,25].includes(x.previousBet)?x.previousBet:bet}catch(e){}}
+function build(){const r=$('#reels');r.innerHTML='';for(let c=0;c<5;c++){const reel=document.createElement('div');reel.className='reel';for(let row=0;row<3;row++){const cell=document.createElement('div');cell.className='cell';cell.dataset.c=c;cell.dataset.r=row;const sp=document.createElement('span');sp.textContent=grid[c][row].icon;cell.appendChild(sp);reel.appendChild(cell)}r.appendChild(reel)}}
+function render(){$('#bankroll').textContent=money(bankroll);$('#bet').textContent=money(bet);$('#lastwin').textContent=money(lastWin);$('#free').textContent=freeSpins;$('#spins').textContent=spins;document.querySelectorAll('.betbtn').forEach(b=>b.classList.toggle('active',Number(b.dataset.bet)===bet));$('#spin').textContent=freeSpins>0?'FREE SPIN':'SPIN';$('#spin').disabled=spinning||(freeSpins===0&&bankroll<bet);save()}
+function clearWins(){document.querySelectorAll('.cell').forEach(c=>c.classList.remove('win','wild','scatter'))}
+function evaluate(){
+ const lineBet=bet/20;let total=0;const hits=new Set(),wins=[];
+ LINES.forEach((line,li)=>{const arr=line.map((r,c)=>grid[c][r]);let target=null;for(const x of arr){if(x.id!=='wild'&&x.id!=='scatter'){target=x;break}}if(!target)return;let count=0;for(const x of arr){if(x.id===target.id||x.id==='wild')count++;else break}if(count>=3){const m=count===3?target.p3:count===4?target.p4:target.p5;if(m){const w=lineBet*m;total+=w;wins.push(`Line ${li+1}: ${target.icon} ×${count} = ${money(w)}`);for(let c=0;c<count;c++)hits.add(`${c}-${line[c]}`)}}});
+ let scat=0;for(let c=0;c<5;c++)for(let r=0;r<3;r++)if(grid[c][r].id==='scatter'){scat++;hits.add(`${c}-${r}`)}
+ return{total,hits,wins,bonus:scat>=4?12:scat===3?8:0,scat};
+}
+function spin(){
+ if(spinning)return;const free=freeSpins>0;if(!free&&bankroll<bet)return;
+ spinning=true;previousBet=bet;if(free)freeSpins--;else bankroll-=bet;lastWin=0;clearWins();$('#resultbox').classList.remove('big');$('#result').textContent=free?'FREE SPIN…':'SPINNING…';$('#lines').textContent='20 paylines active';render();
+ const final=Array.from({length:5},()=>Array.from({length:3},pick));const cells=[...document.querySelectorAll('.cell')];cells.forEach(c=>c.classList.add('spinning'));
+ const iv=setInterval(()=>cells.forEach(c=>c.querySelector('span').textContent=fake().icon),65);
+ setTimeout(()=>{clearInterval(iv);grid=final;cells.forEach(c=>{const col=+c.dataset.c,row=+c.dataset.r;c.classList.remove('spinning');c.querySelector('span').textContent=grid[col][row].icon;if(grid[col][row].id==='wild')c.classList.add('wild');if(grid[col][row].id==='scatter')c.classList.add('scatter')});
+ const ev=evaluate();lastWin=ev.total;bankroll+=lastWin;freeSpins+=ev.bonus;spins++;ev.hits.forEach(k=>{const [c,r]=k.split('-');document.querySelector(`.cell[data-c="${c}"][data-r="${r}"]`)?.classList.add('win')});
+ if(ev.bonus){$('#result').textContent=`${ev.bonus} FREE SPINS!${ev.total?' + '+money(ev.total):''}`;$('#resultbox').classList.add('big');$('#lines').textContent=`${ev.scat} scatters triggered bonus`}
+ else if(ev.total){$('#result').textContent=`WIN ${money(ev.total)}`;$('#lines').textContent=ev.wins.slice(0,3).join(' • ')+(ev.wins.length>3?` • +${ev.wins.length-3} more`:'');if(ev.total>=bet*10)$('#resultbox').classList.add('big')}
+ else{$('#result').textContent='NO WIN';$('#lines').textContent='20 paylines active'}
+ spinning=false;render();},1150);
+}
+document.querySelectorAll('.betbtn').forEach(b=>b.addEventListener('click',()=>{if(!spinning){bet=Number(b.dataset.bet);render()}}));
+$('#spin').addEventListener('click',spin);$('#banker').addEventListener('click',()=>{if(!spinning){bankroll+=500;$('#result').textContent='BANKER +$500';render()}});
+$('#same').addEventListener('click',()=>{if(!spinning){bet=previousBet;render()}});$('#max').addEventListener('click',()=>{if(!spinning){bet=25;render()}});
+$('#paytoggle').addEventListener('click',()=>{const p=$('#paytable');p.hidden=!p.hidden;$('#paytoggle').textContent=p.hidden?'SHOW PAYTABLE':'HIDE PAYTABLE'});
+$('#new').addEventListener('click',()=>{if(spinning)return;if(!confirm('Start a new slot session?'))return;bankroll=1000;bet=1;lastWin=0;freeSpins=0;spins=0;previousBet=1;$('#result').textContent='NEW SESSION';$('#lines').textContent='20 paylines active';render()});
+load();build();render();
+})();
+</script>
+</body>
+</html>
