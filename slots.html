@@ -94,9 +94,60 @@ button{font:inherit}
   100%{opacity:0;transform:translate(-50%,-58%) scale(.92);-webkit-transform:translate(-50%,-58%) scale(.92)}
 }
 
+.result-spin{cursor:pointer;user-select:none}
+.result-spin:active{transform:scale(.99)}
+
+.win-pop-global{
+  position:fixed;
+  left:50%;
+  top:42%;
+  transform:translate(-50%,-50%) scale(.75);
+  -webkit-transform:translate(-50%,-50%) scale(.75);
+  z-index:2147483000;
+  width:min(88vw,540px);
+  padding:22px 18px;
+  border:4px solid #ffe38d;
+  border-radius:22px;
+  background:linear-gradient(180deg,#8c1a2b,#26070d);
+  box-shadow:0 16px 40px rgba(0,0,0,.86),0 0 35px rgba(255,210,75,.7);
+  text-align:center;
+  pointer-events:none;
+  opacity:0;
+  visibility:hidden;
+}
+.win-pop-global .win-pop-label{display:block;font-size:13px;letter-spacing:4px;color:#ffe7a5;font-weight:900}
+.win-pop-global .win-pop-amount{display:block;font-size:clamp(46px,13vw,78px);line-height:1.05;color:#fff0a8;font-weight:1000;text-shadow:0 3px 0 #734800,0 0 22px #ffd45a}
+.win-pop-global.show{
+  visibility:visible;
+  animation:iosWinBounce 1.9s ease-out forwards;
+  -webkit-animation:iosWinBounce 1.9s ease-out forwards;
+}
+@keyframes iosWinBounce{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.65)}
+  14%{opacity:1;transform:translate(-50%,-50%) scale(1.18)}
+  28%{opacity:1;transform:translate(-50%,-50%) scale(.95)}
+  40%{opacity:1;transform:translate(-50%,-50%) scale(1.07)}
+  55%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  84%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  100%{opacity:0;transform:translate(-50%,-58%) scale(.92)}
+}
+@-webkit-keyframes iosWinBounce{
+  0%{opacity:0;-webkit-transform:translate(-50%,-50%) scale(.65)}
+  14%{opacity:1;-webkit-transform:translate(-50%,-50%) scale(1.18)}
+  28%{opacity:1;-webkit-transform:translate(-50%,-50%) scale(.95)}
+  40%{opacity:1;-webkit-transform:translate(-50%,-50%) scale(1.07)}
+  55%{opacity:1;-webkit-transform:translate(-50%,-50%) scale(1)}
+  84%{opacity:1;-webkit-transform:translate(-50%,-50%) scale(1)}
+  100%{opacity:0;-webkit-transform:translate(-50%,-58%) scale(.92)}
+}
+
 </style>
 </head>
 <body>
+<div class="win-pop-global" id="winPop" aria-live="polite">
+  <span class="win-pop-label">TOTAL WIN</span>
+  <span class="win-pop-amount" id="winPopAmount">$0.00</span>
+</div>
 <nav class="game-switcher"><a href="./index.html">🎲 CRAPS</a><a class="active" href="./slots.html">🎰 SLOTS</a></nav>
 <main class="app"><section class="cabinet">
 <div class="marquee top-spin" id="topSpin" role="button" tabindex="0" aria-label="Spin"><small>LAUREN&apos;S SLOTS</small><b id="topSpinText">SPIN TO WIN</b></div>
@@ -111,7 +162,7 @@ button{font:inherit}
 <div class="reelbox"><div class="reels" id="reels"></div></div>
 <div class="note">5 REELS × 3 ROWS • 20 PAYLINES • WILD + SCATTER</div>
 <div class="lines" id="lines">20 paylines active</div>
-<div class="result" id="resultbox"><span>LAST RESULT</span><b id="result">PRESS SPIN</b></div>
+<div class="result result-spin" id="resultbox" role="button" tabindex="0" aria-label="Spin"><span>LAST RESULT</span><b id="result">PRESS SPIN</b></div>
 <div class="controls">
 <div class="panel"><div class="panel-title">TOTAL BET</div><div class="betgrid">
 <button class="betbtn" data-bet=".2">$0.20</button><button class="betbtn" data-bet=".5">$0.50</button><button class="betbtn active" data-bet="1">$1</button><button class="betbtn" data-bet="2">$2</button><button class="betbtn" data-bet="5">$5</button><button class="betbtn" data-bet="10">$10</button><button class="betbtn" data-bet="25">$25</button>
@@ -151,7 +202,7 @@ function fake(){return SYMBOLS[Math.floor(Math.random()*SYMBOLS.length)]}
 function save(){try{localStorage.setItem(SAVE,JSON.stringify({bankroll,bet,lastWin,freeSpins,spins,previousBet}))}catch(e){}}
 function load(){try{const x=JSON.parse(localStorage.getItem(SAVE)||'null');if(!x)return;bankroll=Number.isFinite(x.bankroll)?x.bankroll:1000;bet=[.2,.5,1,2,5,10,25].includes(x.bet)?x.bet:1;lastWin=Number(x.lastWin)||0;freeSpins=Number(x.freeSpins)||0;spins=Number(x.spins)||0;previousBet=[.2,.5,1,2,5,10,25].includes(x.previousBet)?x.previousBet:bet}catch(e){}}
 function build(){const r=$('#reels');r.innerHTML='';for(let c=0;c<5;c++){const reel=document.createElement('div');reel.className='reel';for(let row=0;row<3;row++){const cell=document.createElement('div');cell.className='cell';cell.dataset.c=c;cell.dataset.r=row;const sp=document.createElement('span');sp.textContent=grid[c][row].icon;cell.appendChild(sp);reel.appendChild(cell)}r.appendChild(reel)}}
-function render(){$('#bankroll').textContent=money(bankroll);$('#bet').textContent=money(bet);$('#lastwin').textContent=money(lastWin);$('#free').textContent=freeSpins;$('#spins').textContent=spins;document.querySelectorAll('.betbtn').forEach(b=>b.classList.toggle('active',Number(b.dataset.bet)===bet));$('#spin').textContent=freeSpins>0?'FREE SPIN':'SPIN';$('#spin').disabled=spinning||(freeSpins===0&&bankroll<bet);$('#topSpinText').textContent=spinning?'SPINNING…':freeSpins>0?'FREE SPIN':'SPIN TO WIN';save()}
+function render(){$('#bankroll').textContent=money(bankroll);$('#bet').textContent=money(bet);$('#lastwin').textContent=money(lastWin);$('#free').textContent=freeSpins;$('#spins').textContent=spins;document.querySelectorAll('.betbtn').forEach(b=>b.classList.toggle('active',Number(b.dataset.bet)===bet));$('#spin').textContent=freeSpins>0?'FREE SPIN':'SPIN TO WIN';$('#spin').disabled=spinning||(freeSpins===0&&bankroll<bet);$('#topSpinText').textContent=spinning?'SPINNING…':freeSpins>0?'FREE SPIN':'SPIN TO WIN';save()}
 function clearWins(){document.querySelectorAll('.cell').forEach(c=>c.classList.remove('win','wild','scatter'))}
 function evaluate(){
  const lineBet=bet/20;let total=0;const hits=new Set(),wins=[];
@@ -172,7 +223,9 @@ function spin(){
  spinning=false;render();},1150);
 }
 document.querySelectorAll('.betbtn').forEach(b=>b.addEventListener('click',()=>{if(!spinning){bet=Number(b.dataset.bet);render()}}));
-$('#spin').addEventListener('click',spin);$('#topSpin').addEventListener('click',spin);$('#topSpin').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();spin()}});$('#banker').addEventListener('click',()=>{if(!spinning){bankroll+=500;$('#result').textContent='BANKER +$500';render()}});
+$('#spin').addEventListener('click',spin);$('#topSpin').addEventListener('click',spin);$('#topSpin').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();spin()}});
+$('#resultbox').addEventListener('click',spin);
+$('#resultbox').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();spin()}});$('#banker').addEventListener('click',()=>{if(!spinning){bankroll+=500;$('#result').textContent='BANKER +$500';render()}});
 $('#same').addEventListener('click',()=>{if(!spinning){bet=previousBet;render()}});$('#max').addEventListener('click',()=>{if(!spinning){bet=25;render()}});
 $('#paytoggle').addEventListener('click',()=>{const p=$('#paytable');p.hidden=!p.hidden;$('#paytoggle').textContent=p.hidden?'SHOW PAYTABLE':'HIDE PAYTABLE'});
 $('#new').addEventListener('click',()=>{if(spinning)return;if(!confirm('Start a new slot session?'))return;bankroll=1000;bet=1;lastWin=0;freeSpins=0;spins=0;previousBet=1;$('#result').textContent='NEW SESSION';$('#lines').textContent='20 paylines active';render()});
