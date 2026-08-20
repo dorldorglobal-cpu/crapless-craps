@@ -1,13 +1,16 @@
-CRAPLESS CASINO FULL V23
+CRAPLESS CASINO FULL V24
 
-SLOTS UPDATE
-- Renamed slot game header to LAUREN'S SLOTS.
-- Large top banner now says SPIN TO WIN.
-- The top banner itself is the working spin button.
-- During a spin it shows SPINNING...
-- During free spins it shows FREE SPIN.
-- On phones the lower Spin button is hidden so you do not need to scroll to spin.
-- Banker remains available below the reels.
+Includes all V23 features.
 
-All V22 Craps + Slots features retained.
-PWA cache: crapless-casino-v23
+LAUREN'S SLOTS premium symbol weights:
+Star 7
+Bell 7
+Diamond 6
+Seven 5
+Wild 7
+Scatter 7
+
+The top LAUREN'S SLOTS / SPIN TO WIN banner remains the phone spin button.
+Craps and all prior fixes are retained.
+
+PWA cache: crapless-casino-v24
