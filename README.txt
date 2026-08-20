@@ -1,11 +1,16 @@
-CRAPLESS CASINO FULL V36
+CRAPLESS CASINO FULL V37 — BLACKJACK REBUILD
 
-BLACKJACK BUTTON FIX
-- HIT and STAND no longer get disabled by a stale split-transition flag.
-- DOUBLE keeps a short duplicate-tap lock only during its one-card delay.
-- Split lock clears before advancing.
-- New hands clear stale split state.
-- Dealer resolution still disables play buttons correctly.
-- Prior phone layout fixes retained.
+This build fixes the runtime issue that broke HIT/STAND/DOUBLE/SPLIT in recent builds.
 
-PWA cache: crapless-casino-v36
+Blackjack:
+- HIT / STAND / DOUBLE / SPLIT rebuilt from active hand state.
+- Split flow rebuilt cleanly.
+- Split double gives one card, pauses, then advances.
+- Final split hand automatically starts dealer play.
+- Dealer hole card switches from SHOWING to TOTAL.
+- Original wager is restored after winning a doubled hand.
+- CLEAR BET refunds unplayed wagers.
+- DEAL is dimmed when no main wager is placed.
+- Previous mobile layout, side bets, counter, insurance, chips and banners retained.
+
+PWA cache: crapless-casino-v37

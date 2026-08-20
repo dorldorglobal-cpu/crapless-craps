@@ -157,6 +157,7 @@
     #slot-preview .bj-actions{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:12px;position:relative}
     #slot-preview .bj-action{min-height:56px;border-radius:10px;border:1px solid #6b6b6b;background:#202020;color:#fff;font-weight:900;cursor:pointer;font-size:18px}
     #slot-preview .bj-action.primary{background:linear-gradient(#e0ba5c,#97701f);color:#111;border-color:#ffe29a}
+#slot-preview #bj-deal.no-bet{background:#3b3b3b;color:#8e8e8e;border-color:#5b5b5b;box-shadow:0 5px 0 #222,0 8px 16px #0009}
     #slot-preview #bj-hit,#slot-preview #bj-stand{min-height:66px;font-size:21px}
     #slot-preview #bj-double,#slot-preview #bj-split,#slot-preview #bj-insurance,#slot-preview #bj-new-shoe{min-height:44px;font-size:13px}
     #slot-preview #bj-deal{position:absolute;right:4px;top:50%;transform:translateY(-50%);width:124px;min-height:96px;border-radius:18px;font-size:22px;box-shadow:0 5px 0 #63420d,0 8px 16px #0009}
@@ -257,6 +258,7 @@
         <button type="button" class="bj-action" id="bj-double" disabled>DOUBLE</button>
         <button type="button" class="bj-action" id="bj-split" disabled>SPLIT</button>
         <button type="button" class="bj-action" id="bj-insurance" disabled>INSURANCE</button>
+        <button type="button" class="bj-action" id="bj-clear-bet">CLEAR BET</button>
         <button type="button" class="bj-action" id="bj-new-shoe">NEW SHOE</button>
       </div>
       <div class="bj-chip-row" id="bj-chip-row">
@@ -377,7 +379,7 @@
     let bankroll=Number(localStorage.getItem(SHARED_BANKROLL_KEY)||1000),bet=1,lastWin=0,freeSpins=0,spins=0,previousBet=1,spinning=false;
     let grid=Array.from({length:5},()=>Array.from({length:3},()=>symbols[0]));
     let bjCounterEnabled=false,bjRunningCount=0,bjDecksRemaining=6;
-    let bjBankroll=bankroll,bjSelectedChip=5,bjMainBet=0,bjMatchBet=0,bjLadiesBet=0,bjInsuranceBet=0,bjInsuranceResolved=false,bjLastWin=0,bjRoundActive=false,bjHoleHidden=true;
+    let bjBankroll=bankroll,bjSelectedChip=5,bjMainBet=0,bjBaseMainBet=0,bjMatchBet=0,bjLadiesBet=0,bjInsuranceBet=0,bjInsuranceResolved=false,bjLastWin=0,bjRoundActive=false,bjHoleHidden=true,bjResolvingRound=false,bjSplitAdvanceLocked=false;
     let bjShoe=[],bjPlayer=[],bjDealer=[],bjSplitHands=[],bjSplitBets=[],bjActiveHand=0,bjSplitMode=false;
     const BJ_SUITS=['♠','♥','♦','♣'];
     const BJ_RANKS=['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
@@ -399,21 +401,29 @@
     function bjStackHTML(amount){if(!amount)return'';const denoms=[500,100,25,10,5,1];let remaining=Math.round(amount);const stack=[];for(const d of denoms){const count=Math.floor(remaining/d);for(let i=0;i<count;i++)stack.push(d);remaining-=count*d}return stack.map((d,i)=>`<div class="bj-bet-chip ${bjChipColorClass(d)}"><span>${i===stack.length-1?money(amount):''}</span></div>`).join('')}
     function renderBj(){localStorage.setItem(SHARED_BANKROLL_KEY,String(bjBankroll));bankroll=bjBankroll;
       $('#bj-bankroll').textContent=money(bjBankroll);$('#bj-main-bet').textContent=money(bjMainBet);$('#bj-main-circle-amt').textContent=money(bjMainBet);$('#bj-match-amt').textContent=money(bjMatchBet);$('#bj-ladies-amt').textContent=money(bjLadiesBet);$('#bj-last-win').textContent=money(bjLastWin);$('#bj-shoe').textContent=String(bjShoe.length);$('#bj-main-stack').innerHTML=bjStackHTML(bjMainBet);$('#bj-match-stack').innerHTML=bjStackHTML(bjMatchBet);$('#bj-ladies-stack').innerHTML=bjStackHTML(bjLadiesBet);
-      const shownPlayer=bjSplitMode?bjSplitHands[bjActiveHand]:bjPlayer;
+      const shownPlayer=bjSplitMode?(bjSplitHands[bjActiveHand]||[]):bjPlayer;
       if(bjSplitMode){
         $('#bj-player-hand').innerHTML=`<div class="bj-split-row" data-hands="${bjSplitHands.length}">${bjSplitHands.map((hand,i)=>`<div class="bj-split-hand ${i===bjActiveHand?'active':''}" style="--split-shift:${i%2===0?'10px':'-10px'}">${hand.map(c=>bjCardHTML(c)).join('')}</div>`).join('')}</div>`;
       }else $('#bj-player-hand').innerHTML=shownPlayer.map(c=>bjCardHTML(c)).join('');
       $('#bj-dealer-hand').innerHTML=bjDealer.map((c,i)=>bjCardHTML(c,bjHoleHidden&&i===1)).join('');
       $('#bj-player-total').textContent=shownPlayer.length?`${bjSplitMode?`HAND ${bjActiveHand+1} • `:''}TOTAL ${bjHandValue(shownPlayer)}`:'';
       $('#bj-dealer-total').textContent=bjDealer.length?(bjHoleHidden?`SHOWING ${bjCardValue(bjDealer[0])}`:`TOTAL ${bjHandValue(bjDealer)}`):'';
-      const activeHand=bjSplitMode?bjSplitHands[bjActiveHand]:bjPlayer;
-      $('#bj-hit').disabled=actionLocked;$('#bj-stand').disabled=actionLocked;$('#bj-double').disabled=!bjRoundActive||activeHand.length!==2||bjBankroll<(bjSplitMode?bjSplitBets[bjActiveHand]:bjMainBet);
-      const splitHand=bjSplitMode?bjSplitHands[bjActiveHand]:bjPlayer;
-      const splitWager=bjSplitMode?bjSplitBets[bjActiveHand]:bjMainBet;
-      $('#bj-split').disabled=!bjRoundActive||splitHand.length!==2||splitHand[0].rank!==splitHand[1].rank||bjBankroll<splitWager||(bjSplitMode&&bjSplitHands.length>=5);
-      $('#bj-insurance').disabled=!bjRoundActive||bjInsuranceResolved||!bjDealer[0]||bjDealer[0].rank!=='A'||bjBankroll<Math.min(bjMainBet/2,bjSelectedChip);
+
+      const activeHand=bjSplitMode?(bjSplitHands[bjActiveHand]||[]):bjPlayer;
+      const activeTotal=activeHand.length?bjHandValue(activeHand):0;
+      const handPlayable=bjRoundActive&&!bjResolvingRound&&activeHand.length>0&&activeTotal<21;
+      const activeWager=bjSplitMode?(bjSplitBets[bjActiveHand]||0):bjMainBet;
+
+      $('#bj-hit').disabled=!handPlayable;
+      $('#bj-stand').disabled=!handPlayable;
+      $('#bj-double').disabled=!handPlayable||activeHand.length!==2||bjBankroll<activeWager||bjSplitAdvanceLocked;
+      $('#bj-split').disabled=!handPlayable||activeHand.length!==2||activeHand[0]?.rank!==activeHand[1]?.rank||bjBankroll<activeWager||(bjSplitMode&&bjSplitHands.length>=5)||bjSplitAdvanceLocked;
+      $('#bj-insurance').disabled=!bjRoundActive||bjResolvingRound||bjInsuranceResolved||!bjDealer[0]||bjDealer[0].rank!=='A'||bjBankroll<Math.min(bjMainBet/2,bjSelectedChip);
+      const clearBtn=$('#bj-clear-bet');if(clearBtn)clearBtn.disabled=bjRoundActive||(bjMainBet+bjMatchBet+bjLadiesBet<=0);
+      $('#bj-deal').classList.toggle('no-bet',bjMainBet<=0);
       root.querySelectorAll('[data-bj-chip]').forEach(b=>b.classList.toggle('sel',Number(b.dataset.bjChip)===bjSelectedChip));
     }
+    function clearBjBets(){if(bjRoundActive)return;const refund=bjMainBet+bjMatchBet+bjLadiesBet;if(refund<=0)return;bjBankroll+=refund;bjMainBet=0;bjBaseMainBet=0;bjMatchBet=0;bjLadiesBet=0;$('#bj-message').textContent='Bets cleared.';renderBj()}
     function addBjBet(which){if(bjRoundActive)return;if(bjBankroll<bjSelectedChip){$('#bj-message').textContent='Not enough bankroll.';return}bjBankroll-=bjSelectedChip;if(which==='main')bjMainBet+=bjSelectedChip;if(which==='match')bjMatchBet+=bjSelectedChip;if(which==='ladies')bjLadiesBet+=bjSelectedChip;renderBj()}
     function luckyLadiesMultiplier(){
       if(bjPlayer.length<2||bjHandValue(bjPlayer.slice(0,2))!==20)return 0;
@@ -437,7 +447,7 @@
     }
     function startBjRound(){
       if(bjRoundActive)return;if(bjMainBet<=0){$('#bj-message').textContent='Place a main Blackjack bet first.';return}
-      bjLastWin=0;bjInsuranceBet=0;bjInsuranceResolved=false;bjPlayer=[];bjDealer=[];bjSplitHands=[];bjSplitBets=[];bjActiveHand=0;bjSplitMode=false;bjHoleHidden=true;bjPlayer.push(drawBj(true));bjDealer.push(drawBj(true));bjPlayer.push(drawBj(true));bjDealer.push(drawBj(false));bjRoundActive=true;settleBjSideBets();renderBj();
+      bjLastWin=0;bjInsuranceBet=0;bjInsuranceResolved=false;bjResolvingRound=false;bjSplitAdvanceLocked=false;bjBaseMainBet=bjMainBet;bjPlayer=[];bjDealer=[];bjSplitHands=[];bjSplitBets=[];bjActiveHand=0;bjSplitMode=false;bjHoleHidden=true;bjPlayer.push(drawBj(true));bjDealer.push(drawBj(true));bjPlayer.push(drawBj(true));bjDealer.push(drawBj(false));bjRoundActive=true;settleBjSideBets();renderBj();
       const sideDelay=(bjMatchBet||bjLadiesBet)?1350:0;
       setTimeout(()=>{if(!bjRoundActive)return;if(bjDealer[0]?.rank==='A')$('#bj-message').textContent='Dealer shows Ace — insurance is available.';else if(bjIsBlackjack(bjPlayer)){finishBjRound()}else $('#bj-message').textContent='Hit, Stand, or Double.';renderBj()},sideDelay);
     }
@@ -454,16 +464,33 @@
     }
     function showBjOutcome(title,sub,isWin=false){const overlay=$('#bj-outcome-overlay'),card=$('#bj-outcome-card');$('#bj-outcome-title').textContent=title;$('#bj-outcome-sub').textContent=sub||'';card.classList.toggle('win',isWin);overlay.classList.remove('show');void overlay.offsetWidth;overlay.classList.add('show');clearTimeout(overlay._hideTimer);overlay._hideTimer=setTimeout(()=>overlay.classList.remove('show'),1750)}
     async function finishBjRound(){
+      if(!bjRoundActive||bjResolvingRound)return;
+      bjResolvingRound=true;bjSplitAdvanceLocked=false;
+      if(bjSplitMode&&bjSplitHands.length)bjActiveHand=Math.min(bjActiveHand,bjSplitHands.length-1);
+      renderBj();
+
       const allPlayerBust=bjSplitMode?bjSplitHands.every(hand=>bjHandValue(hand)>21):bjHandValue(bjPlayer)>21;
       if(allPlayerBust){
         const msg=bjSplitMode?'ALL PLAYER HANDS BUST':'PLAYER BUSTS';
-        bjRoundActive=false;bjInsuranceBet=0;bjInsuranceResolved=false;$('#bj-message').textContent=msg;showBjOutcome('BUST','Dealer wins');
-        bjMainBet=0;bjMatchBet=0;bjLadiesBet=0;bjSplitMode=false;bjSplitHands=[];bjSplitBets=[];bjActiveHand=0;renderBj();return;
+        bjRoundActive=false;bjResolvingRound=false;bjInsuranceBet=0;bjInsuranceResolved=false;$('#bj-message').textContent=msg;showBjOutcome('BUST','Dealer wins');
+        bjMainBet=0;bjBaseMainBet=0;bjMatchBet=0;bjLadiesBet=0;bjSplitMode=false;bjSplitHands=[];bjSplitBets=[];bjActiveHand=0;renderBj();return;
       }
-      bjHoleHidden=false;if(bjDealer[1])bjCountCard(bjDealer[1]);$('#bj-message').textContent='Dealer reveals hole card.';renderBj();await new Promise(r=>setTimeout(r,500));
-      while(bjHandValue(bjDealer)<17){await new Promise(r=>setTimeout(r,520));bjDealer.push(drawBj(true));renderBj()}
+
+      bjHoleHidden=false;
+      if(bjDealer[1])bjCountCard(bjDealer[1]);
+      $('#bj-message').textContent='Dealer reveals hole card.';
+      renderBj();
+      await new Promise(r=>setTimeout(r,500));
+
+      while(bjHandValue(bjDealer)<17){
+        await new Promise(r=>setTimeout(r,520));
+        bjDealer.push(drawBj(true));
+        renderBj();
+      }
+
       const dv=bjHandValue(bjDealer),db=bjIsBlackjack(bjDealer);
       let msg='',wonAny=false,totalMainWin=0;
+
       if(bjSplitMode){
         bjSplitHands.forEach((hand,i)=>{
           const pv=bjHandValue(hand),wager=bjSplitBets[i];
@@ -483,62 +510,64 @@
         else if(pv===dv){bjBankroll+=bjMainBet;msg='PUSH';showBjOutcome('PUSH','Bet returned')}
         else{msg='DEALER WINS';showBjOutcome('DEALER WINS','Better luck next hand')}
       }
-      bjRoundActive=false;bjInsuranceBet=0;bjInsuranceResolved=false;$('#bj-message').textContent=msg;
-      if(!wonAny){bjMainBet=0;bjMatchBet=0;bjLadiesBet=0}
+
+      bjRoundActive=false;bjResolvingRound=false;bjInsuranceBet=0;bjInsuranceResolved=false;$('#bj-message').textContent=msg;
+      if(!wonAny){bjMainBet=0;bjBaseMainBet=0;bjMatchBet=0;bjLadiesBet=0}
+      else{bjMainBet=bjBaseMainBet}
       bjSplitMode=false;bjSplitHands=[];bjSplitBets=[];bjActiveHand=0;renderBj();
     }
     function bjHit(){if(!bjRoundActive)return;bjPlayer.push(drawBj(true));renderBj();if(bjHandValue(bjPlayer)>=21)finishBjRound()}
     function bjDouble(){if(!bjRoundActive||bjPlayer.length!==2||bjBankroll<bjMainBet)return;bjBankroll-=bjMainBet;bjMainBet*=2;bjPlayer.push(drawBj(true));renderBj();finishBjRound()}
     function bjAdvanceSplitHand(){
       if(!bjSplitMode||!bjRoundActive||bjResolvingRound)return;
+      bjSplitAdvanceLocked=false;
       const next=bjActiveHand+1;
       if(next<bjSplitHands.length){
-        bjActiveHand=next;
-        bjSplitAdvanceLocked=false;
-        renderBj();
-        $('#bj-message').textContent=`Playing split hand ${bjActiveHand+1}.`;
+        bjActiveHand=next;renderBj();$('#bj-message').textContent=`Playing split hand ${bjActiveHand+1}.`;
+        const hand=bjSplitHands[bjActiveHand];
+        if(hand&&bjHandValue(hand)>=21)setTimeout(bjAdvanceSplitHand,180);
         return;
       }
       bjActiveHand=Math.max(0,bjSplitHands.length-1);
-      bjSplitAdvanceLocked=false;
       $('#bj-message').textContent='Player hands complete — dealer plays.';
       renderBj();
       finishBjRound();
     }
     function bjSplit(){
-      if(!bjRoundActive)return;
+      if(!bjRoundActive||bjResolvingRound||bjSplitAdvanceLocked)return;
       const hand=bjSplitMode?bjSplitHands[bjActiveHand]:bjPlayer;
       const wager=bjSplitMode?bjSplitBets[bjActiveHand]:bjMainBet;
-      if(hand.length!==2||hand[0].rank!==hand[1].rank||bjBankroll<wager||(bjSplitMode&&bjSplitHands.length>=5))return;
+      if(!hand||hand.length!==2||hand[0].rank!==hand[1].rank||bjBankroll<wager||(bjSplitMode&&bjSplitHands.length>=5))return;
       bjBankroll-=wager;
       const right=[hand[1],drawBj(true)],left=[hand[0],drawBj(true)];
       if(!bjSplitMode){bjSplitMode=true;bjSplitHands=[right,left];bjSplitBets=[wager,wager];bjActiveHand=0}
       else{bjSplitHands.splice(bjActiveHand,1,right,left);bjSplitBets.splice(bjActiveHand,1,wager,wager)}
-      renderBj();const row=$('#bj-player-hand .bj-split-row');if(row){row.classList.add('split-anim');setTimeout(()=>row.classList.remove('split-anim'),480)}
+      renderBj();
+      const row=$('#bj-player-hand .bj-split-row');if(row){row.classList.add('split-anim');setTimeout(()=>row.classList.remove('split-anim'),480)}
       $('#bj-message').textContent=`Split accepted. Playing right-hand card first — Hand ${bjActiveHand+1}.`;
+      if(bjHandValue(bjSplitHands[bjActiveHand])>=21)setTimeout(bjAdvanceSplitHand,180);
     }
     function bjHitActive(){
-      if(!bjRoundActive||bjResolvingRound)return;
+      if(!bjRoundActive||bjResolvingRound||bjSplitAdvanceLocked)return;
       if(!bjSplitMode){bjHit();return}
-      const hand=bjSplitHands[bjActiveHand];hand.push(drawBj(true));renderBj();if(bjHandValue(hand)>=21)bjAdvanceSplitHand();
+      const hand=bjSplitHands[bjActiveHand];
+      if(!hand||bjHandValue(hand)>=21)return;
+      hand.push(drawBj(true));renderBj();
+      if(bjHandValue(hand)>=21)setTimeout(bjAdvanceSplitHand,180);
     }
-    function bjStandActive(){if(!bjRoundActive||bjResolvingRound)return;if(bjSplitMode){bjAdvanceSplitHand();return}finishBjRound()}
+    function bjStandActive(){
+      if(!bjRoundActive||bjResolvingRound||bjSplitAdvanceLocked)return;
+      if(bjSplitMode){bjAdvanceSplitHand();return}
+      finishBjRound();
+    }
     function bjDoubleActive(){
       if(!bjRoundActive||bjResolvingRound||bjSplitAdvanceLocked)return;
       if(!bjSplitMode){bjDouble();return}
       const hand=bjSplitHands[bjActiveHand],wager=bjSplitBets[bjActiveHand];
       if(!hand||hand.length!==2||bjBankroll<wager)return;
-      bjSplitAdvanceLocked=true;
-      bjBankroll-=wager;
-      bjSplitBets[bjActiveHand]*=2;
-      hand.push(drawBj(true));
-      renderBj();
+      bjBankroll-=wager;bjSplitBets[bjActiveHand]*=2;hand.push(drawBj(true));bjSplitAdvanceLocked=true;renderBj();
       $('#bj-message').textContent=`Hand ${bjActiveHand+1} doubled — one card dealt.`;
-      setTimeout(()=>{
-        bjSplitAdvanceLocked=false;
-        if(!bjRoundActive||!bjSplitMode||bjResolvingRound)return;
-        bjAdvanceSplitHand();
-      },420);
+      setTimeout(()=>{bjSplitAdvanceLocked=false;if(bjRoundActive&&bjSplitMode&&!bjResolvingRound)bjAdvanceSplitHand()},420);
     }
 
     function bjBetAdvice(trueCount){
@@ -632,6 +661,7 @@
     $('#bj-double').addEventListener('click',bjDoubleActive);
     $('#bj-split').addEventListener('click',bjSplit);
     $('#bj-insurance').addEventListener('click',bjInsurance);
+    $('#bj-clear-bet').addEventListener('click',clearBjBets);
     $('#bj-new-shoe').addEventListener('click',()=>{if(!bjRoundActive)makeBjShoe()});
     $('#bj-add-money').addEventListener('click',()=>{bjBankroll+=500;bankroll=bjBankroll;renderBj();render()});
 
