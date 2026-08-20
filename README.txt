@@ -1,13 +1,10 @@
-CRAPLESS CASINO FULL V25
+CRAPLESS CASINO FULL V26
 
-Includes all V24 features.
+IPHONE WIN POPUP FIX
+- TOTAL WIN popup is now fixed to the phone viewport instead of being contained inside the reel box.
+- Much higher z-index so it cannot render behind the reels or other PWA layers.
+- Added iOS/WebKit animation support.
+- Explicit visibility handling for standalone Home Screen PWA.
+- PWA cache bumped to v26.
 
-NEW SLOT WIN POPUP
-- Every monetary win triggers a large bouncing TOTAL WIN banner over the reels.
-- Shows the full total amount won on that spin.
-- Works during normal spins and free spins.
-- Keeps Lauren's Slots / Spin To Win top button.
-- Keeps the V24 premium symbol weights.
-
-Craps game and all prior fixes remain unchanged.
-PWA cache: crapless-casino-v25
+All V25 features retained.

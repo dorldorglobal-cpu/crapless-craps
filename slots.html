@@ -59,6 +59,41 @@ button{font:inherit}
 .footer{text-align:center;color:#737373;font-size:8px;margin-top:7px}
 @media(max-width:640px){.spin{display:none}.spinrow{grid-template-columns:1fr}.bank{width:100%}.app{padding:5px}.cabinet{padding:6px}.stats{grid-template-columns:repeat(2,1fr)}.reels{gap:3px}.cell{min-height:61px}.controls{grid-template-columns:1fr}.betgrid{grid-template-columns:repeat(4,1fr)}.spinrow{grid-template-columns:1fr}.bank{min-height:48px}.paygrid{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){.cell.spinning,.result.big{animation:none}}
+
+/* V26 iPhone win popup fix */
+@media(max-width:640px){
+  .win-pop{
+    position:fixed!important;
+    left:50%!important;
+    top:42%!important;
+    transform:translate(-50%,-50%) scale(.2)!important;
+    z-index:9999!important;
+    min-width:86vw!important;
+    max-width:92vw!important;
+    padding:20px 18px!important;
+    opacity:0;
+    visibility:hidden;
+    -webkit-transform:translate(-50%,-50%) scale(.2)!important;
+    will-change:transform,opacity;
+  }
+  .win-pop.show{
+    visibility:visible;
+    animation:winPopBounceMobile 1.8s cubic-bezier(.18,.82,.27,1) forwards!important;
+    -webkit-animation:winPopBounceMobile 1.8s cubic-bezier(.18,.82,.27,1) forwards!important;
+  }
+  .win-pop .win-pop-label{font-size:13px!important}
+  .win-pop .win-pop-amount{font-size:52px!important}
+}
+@keyframes winPopBounceMobile{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.25);-webkit-transform:translate(-50%,-50%) scale(.25)}
+  18%{opacity:1;transform:translate(-50%,-50%) scale(1.16);-webkit-transform:translate(-50%,-50%) scale(1.16)}
+  35%{opacity:1;transform:translate(-50%,-50%) scale(.95);-webkit-transform:translate(-50%,-50%) scale(.95)}
+  50%{opacity:1;transform:translate(-50%,-50%) scale(1.06);-webkit-transform:translate(-50%,-50%) scale(1.06)}
+  68%{opacity:1;transform:translate(-50%,-50%) scale(1);-webkit-transform:translate(-50%,-50%) scale(1)}
+  88%{opacity:1;transform:translate(-50%,-50%) scale(1);-webkit-transform:translate(-50%,-50%) scale(1)}
+  100%{opacity:0;transform:translate(-50%,-58%) scale(.92);-webkit-transform:translate(-50%,-58%) scale(.92)}
+}
+
 </style>
 </head>
 <body>
