@@ -118,7 +118,7 @@ button{font:inherit}
       <div class="reels" id="reels"></div>
       <div class="bonus-board" id="bonusBoard">
         <div class="bonus-title">GOLD COIN HOLD & SPIN</div>
-        <div class="bonus-sub">3 FLAGS TRIGGER • NEW COIN RESETS TO 3 • FILL ALL 25 TO WIN GRAND</div>
+        <div class="bonus-sub">3 FLAGS TRIGGER • MINOR + MAJOR COINS CAN LAND • FILL ALL 25 TO WIN GRAND</div>
         <div class="bonus-meter"><span id="bonusSpins">3 RESPINS</span><span id="bonusTotal">$0.00</span></div>
         <div class="bonus-grid" id="bonusGrid"></div>
       </div>
@@ -166,11 +166,11 @@ button{font:inherit}
 (()=>{
 const $=s=>document.querySelector(s);
 const SYMBOLS=[
-{id:'cherry',icon:'🍒',w:26,p3:2,p4:5,p5:15},{id:'lemon',icon:'🍋',w:22,p3:3,p4:7,p5:20},
-{id:'orange',icon:'🍊',w:18,p3:4,p4:10,p5:25},{id:'star',icon:'⭐',w:7,p3:7,p4:18,p5:40},
-{id:'bell',icon:'🔔',w:7,p3:10,p4:25,p5:60},{id:'diamond',icon:'💎',w:6,p3:18,p4:50,p5:120},
-{id:'seven',icon:'7️⃣',w:5,p3:30,p4:90,p5:250},{id:'wild',icon:'🃏',w:7,p3:0,p4:0,p5:0},
-{id:'scatter',icon:'🔮',w:7,p3:0,p4:0,p5:0},{id:'bonus',icon:'🚩',w:3,p3:0,p4:0,p5:0}
+{id:'cherry',icon:'🍒',w:26,p3:8,p4:20,p5:40},{id:'lemon',icon:'🍋',w:22,p3:10,p4:25,p5:50},
+{id:'orange',icon:'🍊',w:18,p3:12,p4:30,p5:65},{id:'star',icon:'⭐',w:7,p3:18,p4:45,p5:90},
+{id:'bell',icon:'🔔',w:7,p3:25,p4:65,p5:140},{id:'diamond',icon:'💎',w:6,p3:40,p4:110,p5:260},
+{id:'seven',icon:'7️⃣',w:5,p3:60,p4:180,p5:500},{id:'wild',icon:'🃏',w:8.5,p3:0,p4:0,p5:0},
+{id:'scatter',icon:'🔮',w:7,p3:0,p4:0,p5:0},{id:'bonus',icon:'🚩',w:1.8,p3:0,p4:0,p5:0}
 ];
 const LINES=[
 [0,0,0,0,0],[1,1,1,1,1],[2,2,2,2,2],[3,3,3,3,3],[4,4,4,4,4],
@@ -185,7 +185,7 @@ const LINES=[
 const SAVE='craplessCasinoSlotsV45';
 const BETS=[.2,.5,1,2,5,10,25,50,100,250,500,1000];
 let bankroll=1000,bet=1,lastWin=0,freeSpins=0,spins=0,previousBet=1,spinning=false;
-let bonusActive=false,bonusSpins=0,bonusTotal=0,bonusCells=[],freeSpinRoundActive=false,freeSpinRoundTotal=0,winPopSticky=false;
+let bonusActive=false,bonusSpins=0,bonusTotal=0,bonusCells=[],bonusTriggerBet=1,freeSpinRoundActive=false,freeSpinRoundTotal=0,winPopSticky=false;
 let minorJackpot=250,majorJackpot=2500,grandJackpot=25000;
 let grid=Array.from({length:5},()=>Array.from({length:5},()=>SYMBOLS[0]));
 
@@ -217,24 +217,48 @@ function showWinPop(amount,sticky=false,label='TOTAL WIN'){if(amount<=0)return;c
 
 function renderBonus(){const board=$('#bonusGrid');board.innerHTML='';bonusCells.forEach((v,i)=>{const c=document.createElement('div');c.className='bonus-cell '+(v?'':'empty');c.textContent=v?money(v):'+';c.dataset.i=i;board.appendChild(c)});render()}
 function bonusCoinValue(){const mults=[1,2,3,5,8,10,15,20,25,50,100],weights=[20,18,15,13,10,8,6,4,3,2,1];let t=weights.reduce((a,b)=>a+b,0),r=rand()*t;for(let i=0;i<mults.length;i++){r-=weights[i];if(r<0)return Math.max(.2,bet*mults[i])}return bet}
-function startBonus(){bonusActive=true;bonusSpins=3;bonusTotal=0;bonusCells=Array(25).fill(0);const starters=3+Math.floor(rand()*4);for(let i=0;i<starters;i++){let idx;do{idx=Math.floor(rand()*25)}while(bonusCells[idx]);const v=bonusCoinValue();bonusCells[idx]=v;bonusTotal+=v}$('#result').textContent='BONUS! PRESS BONUS SPIN';$('#lines').textContent='3 respins — every new coin resets to 3';renderBonus()}
+function startBonus(){bonusTriggerBet=bet;bonusActive=true;bonusSpins=3;bonusTotal=0;bonusCells=Array(25).fill(0);const starters=Math.min(5,3+Math.floor(rand()*3));for(let i=0;i<starters;i++){let idx;do{idx=Math.floor(rand()*25)}while(bonusCells[idx]);const v=bonusCoinValue();bonusCells[idx]=v;bonusTotal+=v}$('#result').textContent='BONUS! PRESS BONUS SPIN';$('#lines').textContent=`3 respins • Bonus locked to ${money(bonusTriggerBet)} trigger bet`;renderBonus()}
 function runBonusSpin(){
- if(!bonusActive||spinning)return;spinning=true;
+ if(!bonusActive||spinning)return;
+ spinning=true;
  const empties=bonusCells.map((v,i)=>v?null:i).filter(v=>v!==null);
  if(!empties.length){finishBonus(true);return}
- let hits=0,newIdx=[];
- empties.forEach(idx=>{if(rand()<.13){const v=bonusCoinValue();bonusCells[idx]=v;bonusTotal+=v;hits++;newIdx.push(idx)}});
- bonusSpins=hits>0?3:bonusSpins-1;renderBonus();
- newIdx.forEach(i=>document.querySelector(`.bonus-cell[data-i="${i}"]`)?.classList.add('pop'));
- spinning=false;
- if(bonusCells.every(Boolean)){setTimeout(()=>finishBonus(true),500);return}
- if(bonusSpins<=0){setTimeout(()=>finishBonus(false),650);return}
- $('#result').textContent=hits>0?`NEW GOLD COIN! ${bonusSpins} RESPINS`:`NO COIN — ${bonusSpins} RESPINS LEFT`;render();
+ const cells=[...document.querySelectorAll('.bonus-cell')];
+ const iv=setInterval(()=>{
+   cells.forEach(c=>{
+     if(c.classList.contains('empty'))c.textContent=rand()<.34?'🪙':'+';
+   });
+ },75);
+ setTimeout(()=>{
+   clearInterval(iv);
+   let hits=0,newIdx=[];
+   empties.forEach(idx=>{
+     if(rand()<.10){
+       const v=bonusCoinValue();
+       bonusCells[idx]=v;
+       bonusTotal+=v.amount;
+       hits++;
+       newIdx.push(idx);
+     }
+   });
+   bonusSpins=hits>0?3:bonusSpins-1;
+   renderBonus();
+   newIdx.forEach(i=>document.querySelector(`.bonus-cell[data-i="${i}"]`)?.classList.add('pop'));
+   spinning=false;
+   if(bonusCells.every(Boolean)){setTimeout(()=>finishBonus(true),500);return}
+   if(bonusSpins<=0){setTimeout(()=>finishBonus(false),650);return}
+   $('#result').textContent=hits>0?`NEW GOLD COIN! ${bonusSpins} RESPINS`:`NO COIN — ${bonusSpins} RESPINS LEFT`;
+   render();
+ },900);
 }
 function finishBonus(full){
  let award=bonusTotal;
+ const minorHit=bonusCells.some(v=>v&&v.type==='minor');
+ const majorHit=bonusCells.some(v=>v&&v.type==='major');
+ if(minorHit)minorJackpot=250;
+ if(majorHit)majorJackpot=2500;
  if(full){award+=grandJackpot;grandJackpot=25000;$('#result').textContent=`GRAND JACKPOT! ${money(award)}`;$('#lines').textContent='ALL 25 GOLD COINS FILLED — GRAND WON!'}
- else{$('#result').textContent=`BONUS WIN ${money(award)}`;$('#lines').textContent='Gold Coin Hold & Spin complete'}
+ else{$('#result').textContent=`BONUS WIN ${money(award)}`;$('#lines').textContent=`Gold Coin Hold & Spin complete${majorHit?' • MAJOR WON':''}${minorHit?' • MINOR WON':''}`}
  bankroll+=award;lastWin=award;bonusActive=false;bonusSpins=0;spinning=false;showWinPop(award,true,full?'GRAND + COIN TOTAL':'GOLD COIN BONUS TOTAL');$('#resultbox').classList.add('big');render();
 }
 function jackpotResult(){
