@@ -215,20 +215,18 @@ function clearWins(){document.querySelectorAll('.cell').forEach(c=>c.classList.r
 function hideWinPop(){const p=$('#winPop');winPopSticky=false;clearTimeout(p._t);p.classList.remove('show')}
 function showWinPop(amount,sticky=false,label='TOTAL WIN'){if(amount<=0)return;const p=$('#winPop');$('#winPopLabel').textContent=label;$('#winPopAmount').textContent=money(amount);p.classList.remove('show');void p.offsetWidth;p.classList.add('show');winPopSticky=sticky;clearTimeout(p._t);if(!sticky)p._t=setTimeout(hideWinPop,1900)}
 
-function renderBonus(){const board=$('#bonusGrid');board.innerHTML='';bonusCells.forEach((v,i)=>{const c=document.createElement('div');c.className='bonus-cell '+(v?'':'empty');c.textContent=v?money(v):'+';c.dataset.i=i;board.appendChild(c)});render()}
-function bonusCoinValue(){const mults=[1,2,3,5,8,10,15,20,25,50,100],weights=[20,18,15,13,10,8,6,4,3,2,1];let t=weights.reduce((a,b)=>a+b,0),r=rand()*t;for(let i=0;i<mults.length;i++){r-=weights[i];if(r<0)return Math.max(.2,bet*mults[i])}return bet}
-function startBonus(){bonusTriggerBet=bet;bonusActive=true;bonusSpins=3;bonusTotal=0;bonusCells=Array(25).fill(0);const starters=Math.min(5,3+Math.floor(rand()*3));for(let i=0;i<starters;i++){let idx;do{idx=Math.floor(rand()*25)}while(bonusCells[idx]);const v=bonusCoinValue();bonusCells[idx]=v;bonusTotal+=v}$('#result').textContent='BONUS! PRESS BONUS SPIN';$('#lines').textContent=`3 respins • Bonus locked to ${money(bonusTriggerBet)} trigger bet`;renderBonus()}
+function safeBonusAmount(v){const n=Number(v&&v.amount);return Number.isFinite(n)&&n>0?n:0}
+function normalizeMoneyState(){if(!Number.isFinite(bankroll))bankroll=1000;if(!Number.isFinite(lastWin))lastWin=0;if(!Number.isFinite(bonusTotal))bonusTotal=0;if(!Number.isFinite(minorJackpot))minorJackpot=250;if(!Number.isFinite(majorJackpot))majorJackpot=2500;if(!Number.isFinite(grandJackpot))grandJackpot=25000}
+function renderBonus(){normalizeMoneyState();const board=$('#bonusGrid');board.innerHTML='';bonusCells.forEach((v,i)=>{const c=document.createElement('div');c.className='bonus-cell '+(v?'':'empty');c.textContent=v?(v.type==='minor'?'MINOR':v.type==='major'?'MAJOR':money(safeBonusAmount(v))):'+';c.dataset.i=i;board.appendChild(c)});render()}
+function bonusCoinValue(){const trigger=Number.isFinite(Number(bonusTriggerBet))&&Number(bonusTriggerBet)>0?Number(bonusTriggerBet):1;const r=rand();if(r<.018)return{type:'major',amount:Number.isFinite(majorJackpot)?majorJackpot:2500};if(r<.075)return{type:'minor',amount:Number.isFinite(minorJackpot)?minorJackpot:250};const mults=[1,2,3,5,8,10,15,20,25,50,100],weights=[20,18,15,13,10,8,6,4,3,2,1];let t=weights.reduce((a,b)=>a+b,0),pickRoll=rand()*t;for(let i=0;i<mults.length;i++){pickRoll-=weights[i];if(pickRoll<0)return{type:'cash',amount:Math.max(.2,trigger*mults[i])}}return{type:'cash',amount:trigger}}
+function startBonus(){bonusTriggerBet=Number.isFinite(Number(bet))&&Number(bet)>0?Number(bet):1;bonusActive=true;bonusSpins=3;bonusTotal=0;bonusCells=Array(25).fill(0);const starters=Math.min(5,3+Math.floor(rand()*3));for(let i=0;i<starters;i++){let idx;do{idx=Math.floor(rand()*25)}while(bonusCells[idx]);const v=bonusCoinValue();bonusCells[idx]=v;bonusTotal+=safeBonusAmount(v)}$('#result').textContent='BONUS! PRESS BONUS SPIN';$('#lines').textContent=`3 respins • Bonus locked to ${money(bonusTriggerBet)} trigger bet`;renderBonus()}
 function runBonusSpin(){
  if(!bonusActive||spinning)return;
  spinning=true;
  const empties=bonusCells.map((v,i)=>v?null:i).filter(v=>v!==null);
  if(!empties.length){finishBonus(true);return}
  const cells=[...document.querySelectorAll('.bonus-cell')];
- const iv=setInterval(()=>{
-   cells.forEach(c=>{
-     if(c.classList.contains('empty'))c.textContent=rand()<.34?'🪙':'+';
-   });
- },75);
+ const iv=setInterval(()=>{cells.forEach(c=>{if(c.classList.contains('empty'))c.textContent=rand()<.34?'🪙':'+'})},75);
  setTimeout(()=>{
    clearInterval(iv);
    let hits=0,newIdx=[];
@@ -236,11 +234,12 @@ function runBonusSpin(){
      if(rand()<.10){
        const v=bonusCoinValue();
        bonusCells[idx]=v;
-       bonusTotal+=v.amount;
+       bonusTotal+=safeBonusAmount(v);
        hits++;
        newIdx.push(idx);
      }
    });
+   normalizeMoneyState();
    bonusSpins=hits>0?3:bonusSpins-1;
    renderBonus();
    newIdx.forEach(i=>document.querySelector(`.bonus-cell[data-i="${i}"]`)?.classList.add('pop'));
@@ -252,14 +251,31 @@ function runBonusSpin(){
  },900);
 }
 function finishBonus(full){
- let award=bonusTotal;
+ normalizeMoneyState();
+ let award=Number.isFinite(bonusTotal)?bonusTotal:0;
  const minorHit=bonusCells.some(v=>v&&v.type==='minor');
  const majorHit=bonusCells.some(v=>v&&v.type==='major');
  if(minorHit)minorJackpot=250;
  if(majorHit)majorJackpot=2500;
- if(full){award+=grandJackpot;grandJackpot=25000;$('#result').textContent=`GRAND JACKPOT! ${money(award)}`;$('#lines').textContent='ALL 25 GOLD COINS FILLED — GRAND WON!'}
- else{$('#result').textContent=`BONUS WIN ${money(award)}`;$('#lines').textContent=`Gold Coin Hold & Spin complete${majorHit?' • MAJOR WON':''}${minorHit?' • MINOR WON':''}`}
- bankroll+=award;lastWin=award;bonusActive=false;bonusSpins=0;spinning=false;showWinPop(award,true,full?'GRAND + COIN TOTAL':'GOLD COIN BONUS TOTAL');$('#resultbox').classList.add('big');render();
+ if(full){
+   award+=(Number.isFinite(grandJackpot)?grandJackpot:25000);
+   grandJackpot=25000;
+   $('#result').textContent=`GRAND JACKPOT! ${money(award)}`;
+   $('#lines').textContent='ALL 25 GOLD COINS FILLED — GRAND WON!';
+ }else{
+   $('#result').textContent=`BONUS WIN ${money(award)}`;
+   $('#lines').textContent=`Gold Coin Hold & Spin complete${majorHit?' • MAJOR WON':''}${minorHit?' • MINOR WON':''}`;
+ }
+ award=Number.isFinite(award)&&award>=0?award:0;
+ bankroll=(Number.isFinite(bankroll)?bankroll:1000)+award;
+ lastWin=award;
+ bonusTotal=award;
+ bonusActive=false;
+ bonusSpins=0;
+ spinning=false;
+ showWinPop(award,true,full?'GRAND + COIN TOTAL':'GOLD COIN BONUS TOTAL');
+ $('#resultbox').classList.add('big');
+ render();
 }
 function jackpotResult(){
  const go=progressiveOdds(grandJackpot,25000,1000000,2000,1000),ma=progressiveOdds(majorJackpot,2500,100000,1000,500),mi=progressiveOdds(minorJackpot,250,10000,100,50);
