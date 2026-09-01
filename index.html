@@ -56,6 +56,9 @@ button{font:inherit}
   background:rgba(0,0,0,.9);border:4px solid #f4cf67;box-shadow:0 0 32px #000,0 0 24px #e3bd58;
   color:#fff;font-weight:900;text-shadow:0 3px 5px #000;
 }
+.win-dice-result{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:8px}
+.win-die{font-size:clamp(44px,9vw,72px);line-height:1;color:#fff}
+.win-total{min-width:48px;font-size:clamp(28px,6vw,48px);font-weight:900;color:#f4cf67}
 .win-label{font-size:22px;letter-spacing:4px;color:#f4cf67}
 .win-amount{font-size:clamp(64px,14vw,130px);line-height:.95;margin-top:4px}
 @keyframes winFlash{
@@ -904,6 +907,11 @@ body{
 </div>
 <div class="win-overlay" id="winOverlay">
   <div class="win-card">
+    <div class="win-dice-result" id="winDiceResult">
+      <span class="win-die" id="winDie1">⚀</span>
+      <span class="win-total" id="winDiceTotal">2</span>
+      <span class="win-die" id="winDie2">⚀</span>
+    </div>
     <div class="win-label">WIN</div>
     <div class="win-amount" id="winAmount">+$0</div>
   </div>
@@ -1135,6 +1143,7 @@ const buyRates={2:6,3:3,4:2,5:1.5,6:1.2,8:1.2,9:1.5,10:2,11:3,12:6};
 const BUY_VIG=0.05;
 const passOddsRates={2:6,3:3,4:2,5:1.5,6:1.2,8:1.2,9:1.5,10:2,11:3,12:6};
 const dice=['⚀','⚁','⚂','⚃','⚄','⚅'];
+let lastResolvedDice=[1,1];
 const $=s=>document.querySelector(s);
 const money=n=>'$'+Math.round(n*100)/100;
 
@@ -1702,6 +1711,10 @@ function addPaidWin(amount){
 function showWinOverlay(){
  if(rollWin<=0)return;
  const ov=$('#winOverlay');
+ const [a,b]=lastResolvedDice;
+ $('#winDie1').textContent=dice[a-1];
+ $('#winDie2').textContent=dice[b-1];
+ $('#winDiceTotal').textContent=a+b;
  $('#winAmount').textContent='+'+money(rollWin);
  ov.classList.remove('show');
  void ov.offsetWidth;
@@ -1949,6 +1962,7 @@ function roll(){
    if(++ticks>10){
     clearInterval(iv);
     const [a,b]=fairDicePair(),total=a+b,wasPoint=point,isComeout=wasPoint===null;
+    lastResolvedDice=[a,b];
     if(physicalDiceEnabled) showPhysicalThrow(a,b);
     rollWin=0;
 

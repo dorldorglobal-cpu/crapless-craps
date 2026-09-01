@@ -1,18 +1,15 @@
-CRAPLESS CASINO FULL V50
+CRAPLESS CASINO FULL V51
 
 CRAPS
-- Adds mild 7-only anti-streak protection.
-- Normal dice rolls remain independent and random.
-- Trigger: 3 or more 7s in the previous 10 resolved rolls.
-- If the next independently generated roll is another 7, it is kept 35% of the time.
-- The other 65% of those candidate 7s are rerolled until a non-7 appears.
-- No non-7 candidate roll is modified by the anti-streak logic.
-- Existing roll history supplies the 10-roll window.
+- Fixes rolls where a WIN popup could visually hide the final dice.
+- The WIN popup now shows the exact two resolved dice plus their total.
+- Main table dice still remain on the resolved result until the next roll begins.
+- V50 mild 7-only anti-streak system retained.
 
 SLOTS
-- Unchanged from V49.
+- Unchanged from V49/V50.
 
 BLACKJACK
-- Unchanged from V49.
+- Unchanged from V49/V50.
 
-PWA cache: crapless-casino-v50
+PWA cache: crapless-casino-v51
