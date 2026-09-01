@@ -1,12 +1,18 @@
-CRAPLESS CASINO FULL V49
+CRAPLESS CASINO FULL V50
 
-SLOTS FIX
-- Fixes Gold Coin BONUS WIN $NaN bug.
-- Cash, MINOR, and MAJOR bonus coins now use one consistent payout format.
-- Bonus totals are validated before being added.
-- Bankroll and Last Win cannot be corrupted by a bad bonus value.
-- Bonus stays locked to the triggering bet.
-- V48 slot tuning retained.
-- Blackjack and Craps unchanged.
+CRAPS
+- Adds mild 7-only anti-streak protection.
+- Normal dice rolls remain independent and random.
+- Trigger: 3 or more 7s in the previous 10 resolved rolls.
+- If the next independently generated roll is another 7, it is kept 35% of the time.
+- The other 65% of those candidate 7s are rerolled until a non-7 appears.
+- No non-7 candidate roll is modified by the anti-streak logic.
+- Existing roll history supplies the 10-roll window.
 
-PWA cache: crapless-casino-v49
+SLOTS
+- Unchanged from V49.
+
+BLACKJACK
+- Unchanged from V49.
+
+PWA cache: crapless-casino-v50
