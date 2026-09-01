@@ -878,6 +878,11 @@ body{
 </style>
 </head>
 <body>
+<div id="lastWinHud" style="position:fixed;right:10px;top:78px;z-index:45;background:#101010;border:1px solid #c99b35;border-radius:10px;padding:6px 10px;text-align:center;box-shadow:0 3px 12px #0008;min-width:92px">
+  <div style="font-size:10px;letter-spacing:1.5px;color:#d7b866;font-weight:800">LAST WIN</div>
+  <div id="lastWinDisplay" style="font-size:18px;font-weight:900;color:#fff">$0.00</div>
+</div>
+
 <nav class="game-switcher" aria-label="Casino games">
   <a class="active" href="./index.html">🎲 CRAPS</a>
   <a class="" href="./slots.html">🎰 SLOTS</a>
@@ -1124,10 +1129,11 @@ body{
 
 <script>
 (()=>{
-const chips=[1,5,10,25,100,500];
+const chips=[1,5,10,25,100,500,1000];
 const chipClasses={1:'c1',5:'c5',10:'c10',25:'c25',100:'c100',500:'c500'};
 let selected=5, bankroll=1000, bets={}, point=null, betsWorking=true, history=[];
 let rollWin=0;
+let lastResolvedWin=0;
 let atsSeen=new Set(), undoStack=[];
 let atsLocked=false;
 let lastBetLayout=null;
@@ -1190,10 +1196,10 @@ function fairDicePair(){
  // Fixed weighted Crapless distribution.
  // 7 = 8% long-term target. Removed probability goes only to 2,3,11,12.
  const weights=[
-   [2,4.9444444444],[3,7.7222222222],[4,8.3333333333],
-   [5,11.1111111111],[6,13.8888888889],[7,8.0000000000],
+   [2,4.5694444444],[3,7.3472222222],[4,8.3333333333],
+   [5,11.1111111111],[6,13.8888888889],[7,9.5000000000],
    [8,13.8888888889],[9,11.1111111111],[10,8.3333333333],
-   [11,7.7222222222],[12,4.9444444444]
+   [11,7.3472222222],[12,4.5694444444]
  ];
  let r=cryptoUnit()*100;
  for(const [total,w] of weights){
@@ -1718,6 +1724,8 @@ function addPaidWin(amount){
 }
 function showWinOverlay(){
  if(rollWin<=0)return;
+ lastResolvedWin=rollWin;
+ const lw=$('#lastWinDisplay');if(lw)lw.textContent=money(lastResolvedWin);
  const ov=$('#winOverlay');
  const [a,b]=lastResolvedDice;
  $('#winDie1').textContent=dice[a-1];
@@ -1999,7 +2007,7 @@ function roll(){
 
     history.push(total);
     render();
-    showWinOverlay();
+    if(rollWin<=0){lastResolvedWin=0;const lw=$('#lastWinDisplay');if(lw)lw.textContent=money(0);}showWinOverlay();
     rb.disabled=false;
     if(shouldAskPassOdds)setTimeout(()=>showPassOddsPrompt(total),450);
 
