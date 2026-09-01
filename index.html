@@ -1185,8 +1185,8 @@ function fairDicePair(){
 
  // Mild anti-streak protection for 7 only.
  // It activates only after 3+ sevens appear in the previous 10 resolved rolls.
- // If the next independent result is also 7, it stays 7 35% of the time.
- if(a+b===7 && recentSevens>=3 && cryptoUnit()>=0.35){
+ // If the next independent result is also 7, it stays 7 10% of the time.
+ if(a+b===7 && recentSevens>=3 && cryptoUnit()>=0.10){
    do{
      a=fairDie();
      b=fairDie();
