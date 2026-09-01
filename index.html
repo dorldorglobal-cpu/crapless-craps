@@ -1178,21 +1178,29 @@ function cryptoUnit(){
  crypto.getRandomValues(x);
  return x[0]/4294967296;
 }
-function fairDicePair(){
- let a=fairDie(),b=fairDie();
- const recent10=history.slice(-10);
- const recentSevens=recent10.filter(v=>v===7).length;
-
- // Mild anti-streak protection for 7 only.
- // It activates only after 3+ sevens appear in the previous 10 resolved rolls.
- // If the next independent result is also 7, it stays 7 10% of the time.
- if(a+b===7 && recentSevens>=3 && cryptoUnit()>=0.10){
-   do{
-     a=fairDie();
-     b=fairDie();
-   }while(a+b===7);
+function pairForTotal(total){
+ const pairs=[];
+ for(let a=1;a<=6;a++){
+   const b=total-a;
+   if(b>=1&&b<=6)pairs.push([a,b]);
  }
- return [a,b];
+ return pairs[Math.floor(cryptoUnit()*pairs.length)];
+}
+function fairDicePair(){
+ // Fixed weighted Crapless distribution.
+ // 7 = 8% long-term target. Removed probability goes only to 2,3,11,12.
+ const weights=[
+   [2,4.9444444444],[3,7.7222222222],[4,8.3333333333],
+   [5,11.1111111111],[6,13.8888888889],[7,8.0000000000],
+   [8,13.8888888889],[9,11.1111111111],[10,8.3333333333],
+   [11,7.7222222222],[12,4.9444444444]
+ ];
+ let r=cryptoUnit()*100;
+ for(const [total,w] of weights){
+   r-=w;
+   if(r<0)return pairForTotal(total);
+ }
+ return pairForTotal(12);
 }
 function saveUndo(){
  undoStack.push(JSON.stringify({bankroll,bets,point,betsWorking,atsLocked,rollStreak,lastStreak,comePoints,dontComePoints,passOdds,seen:[...atsSeen]}));

@@ -1,17 +1,14 @@
-CRAPLESS CASINO FULL V52
+CRAPLESS CASINO FULL V53
 
 CRAPS
-- Strengthens the 7-only anti-streak protection.
-- Trigger remains: 3 or more 7s in the previous 10 resolved rolls.
-- Once triggered, a newly generated 7 is now kept only 10% of the time.
-- The other 90% of those candidate 7s are rerolled until a non-7 result occurs.
-- Non-7 candidate rolls are not modified.
-- V51 final-dice WIN display fix retained.
+- Fixed weighted roll distribution.
+- 7 target probability: 8.00% on every roll.
+- Removed 8.6667 percentage points are redistributed equally to 2, 3, 11 and 12.
+- Targets: 2=4.9444%, 3=7.7222%, 4=8.3333%, 5=11.1111%, 6=13.8889%, 7=8.0000%, 8=13.8889%, 9=11.1111%, 10=8.3333%, 11=7.7222%, 12=4.9444%.
+- Anti-streak logic removed because 7 is now fixed at 8%.
+- V51 dice WIN display fix retained.
 
-SLOTS
+SLOTS / BLACKJACK
 - Unchanged.
 
-BLACKJACK
-- Unchanged.
-
-PWA cache: crapless-casino-v52
+PWA cache: crapless-casino-v53
