@@ -1,12 +1,12 @@
-CRAPLESS CASINO FULL V55
+CRAPLESS CASINO FULL V56
 
 CRAPS
-- Added $1,000 (1K) betting chip.
-- Retains V54 fixed 9.5% seven distribution.
-- Retains V54 LAST WIN display.
-- Retains final-dice WIN display.
+- $1,000 chip now uses an orange casino-chip style matching the other denominations.
+- 1K chips also render orange in bet stacks and while being dragged.
+- $1K denomination participates in chip-stack decomposition.
+- Retains V54/V55 9.5% seven distribution and LAST WIN display.
 
 SLOTS and BLACKJACK
 - Unchanged.
 
-PWA cache: crapless-casino-v55
+PWA cache: crapless-casino-v56

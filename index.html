@@ -156,7 +156,7 @@ button{font:inherit}
 .chip.sel{outline:4px solid #ffd862;transform:translateY(-3px)}
 .c1{background:#eee;color:#111}.c5{background:#d2222d;color:#fff}
 .c10{background:#1469be;color:white}.c25{background:#188c4b;color:#fff}
-.c100{background:#111;color:#fff}.c500{background:#7a2ca6;color:#fff}
+.c100{background:#111;color:#fff}.c500{background:#7a2ca6;color:#fff}.c1000{background:#f28a00;color:#fff}
 .bets-toggle{display:flex;gap:4px}
 .onoff{font-size:12px;padding:7px 10px}
 .legend{font-size:10px;color:#ddd;text-align:center;margin-top:5px}
@@ -569,7 +569,7 @@ body{
 .grabbed-chip.c10{background:#1469be;color:#fff;border-color:#fff}
 .grabbed-chip.c25{background:#188c4b;color:#fff;border-color:#fff}
 .grabbed-chip.c100{background:#111;color:#fff;border-color:#fff}
-.grabbed-chip.c500{background:#7a2ca6;color:#fff;border-color:#fff}
+.grabbed-chip.c500{background:#7a2ca6;color:#fff;border-color:#fff}.grabbed-chip.c1000{background:#f28a00;color:#fff;border-color:#fff}
 
 .remove-drop-zone{
   position:fixed;
@@ -643,7 +643,7 @@ body{
 .stack-chip.c10{background:#1768b5;color:#fff}
 .stack-chip.c25{background:#18884a;color:#fff}
 .stack-chip.c100{background:#161616;color:#fff}
-.stack-chip.c500{background:#742c99;color:#fff}
+.stack-chip.c500{background:#742c99;color:#fff}.stack-chip.c1000{background:#f28a00;color:#fff}
 .stack-chip.total-chip{
   width:25px;height:25px;
   font-size:6px;
@@ -874,7 +874,7 @@ body{
 }
 
 
-.chip[data-v="100"],.chip[data-v="500"]{font-size:11px!important;letter-spacing:-.8px!important}
+.chip[data-v="100"],.chip[data-v="500"],.chip[data-v="1000"]{font-size:11px!important;letter-spacing:-.8px!important}
 </style>
 </head>
 <body>
@@ -1130,7 +1130,7 @@ body{
 <script>
 (()=>{
 const chips=[1,5,10,25,100,500,1000];
-const chipClasses={1:'c1',5:'c5',10:'c10',25:'c25',100:'c100',500:'c500'};
+const chipClasses={1:'c1',5:'c5',10:'c10',25:'c25',100:'c100',500:'c500',1000:'c1000'};
 let selected=5, bankroll=1000, bets={}, point=null, betsWorking=true, history=[];
 let rollWin=0;
 let lastResolvedWin=0;
@@ -1349,9 +1349,9 @@ function renderATSHighlights(){
 }
 
 
-const CHIP_DENOMS=[500,100,25,10,5,1];
+const CHIP_DENOMS=[1000,500,100,25,10,5,1];
 function chipClassForValue(v){
- return ({1:'c1',5:'c5',10:'c10',25:'c25',100:'c100',500:'c500'})[v]||'c1';
+ return ({1:'c1',5:'c5',10:'c10',25:'c25',100:'c100',500:'c500',1000:'c1000'})[v]||'c1';
 }
 function decomposeChips(amount){
  let remaining=Math.max(0,Math.round(amount));
