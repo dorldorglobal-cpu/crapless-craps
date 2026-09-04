@@ -109,11 +109,31 @@ button{font:inherit}
 .field strong{font-size:24px;margin:0 3px}
 .ats-wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px}
 .atsbox{min-height:62px}
+.prop-tabs{
+  display:grid;grid-template-columns:1fr 1fr;margin-top:8px;border:2px solid #d5b56c;
+  border-radius:9px;overflow:hidden;background:#171717
+}
+.prop-tab{
+  min-height:38px;border:0;background:#171717;color:#eee;font-size:11px;font-weight:900;
+  letter-spacing:.5px;cursor:pointer
+}
+.prop-tab.active{background:linear-gradient(#e7c467,#b88524);color:#111}
 .props{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:8px}
 .prop{
   border:2px solid #f1e5c0;border-radius:50%;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;
   text-align:center;font-size:10px;font-weight:bold;position:relative;cursor:pointer;background:rgba(87,0,0,.28)
 }
+.hop-panel{display:none}
+.hop-panel.active{display:grid}
+.prop-panel.hidden{display:none}
+.hop-bets{grid-template-columns:repeat(7,1fr);gap:6px;margin-top:8px}
+.hop-bet{
+  min-height:54px;aspect-ratio:auto;border-radius:8px;background:rgba(0,0,0,.20);
+  flex-direction:column;font-size:10px
+}
+.hop-bet .hop-pair{font-size:15px;font-weight:900;line-height:1}
+.hop-bet .hop-pay{font-size:9px;color:#f3d98e;margin-top:4px}
+
 .hardways{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
 .hard{
   min-height:62px;border:2px solid #e3d18d;border-radius:4px;display:flex;align-items:center;justify-content:center;
@@ -212,10 +232,11 @@ button{font:inherit}
  .logo{font-size:14px;margin:0 0 2px}
  .section-title{margin:2px 0;font-size:8px}
  .bet{min-height:62px}.number-half{height:31px}.bet .num{font-size:20px}
- .midrow,.ats-wrap,.hardways,.props,.bottom-grid{margin-top:4px;gap:4px}
+ .midrow,.ats-wrap,.hardways,.props,.hop-bets,.bottom-grid{margin-top:4px;gap:4px}
  .pass,.field,.atsbox,.hard,.bottom{min-height:42px;font-size:9px}
- .props{grid-template-columns:repeat(7,1fr)}
+ .props,.hop-bets{grid-template-columns:repeat(7,1fr)}
  .prop{aspect-ratio:auto;min-height:44px;border-radius:6px}
+ .hop-bet{min-height:40px}
  .ats-num{width:20px;height:20px;font-size:8px}
  .dice-zone{margin-top:4px;min-height:52px;padding:3px 135px 3px 3px}
  .die{width:44px;height:44px;font-size:28px}
@@ -1088,8 +1109,11 @@ body{
     <div class="hard target" data-key="H10">HARD 10<br>5 + 5<div class="smallchip"></div></div>
    </div>
 
-   <div class="section-title">ONE ROLL / PROPOSITION BETS</div>
-   <div class="props">
+   <div class="prop-tabs" role="tablist" aria-label="One roll bet types">
+    <button type="button" class="prop-tab active" id="propTab" aria-selected="true">ONE ROLL / PROPOSITION BETS</button>
+    <button type="button" class="prop-tab" id="hopTab" aria-selected="false">HOP BETS</button>
+   </div>
+   <div class="props prop-panel" id="propPanel">
     <div class="prop target" data-key="ANY7">ANY<br>7<div class="smallchip"></div></div>
     <div class="prop target" data-key="ANYCRAPS">ANY<br>CRAPS<div class="smallchip"></div></div>
     <div class="prop target" data-key="ACES">ACES<br>2<div class="smallchip"></div></div>
@@ -1097,6 +1121,29 @@ body{
     <div class="prop target" data-key="YO">YO<br>11<div class="smallchip"></div></div>
     <div class="prop target" data-key="BOXCARS">BOXCARS<br>12<div class="smallchip"></div></div>
     <div class="prop target" data-key="HORN">HORN<br>2•3•11•12<div class="smallchip"></div></div>
+   </div>
+   <div class="props hop-bets hop-panel" id="hopPanel">
+    <div class="prop hop-bet target" data-key="HOP_1_1"><span class="hop-pair">1-1</span><span class="hop-pay">30:1</span><div class="smallchip"></div></div>
+    <div class="prop hop-bet target" data-key="HOP_1_2"><span class="hop-pair">1-2</span><span class="hop-pay">15:1</span><div class="smallchip"></div></div>
+    <div class="prop hop-bet target" data-key="HOP_1_3"><span class="hop-pair">1-3</span><span class="hop-pay">15:1</span><div class="smallchip"></div></div>
+    <div class="prop hop-bet target" data-key="HOP_1_4"><span class="hop-pair">1-4</span><span class="hop-pay">15:1</span><div class="smallchip"></div></div>
+    <div class="prop hop-bet target" data-key="HOP_1_5"><span class="hop-pair">1-5</span><span class="hop-pay">15:1</span><div class="smallchip"></div></div>
+    <div class="prop hop-bet target" data-key="HOP_1_6"><span class="hop-pair">1-6</span><span class="hop-pay">15:1</span><div class="smallchip"></div></div>
+    <div class="prop hop-bet target" data-key="HOP_2_2"><span class="hop-pair">2-2</span><span class="hop-pay">30:1</span><div class="smallchip"></div></div>
+    <div class="prop hop-bet target" data-key="HOP_2_3"><span class="hop-pair">2-3</span><span class="hop-pay">15:1</span><div class="smallchip"></div></div>
+    <div class="prop hop-bet target" data-key="HOP_2_4"><span class="hop-pair">2-4</span><span class="hop-pay">15:1</span><div class="smallchip"></div></div>
+    <div class="prop hop-bet target" data-key="HOP_2_5"><span class="hop-pair">2-5</span><span class="hop-pay">15:1</span><div class="smallchip"></div></div>
+    <div class="prop hop-bet target" data-key="HOP_2_6"><span class="hop-pair">2-6</span><span class="hop-pay">15:1</span><div class="smallchip"></div></div>
+    <div class="prop hop-bet target" data-key="HOP_3_3"><span class="hop-pair">3-3</span><span class="hop-pay">30:1</span><div class="smallchip"></div></div>
+    <div class="prop hop-bet target" data-key="HOP_3_4"><span class="hop-pair">3-4</span><span class="hop-pay">15:1</span><div class="smallchip"></div></div>
+    <div class="prop hop-bet target" data-key="HOP_3_5"><span class="hop-pair">3-5</span><span class="hop-pay">15:1</span><div class="smallchip"></div></div>
+    <div class="prop hop-bet target" data-key="HOP_3_6"><span class="hop-pair">3-6</span><span class="hop-pay">15:1</span><div class="smallchip"></div></div>
+    <div class="prop hop-bet target" data-key="HOP_4_4"><span class="hop-pair">4-4</span><span class="hop-pay">30:1</span><div class="smallchip"></div></div>
+    <div class="prop hop-bet target" data-key="HOP_4_5"><span class="hop-pair">4-5</span><span class="hop-pay">15:1</span><div class="smallchip"></div></div>
+    <div class="prop hop-bet target" data-key="HOP_4_6"><span class="hop-pair">4-6</span><span class="hop-pay">15:1</span><div class="smallchip"></div></div>
+    <div class="prop hop-bet target" data-key="HOP_5_5"><span class="hop-pair">5-5</span><span class="hop-pay">30:1</span><div class="smallchip"></div></div>
+    <div class="prop hop-bet target" data-key="HOP_5_6"><span class="hop-pair">5-6</span><span class="hop-pay">15:1</span><div class="smallchip"></div></div>
+    <div class="prop hop-bet target" data-key="HOP_6_6"><span class="hop-pair">6-6</span><span class="hop-pay">30:1</span><div class="smallchip"></div></div>
    </div>
 
    <div class="bottom-grid">
@@ -1776,6 +1823,22 @@ function payOneRoll(k,mult,cond){
  if(cond){bankroll+=stake*(mult+1);rollWin+=stake*mult;$('#msg').textContent+=` ${k} wins ${money(stake*mult)}.`}
  delete bets[k];
 }
+function resolveHops(a,b){
+ const lo=Math.min(a,b),hi=Math.max(a,b);
+ Object.keys(bets).filter(k=>k.startsWith('HOP_')).forEach(k=>{
+   const parts=k.split('_');
+   const x=Number(parts[1]),y=Number(parts[2]);
+   const stake=bets[k]||0;
+   if(!stake){delete bets[k];return}
+   if(lo===x && hi===y){
+     const mult=x===y?30:15;
+     bankroll+=stake*(mult+1);
+     rollWin+=stake*mult;
+     $('#msg').textContent+=` HOP ${x}-${y} wins ${money(stake*mult)}.`;
+   }
+   delete bets[k];
+ });
+}
 function resolveProps(a,b,total){
  payOneRoll('ANY7',4,total===7);
  payOneRoll('ANYCRAPS',7,[2,3,12].includes(total));
@@ -1989,6 +2052,7 @@ function roll(){
 
     $('#msg').textContent=`Rolled ${a} + ${b} = ${total}.`;
     resolveProps(a,b,total);
+    resolveHops(a,b);
     resolvePlace(total,isComeout);
     resolveHard(a,b,total,isComeout);
     resolveATS(total);
@@ -2017,10 +2081,27 @@ function roll(){
 }
 chips.forEach(v=>{
  const b=document.createElement('button');b.className=`chip ${chipClasses[v]} ${v===selected?'sel':''}`;
- b.textContent='$'+v;b.onclick=()=>{selected=v;document.querySelectorAll('.chip').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');scheduleSave()};
+ b.textContent=v===1000?'$1K':'$'+v;b.onclick=()=>{selected=v;document.querySelectorAll('.chip').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');scheduleSave()};
  $('#chiptray').appendChild(b);
 });
 $('#roll').onclick=roll;
+
+const propTab=$('#propTab'),hopTab=$('#hopTab'),propPanel=$('#propPanel'),hopPanel=$('#hopPanel');
+function setPropMode(mode){
+ const showHop=mode==='hop';
+ propTab.classList.toggle('active',!showHop);
+ hopTab.classList.toggle('active',showHop);
+ propTab.setAttribute('aria-selected',String(!showHop));
+ hopTab.setAttribute('aria-selected',String(showHop));
+ propPanel.classList.toggle('hidden',showHop);
+ hopPanel.classList.toggle('active',showHop);
+ $('#msg').textContent=showHop
+   ? 'HOP BETS: choose an exact two-dice combination. Every Hop bet resolves on the next roll.'
+   : 'ONE ROLL / PROPOSITION BETS selected.';
+}
+propTab.onclick=()=>setPropMode('prop');
+hopTab.onclick=()=>setPropMode('hop');
+
 $('#betsOn').onclick=()=>{betsWorking=true;render()};
 $('#betsOff').onclick=()=>{betsWorking=false;render()};
 $('#sameBet').onclick=()=>{
