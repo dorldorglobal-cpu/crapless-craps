@@ -896,6 +896,16 @@ body{
 
 
 .chip[data-v="100"],.chip[data-v="500"],.chip[data-v="1000"]{font-size:11px!important;letter-spacing:-.8px!important}
+
+/* V58: keep large bankroll from overlapping ON TABLE */
+.stats>div,.stats .stat{min-width:0;overflow:hidden}
+#bankroll,#onTable{white-space:nowrap;overflow:hidden;font-variant-numeric:tabular-nums}
+@media(max-width:700px){
+ .stats{grid-template-columns:1.35fr .95fr .72fr .82fr .82fr 1.05fr!important;gap:5px!important}
+ .stats>div,.stats .stat{padding-left:5px!important;padding-right:5px!important}
+ #bankroll{font-size:clamp(16px,3.7vw,23px)!important;letter-spacing:-.7px!important}
+ #onTable{font-size:clamp(16px,3.5vw,22px)!important;letter-spacing:-.5px!important}
+}
 </style>
 </head>
 <body>
