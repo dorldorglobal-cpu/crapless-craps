@@ -906,6 +906,13 @@ body{
  #bankroll{font-size:clamp(16px,3.7vw,23px)!important;letter-spacing:-.7px!important}
  #onTable{font-size:clamp(16px,3.5vw,22px)!important;letter-spacing:-.5px!important}
 }
+
+/* V59 full bankroll including cents */
+@media(max-width:700px){
+ .stats{grid-template-columns:1.55fr .92fr .68fr .78fr .78fr 1.02fr!important;gap:4px!important}
+ #bankroll{display:block!important;width:100%!important;max-width:100%!important;font-size:clamp(13px,3.25vw,21px)!important;letter-spacing:-.8px!important;white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important}
+ #onTable{font-size:clamp(14px,3.25vw,21px)!important;white-space:nowrap!important}
+}
 </style>
 </head>
 <body>
