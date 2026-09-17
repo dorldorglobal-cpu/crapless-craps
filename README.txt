@@ -1,7 +1,6 @@
-V65
-- Keeps V64 iPhone layout.
-- Fixes right-edge clipping by adding safe horizontal inset.
-- Slightly reduces bottom chip sizes so all $1-$5K chips fit fully on screen.
-- Roll History receives the same safe inset.
-- Last Win moved slightly left from the right edge.
-- Roll Dice and all gameplay unchanged.
+V66
+- Fixes iPhone LAST WIN box being cut off at the top-right.
+- Moves the entire Last Win box lower into the visible stats area.
+- Long Last Win amounts scale down to remain inside the box.
+- V65 right-edge fix and all V64 layout/gameplay changes retained.
+- Roll Dice unchanged.

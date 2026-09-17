@@ -1095,6 +1095,43 @@ body{
     max-width:calc(100vw - 28px)!important;
   }
 }
+
+/* V66: fully visible LAST WIN on iPhone */
+@media (orientation:portrait) and (max-width:700px){
+  #lastWinHud{
+    position:absolute!important;
+    top:100px!important;
+    right:12px!important;
+    width:106px!important;
+    min-width:106px!important;
+    max-width:106px!important;
+    height:68px!important;
+    box-sizing:border-box!important;
+    padding:6px 5px!important;
+    overflow:hidden!important;
+    z-index:95!important;
+  }
+  #lastWinHud .label,
+  #lastWinHud small{
+    font-size:10px!important;
+    line-height:1!important;
+    white-space:nowrap!important;
+  }
+  #lastWinHud b,
+  #lastWinHud .value{
+    display:block!important;
+    width:100%!important;
+    max-width:100%!important;
+    margin-top:4px!important;
+    font-size:clamp(13px,3.2vw,18px)!important;
+    line-height:1.05!important;
+    letter-spacing:-.55px!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:clip!important;
+    text-align:center!important;
+  }
+}
 </style>
 </head>
 <body>
