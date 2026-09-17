@@ -1513,7 +1513,7 @@ const chips=[1,5,10,25,100,500,1000,5000];
 const chipClasses={1:'c1',5:'c5',10:'c10',25:'c25',100:'c100',500:'c500',1000:'c1000',5000:'c5000'};
 let selected=5, bankroll=1000, bets={}, point=null, betsWorking=true, history=[];
 let rollWin=0;
-let lastResolvedWin=0;
+let lastResolvedWin=0; v71LastRollWin=0;
 let atsSeen=new Set(), undoStack=[];
 let atsLocked=false;
 let lastBetLayout=null;
@@ -2114,8 +2114,8 @@ function addPaidWin(amount){
 }
 function showWinOverlay(){
  if(rollWin<=0)return;
- lastResolvedWin=rollWin;
- const lw=$('#lastWinDisplay');if(lw)lw.textContent='$'+Math.round(lastResolvedWin).toLocaleString();
+ lastResolvedWin=rollWin; v71LastRollWin=rollWin;
+ const lw=$('#lastWinDisplay');if(lw&&!sevenToSevenDisplay)lw.textContent='$'+Math.round(v71LastRollWin).toLocaleString();
  const ov=$('#winOverlay');
  const [a,b]=lastResolvedDice;
  $('#winDie1').textContent=dice[a-1];
@@ -2424,7 +2424,7 @@ function roll(){
     const _lw=document.getElementById('lastWinDisplay');
     if(_lw)_lw.textContent='$'+Math.round(sevenToSevenGross).toLocaleString();
   }
-    if(rollWin<=0){lastResolvedWin=0;const lw=$('#lastWinDisplay');if(lw&&!sevenToSevenDisplay)lw.textContent='$0';}showWinOverlay();
+    if(rollWin<=0){lastResolvedWin=0; v71LastRollWin=0;const lw=$('#lastWinDisplay');if(lw&&!sevenToSevenDisplay)lw.textContent='$0';}showWinOverlay();
     rb.disabled=false;
     if(shouldAskPassOdds)setTimeout(()=>showPassOddsPrompt(total),450);
 
@@ -2554,6 +2554,8 @@ document.addEventListener('click',function(e){
   }
 });
 
+
+let v71LastRollWin=0;
 let sevenToSevenGross=0;
 let sevenToSevenDisplay=false;
 function updateLastWinHud(){
@@ -2580,7 +2582,7 @@ document.addEventListener('click',function(e){
     if(el)el.textContent='$'+Math.round(sevenToSevenGross).toLocaleString();
   }else{
     stat.firstChild.nodeValue='LAST WIN';
-    if(el)el.textContent='$'+Math.round(lastResolvedWin).toLocaleString();
+    if(el)el.textContent='$'+Math.round(v71LastRollWin).toLocaleString();
   }
 });
 </script>
