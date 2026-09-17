@@ -1,12 +1,11 @@
-V69
+V70
 CRAPS
-- LAST WIN still shows the most recent roll's winnings by default.
-- Tap LAST WIN to switch to 7→7 TOTAL.
-- 7→7 TOTAL adds gross winning amounts from rolls in the current seven-to-seven cycle.
-- Losing bets do not subtract from this total.
-- Tap again to return to LAST WIN.
-- V68 bankroll tap fix retained.
-- V67 Last Win structural layout retained.
-- V65/V64 iPhone history/chip layout retained.
+- Corrected 7→7 TOTAL logic.
+- A 7 begins the cycle; each following roll's gross winnings are added until the next 7 begins a new cycle.
+- LAST WIN remains only the most recent roll's win.
+- Tap LAST WIN to see the cumulative total since the most recent 7.
+- LAST WIN and 7→7 TOTAL now display whole dollars only (no cents).
+- Last Win box widened and enlarged so large values fit better.
+- V68 bankroll toggle fix and current iPhone layout retained.
 - Slots and Blackjack unchanged.
-PWA cache: crapless-casino-v69
+PWA cache: crapless-casino-v70

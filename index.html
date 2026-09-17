@@ -1201,6 +1201,39 @@ body{
  .last-win-stat[data-mode="cycle"]{font-size:8px!important}
  .last-win-stat{cursor:pointer!important}
 }
+
+/* V70 larger LAST WIN / 7→7 TOTAL box */
+@media (orientation:portrait) and (max-width:700px){
+ .topbar>div:first-child{
+   grid-template-columns:
+     minmax(0,1.72fr)
+     minmax(0,1.00fr)
+     minmax(0,.68fr)
+     minmax(0,.82fr)
+     minmax(0,.78fr)
+     minmax(0,1.42fr)!important;
+   gap:4px!important;
+ }
+ .last-win-stat{
+   min-height:58px!important;
+   padding:5px 4px!important;
+   overflow:hidden!important;
+ }
+ #lastWinDisplay{
+   display:block!important;
+   width:100%!important;
+   max-width:100%!important;
+   font-size:clamp(11px,3.05vw,17px)!important;
+   line-height:1.05!important;
+   letter-spacing:-.7px!important;
+   white-space:nowrap!important;
+   overflow:hidden!important;
+   text-overflow:clip!important;
+ }
+ .last-win-stat[data-mode="cycle"]{
+   font-size:8px!important;
+ }
+}
 </style>
 </head>
 <body>
@@ -2082,7 +2115,7 @@ function addPaidWin(amount){
 function showWinOverlay(){
  if(rollWin<=0)return;
  lastResolvedWin=rollWin;
- const lw=$('#lastWinDisplay');if(lw)lw.textContent=money(lastResolvedWin);
+ const lw=$('#lastWinDisplay');if(lw)lw.textContent='$'+Math.round(lastResolvedWin).toLocaleString();
  const ov=$('#winOverlay');
  const [a,b]=lastResolvedDice;
  $('#winDie1').textContent=dice[a-1];
@@ -2378,26 +2411,20 @@ function roll(){
     }else{
       rollStreak++;
     }
-
-    
-  // V69: accumulate gross winning profit between sevens.
-  // A 7 closes the current cycle; its own winning payouts are included,
-  // then the next roll begins a fresh cycle.
-  sevenToSevenGross += Math.max(0, Number(rollWin)||0);
-  if(total===7){
-    // preserve completed 7→7 total until the next non-7 roll starts the next cycle
-    window._completedSevenToSeven = sevenToSevenGross;
-  } else if(window._completedSevenToSeven!==undefined){
-    sevenToSevenGross = Math.max(0, Number(rollWin)||0);
-    delete window._completedSevenToSeven;
-  }
-history.push(total);
+    // V70: total gross winnings from the most recent 7 through this roll.
+    // When another 7 rolls, that roll begins the next 7→7 cycle.
+    if(total===7){
+      sevenToSevenGross=Math.max(0,Number(rollWin)||0);
+    }else{
+      sevenToSevenGross+=Math.max(0,Number(rollWin)||0);
+    }
+    history.push(total);
     render();
   if(sevenToSevenDisplay){
     const _lw=document.getElementById('lastWinDisplay');
-    if(_lw)_lw.textContent=money(sevenToSevenGross);
+    if(_lw)_lw.textContent='$'+Math.round(sevenToSevenGross).toLocaleString();
   }
-    if(rollWin<=0){lastResolvedWin=0;const lw=$('#lastWinDisplay');if(lw)lw.textContent=money(0);}showWinOverlay();
+    if(rollWin<=0){lastResolvedWin=0;const lw=$('#lastWinDisplay');if(lw&&!sevenToSevenDisplay)lw.textContent='$0';}showWinOverlay();
     rb.disabled=false;
     if(shouldAskPassOdds)setTimeout(()=>showPassOddsPrompt(total),450);
 
@@ -2550,10 +2577,10 @@ document.addEventListener('click',function(e){
   if(sevenToSevenDisplay){
     stat.dataset.originalLabel='LAST WIN';
     stat.firstChild.nodeValue='7→7 TOTAL';
-    if(el)el.textContent=money(sevenToSevenGross);
+    if(el)el.textContent='$'+Math.round(sevenToSevenGross).toLocaleString();
   }else{
     stat.firstChild.nodeValue='LAST WIN';
-    render();
+    if(el)el.textContent='$'+Math.round(lastResolvedWin).toLocaleString();
   }
 });
 </script>
