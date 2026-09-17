@@ -937,18 +937,129 @@ body{
   .chip[data-v="1000"],.chip[data-v="5000"]{font-size:13px!important;letter-spacing:-.3px!important}
 }
 
-/* V63 stable iPhone HUD/history/chip layout */
-@media(max-width:700px){
- .stats{grid-template-columns:minmax(0,1.75fr) minmax(0,1.08fr) minmax(0,.72fr) minmax(0,.82fr) minmax(0,.82fr) minmax(0,1.10fr)!important;gap:3px!important}
- .stats>div,.stats .stat{min-width:0!important;padding-left:4px!important;padding-right:4px!important;overflow:hidden!important}
- #bankroll{font-size:clamp(16px,4vw,23px)!important;font-weight:900!important;letter-spacing:-.65px!important;white-space:nowrap!important;cursor:pointer!important}
- #onTable,#tableAmt{font-size:clamp(14px,3.25vw,20px)!important;font-weight:850!important;white-space:nowrap!important}
- #lastWin,.last-win,.lastWin{position:relative!important;inset:auto!important;transform:none!important;white-space:nowrap!important}
- .history-wrap,.roll-history,.rollHistory,#rollHistory{display:block!important;visibility:visible!important;position:relative!important;min-height:78px!important;height:78px!important;overflow:hidden!important;z-index:25!important;flex:none!important}
- .chip-tray,.chips,.chipbar,.chip-bar{min-height:76px!important;height:auto!important;padding:6px 4px calc(7px + env(safe-area-inset-bottom))!important;gap:3px!important;align-items:flex-start!important;justify-content:space-evenly!important;flex-wrap:nowrap!important;overflow-x:auto!important;overflow-y:hidden!important}
- .chip-tray .chip,.chips .chip,.chipbar .chip,.chip-bar .chip{width:48px!important;height:48px!important;min-width:48px!important;flex:0 0 48px!important;font-size:14px!important;line-height:1!important}
- .chip[data-v="1000"],.chip[data-v="5000"]{font-size:12px!important;letter-spacing:-.4px!important}
- .puck,#puck,.point-puck,.pointPuck{width:36px!important;height:36px!important;min-width:36px!important;min-height:36px!important;font-size:9px!important;z-index:12!important;pointer-events:none!important}
+
+/* V64 - actual iPhone selectors */
+@media (orientation:portrait) and (max-width:700px){
+  body{padding-bottom:116px!important}
+
+  /* Actual top stats container */
+  .topbar>div:first-child{
+    display:grid!important;
+    grid-template-columns:minmax(0,2.05fr) minmax(0,1.18fr) minmax(0,.72fr) minmax(0,.95fr) minmax(0,.88fr)!important;
+    gap:7px!important;
+    width:calc(100% - 112px)!important;
+    padding-right:0!important;
+  }
+  .topbar .stat{
+    min-width:0!important;
+    overflow:hidden!important;
+    font-size:10px!important;
+    line-height:1.05!important;
+  }
+  .topbar .stat b{
+    margin-top:3px!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:clip!important;
+  }
+  #bankroll{
+    font-size:20px!important;
+    letter-spacing:-.55px!important;
+    cursor:pointer!important;
+  }
+  #tableAmt{font-size:17px!important;letter-spacing:-.45px!important}
+  #point{font-size:18px!important}
+
+  /* SAVE is redundant on phone; Last Win owns this fixed top-right space. */
+  .save-stat{display:none!important}
+  #lastWinHud{
+    position:absolute!important;
+    top:78px!important;
+    right:10px!important;
+    min-width:100px!important;
+    z-index:90!important;
+  }
+
+  /* Actual history bar + history circles */
+  .roll-history-bar{
+    position:fixed!important;
+    left:0!important;right:0!important;
+    bottom:58px!important;
+    height:62px!important;
+    min-height:62px!important;
+    box-sizing:border-box!important;
+    padding:5px 8px 5px!important;
+    z-index:69!important;
+    overflow:hidden!important;
+  }
+  .roll-history-head{
+    display:flex!important;
+    justify-content:center!important;
+    gap:10px!important;
+    margin-bottom:4px!important;
+  }
+  .roll-history-main,.roll-history-direction{
+    font-size:8px!important;
+  }
+  #rollHistory.roll-history{
+    display:flex!important;
+    visibility:visible!important;
+    height:31px!important;
+    min-height:31px!important;
+    gap:4px!important;
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+    padding:0 1px 1px!important;
+  }
+  .history-roll{
+    width:27px!important;height:27px!important;
+    flex:0 0 27px!important;
+    font-size:10px!important;
+    border-width:2px!important;
+  }
+
+  /* Actual bottom tray; all 8 chips on one row */
+  #chiptray.chiptray{
+    position:fixed!important;
+    left:0!important;right:0!important;bottom:0!important;
+    height:58px!important;
+    min-height:58px!important;
+    box-sizing:border-box!important;
+    padding:4px 5px max(4px,env(safe-area-inset-bottom))!important;
+    display:flex!important;
+    flex-wrap:nowrap!important;
+    justify-content:space-between!important;
+    align-items:flex-start!important;
+    gap:3px!important;
+    overflow:hidden!important;
+    z-index:70!important;
+  }
+  #chiptray .chip{
+    width:45px!important;height:45px!important;
+    min-width:45px!important;flex:0 0 45px!important;
+    border-width:4px!important;
+    font-size:13px!important;
+  }
+  #chiptray .chip[data-v="1000"],#chiptray .chip[data-v="5000"]{
+    font-size:11px!important;letter-spacing:-.4px!important
+  }
+
+  /* Keep Roll Dice exactly in its pre-V63 location relative to the tray/history. */
+  .roll-float{bottom:155px!important;right:16px!important}
+
+  /* Actual point puck: smaller and pushed high inside the number box. */
+  .point-puck-anchor{width:22px!important;height:22px!important}
+  .point-puck-anchor .point-puck{
+    width:24px!important;height:24px!important;
+    min-width:24px!important;min-height:24px!important;
+    font-size:6px!important;
+    transform:translateY(-25px) scale(.78)!important;
+  }
+  #pointPuckDock .point-puck{
+    width:26px!important;height:26px!important;
+    min-width:26px!important;min-height:26px!important;
+    font-size:7px!important;
+  }
 }
 </style>
 </head>
@@ -1358,7 +1469,7 @@ function totalBets(){
    +passOdds;
 }
 function render(){
- $('#bankroll').textContent=money(bankroll);
+ $('#bankroll').textContent=money(bankroll); v64FormatBankroll();
  $('#tableAmt').textContent=money(totalBets());
  $('#point').textContent=point??'OFF';
  renderPointPuck();
@@ -2236,25 +2347,22 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
   navigator.serviceWorker.register('./sw.js').catch(()=>{});
 }
 
-let bankrollExactVisible=false;
-function v63Bankroll(){
- const e=document.getElementById('bankroll'); if(!e)return;
+
+
+let v64BankrollExact=false;
+function v64FormatBankroll(){
+ const el=document.getElementById('bankroll');
+ if(!el)return;
  const v=Number(bankroll)||0;
- const txt=bankrollExactVisible
-  ? v.toLocaleString(undefined,{style:'currency',currency:'USD',minimumFractionDigits:2,maximumFractionDigits:2})
-  : '$'+Math.trunc(v).toLocaleString();
- if(e.textContent!==txt)e.textContent=txt;
+ el.textContent=v64BankrollExact
+   ? v.toLocaleString(undefined,{style:'currency',currency:'USD',minimumFractionDigits:2,maximumFractionDigits:2})
+   : '$'+Math.trunc(v).toLocaleString();
 }
-document.addEventListener('click',e=>{
- if(e.target.closest&&e.target.closest('#bankroll')){
-   bankrollExactVisible=!bankrollExactVisible; v63Bankroll();
+document.addEventListener('click',function(e){
+ if(e.target && e.target.id==='bankroll'){
+   v64BankrollExact=!v64BankrollExact;
+   v64FormatBankroll();
  }
-});
-document.addEventListener('DOMContentLoaded',()=>{
- const e=document.getElementById('bankroll'); if(!e)return;
- const o=new MutationObserver(()=>v63Bankroll());
- o.observe(e,{childList:true,characterData:true,subtree:true});
- v63Bankroll();
 });
 </script>
 </body>
