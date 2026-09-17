@@ -1132,14 +1132,73 @@ body{
     text-align:center!important;
   }
 }
+
+/* V67: Last Win is part of the stats row — no floating/clipping */
+@media (orientation:portrait) and (max-width:700px){
+  .topbar{
+    display:block!important;
+    padding:9px 10px!important;
+  }
+  .topbar>div:first-child{
+    display:grid!important;
+    grid-template-columns:
+      minmax(0,1.85fr)
+      minmax(0,1.10fr)
+      minmax(0,.72fr)
+      minmax(0,.92fr)
+      minmax(0,.86fr)
+      minmax(0,1.12fr)!important;
+    gap:5px!important;
+    width:100%!important;
+    padding:0!important;
+  }
+  .topbar .stat{
+    min-width:0!important;
+    overflow:hidden!important;
+    font-size:9px!important;
+    line-height:1.05!important;
+  }
+  .topbar .stat b{
+    display:block!important;
+    margin-top:4px!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:clip!important;
+  }
+  #bankroll{
+    font-size:18px!important;
+    letter-spacing:-.7px!important;
+  }
+  #tableAmt{font-size:16px!important;letter-spacing:-.5px!important}
+  #point{font-size:17px!important}
+  .last-win-stat{
+    display:block!important;
+    color:#d7b866!important;
+    text-align:center!important;
+    border:1px solid #c99b35!important;
+    border-radius:8px!important;
+    padding:4px 3px!important;
+    background:#101010!important;
+  }
+  #lastWinDisplay{
+    font-size:14px!important;
+    letter-spacing:-.45px!important;
+    color:#fff!important;
+    text-align:center!important;
+  }
+
+  /* Controls remain below the full stats row. */
+  .topbar .controls{
+    width:100%!important;
+    margin-top:9px!important;
+  }
+
+  /* Kill all legacy floating-HUD positioning if cached CSS survives. */
+  #lastWinHud{display:none!important}
+}
 </style>
 </head>
 <body>
-<div id="lastWinHud" style="position:fixed;right:10px;top:78px;z-index:45;background:#101010;border:1px solid #c99b35;border-radius:10px;padding:6px 10px;text-align:center;box-shadow:0 3px 12px #0008;min-width:92px">
-  <div style="font-size:10px;letter-spacing:1.5px;color:#d7b866;font-weight:800">LAST WIN</div>
-  <div id="lastWinDisplay" style="font-size:18px;font-weight:900;color:#fff">$0.00</div>
-</div>
-
 <nav class="game-switcher" aria-label="Casino games">
   <a class="active" href="./index.html">🎲 CRAPS</a>
   <a class="" href="./slots.html">🎰 SLOTS</a>
@@ -1199,7 +1258,7 @@ body{
     <div class="stat">POINT<b id="point">OFF</b></div>
     <div class="stat">CURRENT STREAK<b id="streak">0</b></div>
     <div class="stat">LAST STREAK<b id="lastStreak">0</b></div>
-    <div class="stat save-stat">SAVE<b id="saveStatus">READY</b></div>
+    <div class="stat last-win-stat">LAST WIN<b id="lastWinDisplay">$0.00</b></div>
   </div>
   <div class="controls">
     <div class="bets-toggle">
