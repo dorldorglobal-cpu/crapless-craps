@@ -176,7 +176,7 @@ button{font:inherit}
 .chip.sel{outline:4px solid #ffd862;transform:translateY(-3px)}
 .c1{background:#eee;color:#111}.c5{background:#d2222d;color:#fff}
 .c10{background:#1469be;color:white}.c25{background:#188c4b;color:#fff}
-.c100{background:#111;color:#fff}.c500{background:#7a2ca6;color:#fff}.c1000{background:#f28a00;color:#fff}
+.c100{background:#111;color:#fff}.c500{background:#7a2ca6;color:#fff}.c1000{background:#f28a00;color:#fff}.c5000{background:#0f7894;color:#fff}
 .bets-toggle{display:flex;gap:4px}
 .onoff{font-size:12px;padding:7px 10px}
 .legend{font-size:10px;color:#ddd;text-align:center;margin-top:5px}
@@ -590,7 +590,7 @@ body{
 .grabbed-chip.c10{background:#1469be;color:#fff;border-color:#fff}
 .grabbed-chip.c25{background:#188c4b;color:#fff;border-color:#fff}
 .grabbed-chip.c100{background:#111;color:#fff;border-color:#fff}
-.grabbed-chip.c500{background:#7a2ca6;color:#fff;border-color:#fff}.grabbed-chip.c1000{background:#f28a00;color:#fff;border-color:#fff}
+.grabbed-chip.c500{background:#7a2ca6;color:#fff;border-color:#fff}.grabbed-chip.c1000{background:#f28a00;color:#fff;border-color:#fff}.grabbed-chip.c5000{background:#0f7894;color:#fff;border-color:#fff}
 
 .remove-drop-zone{
   position:fixed;
@@ -664,7 +664,7 @@ body{
 .stack-chip.c10{background:#1768b5;color:#fff}
 .stack-chip.c25{background:#18884a;color:#fff}
 .stack-chip.c100{background:#161616;color:#fff}
-.stack-chip.c500{background:#742c99;color:#fff}.stack-chip.c1000{background:#f28a00;color:#fff}
+.stack-chip.c500{background:#742c99;color:#fff}.stack-chip.c1000{background:#f28a00;color:#fff}.stack-chip.c5000{background:#0f7894;color:#fff}.c5000{background:#0f7894;color:#fff}
 .stack-chip.total-chip{
   width:25px;height:25px;
   font-size:6px;
@@ -895,7 +895,7 @@ body{
 }
 
 
-.chip[data-v="100"],.chip[data-v="500"],.chip[data-v="1000"]{font-size:11px!important;letter-spacing:-.8px!important}
+.chip[data-v="100"],.chip[data-v="500"],.chip[data-v="1000"],.chip[data-v="5000"]{font-size:11px!important;letter-spacing:-.8px!important}
 
 /* V58: keep large bankroll from overlapping ON TABLE */
 .stats>div,.stats .stat{min-width:0;overflow:hidden}
@@ -912,6 +912,51 @@ body{
  .stats{grid-template-columns:1.55fr .92fr .68fr .78fr .78fr 1.02fr!important;gap:4px!important}
  #bankroll{display:block!important;width:100%!important;max-width:100%!important;font-size:clamp(13px,3.25vw,21px)!important;letter-spacing:-.8px!important;white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important}
  #onTable{font-size:clamp(14px,3.25vw,21px)!important;white-space:nowrap!important}
+}
+
+/* V60 iPhone HUD readability */
+@media(max-width:700px){
+  .topstats,.stats{
+    grid-template-columns:minmax(0,1.65fr) minmax(0,1.10fr) minmax(0,.68fr) minmax(0,.78fr) minmax(0,.78fr) minmax(0,1.02fr)!important;
+    gap:3px!important;
+  }
+  .stats .stat{padding:4px 3px!important;overflow:visible!important}
+  .stats .stat{font-size:clamp(9px,2.35vw,12px)!important}
+  #bankroll,#tableAmt{
+    width:100%!important;
+    max-width:100%!important;
+    white-space:nowrap!important;
+    overflow:visible!important;
+    text-overflow:clip!important;
+    font-weight:900!important;
+    line-height:1.08!important;
+    letter-spacing:-.65px!important;
+  }
+  #bankroll{font-size:clamp(15px,3.65vw,22px)!important}
+  #tableAmt{font-size:clamp(14px,3.45vw,21px)!important}
+  .chip[data-v="1000"],.chip[data-v="5000"]{font-size:13px!important;letter-spacing:-.3px!important}
+}
+
+/* V62 iPhone: keep BETS ON/OFF controls away from number chips */
+@media(max-width:700px){
+  #betsOn,#betsOff{
+    position:relative!important;
+    inset:auto!important;
+    transform:none!important;
+    z-index:20!important;
+  }
+  .work-controls,.bets-work,.bets-toggle{
+    position:relative!important;
+    inset:auto!important;
+    transform:none!important;
+    z-index:20!important;
+    display:flex!important;
+    justify-content:center!important;
+    gap:8px!important;
+    margin:6px auto 4px!important;
+    width:100%!important;
+    pointer-events:auto!important;
+  }
 }
 </style>
 </head>
@@ -1193,8 +1238,8 @@ body{
 
 <script>
 (()=>{
-const chips=[1,5,10,25,100,500,1000];
-const chipClasses={1:'c1',5:'c5',10:'c10',25:'c25',100:'c100',500:'c500',1000:'c1000'};
+const chips=[1,5,10,25,100,500,1000,5000];
+const chipClasses={1:'c1',5:'c5',10:'c10',25:'c25',100:'c100',500:'c500',1000:'c1000',5000:'c5000'};
 let selected=5, bankroll=1000, bets={}, point=null, betsWorking=true, history=[];
 let rollWin=0;
 let lastResolvedWin=0;
@@ -1413,7 +1458,7 @@ function renderATSHighlights(){
 }
 
 
-const CHIP_DENOMS=[1000,500,100,25,10,5,1];
+const CHIP_DENOMS=[5000,1000,500,100,25,10,5,1];
 function chipClassForValue(v){
  return ({1:'c1',5:'c5',10:'c10',25:'c25',100:'c100',500:'c500',1000:'c1000'})[v]||'c1';
 }
@@ -2098,7 +2143,7 @@ function roll(){
 }
 chips.forEach(v=>{
  const b=document.createElement('button');b.className=`chip ${chipClasses[v]} ${v===selected?'sel':''}`;
- b.textContent=v===1000?'$1K':'$'+v;b.onclick=()=>{selected=v;document.querySelectorAll('.chip').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');scheduleSave()};
+ b.textContent=v===1000?'$1K':v===5000?'$5K':'$'+v;b.onclick=()=>{selected=v;document.querySelectorAll('.chip').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');scheduleSave()};
  $('#chiptray').appendChild(b);
 });
 $('#roll').onclick=roll;
