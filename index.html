@@ -1196,6 +1196,11 @@ body{
   /* Kill all legacy floating-HUD positioning if cached CSS survives. */
   #lastWinHud{display:none!important}
 }
+
+@media (orientation:portrait) and (max-width:700px){
+ .last-win-stat[data-mode="cycle"]{font-size:8px!important}
+ .last-win-stat{cursor:pointer!important}
+}
 </style>
 </head>
 <body>
@@ -2374,8 +2379,24 @@ function roll(){
       rollStreak++;
     }
 
-    history.push(total);
+    
+  // V69: accumulate gross winning profit between sevens.
+  // A 7 closes the current cycle; its own winning payouts are included,
+  // then the next roll begins a fresh cycle.
+  sevenToSevenGross += Math.max(0, Number(rollWin)||0);
+  if(total===7){
+    // preserve completed 7→7 total until the next non-7 roll starts the next cycle
+    window._completedSevenToSeven = sevenToSevenGross;
+  } else if(window._completedSevenToSeven!==undefined){
+    sevenToSevenGross = Math.max(0, Number(rollWin)||0);
+    delete window._completedSevenToSeven;
+  }
+history.push(total);
     render();
+  if(sevenToSevenDisplay){
+    const _lw=document.getElementById('lastWinDisplay');
+    if(_lw)_lw.textContent=money(sevenToSevenGross);
+  }
     if(rollWin<=0){lastResolvedWin=0;const lw=$('#lastWinDisplay');if(lw)lw.textContent=money(0);}showWinOverlay();
     rb.disabled=false;
     if(shouldAskPassOdds)setTimeout(()=>showPassOddsPrompt(total),450);
@@ -2503,6 +2524,36 @@ document.addEventListener('click',function(e){
   }else{
     const n=Number(String(exact).replace(/[^0-9.-]/g,''));
     el.textContent=Number.isFinite(n)?'$'+Math.trunc(n).toLocaleString():exact;
+  }
+});
+
+let sevenToSevenGross=0;
+let sevenToSevenDisplay=false;
+function updateLastWinHud(){
+  const el=document.getElementById('lastWinDisplay');
+  if(!el)return;
+  const stat=el.closest('.last-win-stat');
+  const label=stat?stat.childNodes[0]:null;
+  if(sevenToSevenDisplay){
+    if(stat) stat.setAttribute('data-mode','cycle');
+    el.textContent=money(sevenToSevenGross);
+  }else{
+    if(stat) stat.setAttribute('data-mode','last');
+    // existing render owns the normal LAST WIN value
+  }
+}
+document.addEventListener('click',function(e){
+  const stat=e.target.closest&&e.target.closest('.last-win-stat');
+  if(!stat)return;
+  sevenToSevenDisplay=!sevenToSevenDisplay;
+  const el=document.getElementById('lastWinDisplay');
+  if(sevenToSevenDisplay){
+    stat.dataset.originalLabel='LAST WIN';
+    stat.firstChild.nodeValue='7→7 TOTAL';
+    if(el)el.textContent=money(sevenToSevenGross);
+  }else{
+    stat.firstChild.nodeValue='LAST WIN';
+    render();
   }
 });
 </script>
