@@ -1,8 +1,9 @@
-V67
-- LAST WIN is no longer a floating box.
-- LAST WIN is now the sixth item inside the actual top stats row, replacing SAVE on iPhone/desktop.
-- This structurally prevents the top-right clipping seen in V66.
-- Bankroll, On Table, Point, Current Streak, Last Streak and Last Win all share one stable row.
-- V65/V64 bottom chip and Roll History fixes retained.
-- Roll Dice unchanged.
+V68
+- Fixes Bankroll display turning to $0 when tapped.
+- Tap no longer recalculates the bankroll from game state.
+- Render stores the already-correct exact bankroll string.
+- Normal view shows whole dollars; tap shows the stored exact amount with cents; tap again returns to whole dollars.
+- Bankroll balance itself is never changed by this display toggle.
+- V67 Last Win structural fix retained.
+- V65/V64 iPhone chip/history layout retained.
 - Slots and Blackjack unchanged.

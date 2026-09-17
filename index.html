@@ -1599,7 +1599,17 @@ function totalBets(){
    +passOdds;
 }
 function render(){
- $('#bankroll').textContent=money(bankroll); v64FormatBankroll();
+ {
+      const _be=$('#bankroll');
+      const _exact=money(bankroll);
+      _be.dataset.exact=_exact;
+      if(_be.dataset.showExact==='1'){
+        _be.textContent=_exact;
+      }else{
+        const _n=Number(String(_exact).replace(/[^0-9.-]/g,''));
+        _be.textContent=Number.isFinite(_n)?'$'+Math.trunc(_n).toLocaleString():_exact;
+      }
+    }
  $('#tableAmt').textContent=money(totalBets());
  $('#point').textContent=point??'OFF';
  renderPointPuck();
@@ -2479,20 +2489,21 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
 
 
 
-let v64BankrollExact=false;
-function v64FormatBankroll(){
- const el=document.getElementById('bankroll');
- if(!el)return;
- const v=Number(bankroll)||0;
- el.textContent=v64BankrollExact
-   ? v.toLocaleString(undefined,{style:'currency',currency:'USD',minimumFractionDigits:2,maximumFractionDigits:2})
-   : '$'+Math.trunc(v).toLocaleString();
-}
+
+
 document.addEventListener('click',function(e){
- if(e.target && e.target.id==='bankroll'){
-   v64BankrollExact=!v64BankrollExact;
-   v64FormatBankroll();
- }
+  const el=e.target.closest&&e.target.closest('#bankroll');
+  if(!el)return;
+  const exact=el.dataset.exact;
+  if(!exact)return;
+  const show=el.dataset.showExact!=='1';
+  el.dataset.showExact=show?'1':'0';
+  if(show){
+    el.textContent=exact;
+  }else{
+    const n=Number(String(exact).replace(/[^0-9.-]/g,''));
+    el.textContent=Number.isFinite(n)?'$'+Math.trunc(n).toLocaleString():exact;
+  }
 });
 </script>
 </body>
