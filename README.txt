@@ -1,10 +1,10 @@
-V71
+V72
 CRAPS
-- Fixes LAST WIN ↔ 7→7 TOTAL toggle.
-- LAST WIN now has its own dedicated most-recent-roll value.
-- Tap once: shows cumulative 7→7 TOTAL.
-- Tap again: reliably restores the most recent roll's LAST WIN, not the cumulative total.
-- Whole-dollar display and enlarged Last Win box retained.
-- All V70/V68 iPhone and bankroll fixes retained.
+- Fixes the iPhone SWIPE DOWN TO REMOVE overlay getting stuck over the chip tray.
+- Drag cleanup now runs on touch cancel, pointer cancel, app/background visibility changes, blur, page hide, and orientation changes.
+- Cleanup also clears any stale faded chip or drag highlight.
+- ON/OFF point puck moved to the upper-right of the active number box so it does not cover the wager chip/amount.
+- V71 Last Win / 7-to-7 toggle retained.
+- Existing bankroll, roll history, compact chip tray and Roll Dice layout retained.
 - Slots and Blackjack unchanged.
-PWA cache: crapless-casino-v71
+PWA cache: crapless-casino-v72

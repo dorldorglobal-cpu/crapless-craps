@@ -1234,6 +1234,26 @@ body{
    font-size:8px!important;
  }
 }
+
+/* V72: iPhone drag cleanup + non-overlapping point puck */
+@media (orientation:portrait) and (max-width:700px){
+ .point-puck-anchor{
+   left:auto!important;
+   right:5px!important;
+   top:5px!important;
+   width:22px!important;
+   height:22px!important;
+   transform:none!important;
+ }
+ .point-puck-anchor .point-puck{
+   width:22px!important;
+   height:22px!important;
+   min-width:22px!important;
+   min-height:22px!important;
+   font-size:6px!important;
+   transform:none!important;
+ }
+}
 </style>
 </head>
 <body>
@@ -1953,11 +1973,12 @@ function endChipGrab(touch){
  render();
 }
 function cancelChipGrab(){
- if(!chipDragState) return;
- chipDragState.sourceEl.classList.remove('chip-grab-source');
+ if(chipDragState?.sourceEl) chipDragState.sourceEl.classList.remove('chip-grab-source');
+ document.querySelectorAll('.chip-grab-source').forEach(el=>el.classList.remove('chip-grab-source'));
  document.querySelectorAll('.drag-target-hot').forEach(el=>el.classList.remove('drag-target-hot'));
- $('#grabbedChip').className='grabbed-chip';
- $('#removeDropZone').classList.remove('show','hot');
+ const ghost=$('#grabbedChip'); if(ghost) ghost.className='grabbed-chip';
+ const rz=$('#removeDropZone'); if(rz) rz.classList.remove('show','hot');
+ const dz=$('#deleteZone'); if(dz) dz.classList.remove('show');
  chipDragState=null;
 }
 
@@ -2585,6 +2606,21 @@ document.addEventListener('click',function(e){
     if(el)el.textContent='$'+Math.round(v71LastRollWin).toLocaleString();
   }
 });
+
+function v72ClearStuckChipDrag(){
+  cancelChipGrab();
+  document.querySelectorAll('.dragging-chip').forEach(el=>el.classList.remove('dragging-chip'));
+  const rz=document.getElementById('removeDropZone');
+  if(rz)rz.classList.remove('show','hot');
+  const dz=document.getElementById('deleteZone');
+  if(dz)dz.classList.remove('show');
+}
+document.addEventListener('touchcancel',v72ClearStuckChipDrag,{passive:true,capture:true});
+document.addEventListener('pointercancel',v72ClearStuckChipDrag,true);
+window.addEventListener('blur',v72ClearStuckChipDrag);
+window.addEventListener('pagehide',v72ClearStuckChipDrag);
+window.addEventListener('orientationchange',v72ClearStuckChipDrag);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)v72ClearStuckChipDrag();});
 </script>
 </body>
 </html>
